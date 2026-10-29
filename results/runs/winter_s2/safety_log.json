@@ -1,0 +1,174 @@
+[
+ {
+  "seq": 0,
+  "t": 720.475,
+  "kind": "stop",
+  "data": {
+   "state": "PROTECTIVE_STOP",
+   "cause": "REMOTE_LINK",
+   "age": 0.525
+  },
+  "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+  "hash": "5b8dadf6704c119a9e0bb49b70229dd407a6d99ab0c8933bdc97d7854e12d885"
+ },
+ {
+  "seq": 1,
+  "t": 720.6,
+  "kind": "stop",
+  "data": {
+   "state": "PROTECTIVE_STOP",
+   "cause": "FIELD_SIDE",
+   "field": "fwd_0.5_S",
+   "v": 0.2
+  },
+  "prev": "5b8dadf6704c119a9e0bb49b70229dd407a6d99ab0c8933bdc97d7854e12d885",
+  "hash": "4448641f5f2781b80fdf0e4df80ade3e7ef679329b70225f7cb5089c82f24783"
+ },
+ {
+  "seq": 2,
+  "t": 748.65,
+  "kind": "recovery",
+  "data": {
+   "fields": "FIELD_SIDE"
+  },
+  "prev": "4448641f5f2781b80fdf0e4df80ade3e7ef679329b70225f7cb5089c82f24783",
+  "hash": "d5644dd790b7bca6caaec579870563c43a05084fb1940d113934ec0e32de2d9b"
+ },
+ {
+  "seq": 3,
+  "t": 748.65,
+  "kind": "reset",
+  "data": {
+   "by": "supervisor",
+   "cleared": "FIELD_SIDE|REMOTE_LINK"
+  },
+  "prev": "d5644dd790b7bca6caaec579870563c43a05084fb1940d113934ec0e32de2d9b",
+  "hash": "c85e691669ac43283f7a67dd94d625aa436278467233421b8e67f4a28de5385a"
+ },
+ {
+  "seq": 4,
+  "t": 748.9,
+  "kind": "stop",
+  "data": {
+   "state": "PROTECTIVE_STOP",
+   "cause": "FIELD_SIDE",
+   "field": "standstill",
+   "v": -0.1
+  },
+  "prev": "c85e691669ac43283f7a67dd94d625aa436278467233421b8e67f4a28de5385a",
+  "hash": "fea1db094a69750643416d8dfa99ff46c6e6b3ca8a0cc076d3dd4e48a079ee74"
+ },
+ {
+  "seq": 5,
+  "t": 751.7,
+  "kind": "recovery",
+  "data": {
+   "fields": "FIELD_SIDE"
+  },
+  "prev": "fea1db094a69750643416d8dfa99ff46c6e6b3ca8a0cc076d3dd4e48a079ee74",
+  "hash": "31c3bedf76de50890c6498f91d772b0515cfc0cfac8380338698dc0bf94f84a1"
+ },
+ {
+  "seq": 6,
+  "t": 751.7,
+  "kind": "reset",
+  "data": {
+   "by": "supervisor",
+   "cleared": "FIELD_SIDE"
+  },
+  "prev": "31c3bedf76de50890c6498f91d772b0515cfc0cfac8380338698dc0bf94f84a1",
+  "hash": "9ef28205cf54e099ab1020981cc7891825532e8e55bd9216a3c746130f5e2aa3"
+ },
+ {
+  "seq": 7,
+  "t": 1167.5,
+  "kind": "stop",
+  "data": {
+   "state": "PROTECTIVE_STOP",
+   "cause": "FIELD_FRONT",
+   "field": "fwd_1.5_R2",
+   "v": 0.99
+  },
+  "prev": "9ef28205cf54e099ab1020981cc7891825532e8e55bd9216a3c746130f5e2aa3",
+  "hash": "1dcf9a0e35ee87c58517341c453945d3ae7f9a1dfb2da0e4af0bbcd8dd594df6"
+ },
+ {
+  "seq": 8,
+  "t": 1193.1,
+  "kind": "reset",
+  "data": {
+   "by": "supervisor",
+   "cleared": "FIELD_FRONT"
+  },
+  "prev": "1dcf9a0e35ee87c58517341c453945d3ae7f9a1dfb2da0e4af0bbcd8dd594df6",
+  "hash": "e6fe61e59317053fa6d81826507c9b470dffa7157ea3479e5fda2f53f137ed23"
+ },
+ {
+  "seq": 9,
+  "t": 2880.2,
+  "kind": "stop",
+  "data": {
+   "state": "PROTECTIVE_STOP",
+   "cause": "WATCHDOG",
+   "age": 0.2
+  },
+  "prev": "e6fe61e59317053fa6d81826507c9b470dffa7157ea3479e5fda2f53f137ed23",
+  "hash": "9677085fbc9d7287987c262be6f24f34ca5ff0b10be92fc9c115b7f5c297d84e"
+ },
+ {
+  "seq": 10,
+  "t": 2880.95,
+  "kind": "stop",
+  "data": {
+   "state": "PROTECTIVE_STOP",
+   "cause": "FIELD_FRONT",
+   "field": "standstill",
+   "v": 0.02
+  },
+  "prev": "9677085fbc9d7287987c262be6f24f34ca5ff0b10be92fc9c115b7f5c297d84e",
+  "hash": "b33fe8d2c4cbc65539c2ecf764c8565ec1cf6a77cdc58fcd5cd38e38dfec273e"
+ },
+ {
+  "seq": 11,
+  "t": 2916.1,
+  "kind": "recovery",
+  "data": {
+   "fields": "FIELD_FRONT"
+  },
+  "prev": "b33fe8d2c4cbc65539c2ecf764c8565ec1cf6a77cdc58fcd5cd38e38dfec273e",
+  "hash": "6aa406b3ac7dcef99e40c3775e265e297027ade1bd49646d7c44b4296447f91f"
+ },
+ {
+  "seq": 12,
+  "t": 2916.1,
+  "kind": "reset",
+  "data": {
+   "by": "supervisor",
+   "cleared": "FIELD_FRONT|WATCHDOG"
+  },
+  "prev": "6aa406b3ac7dcef99e40c3775e265e297027ade1bd49646d7c44b4296447f91f",
+  "hash": "cb7728ef4ddb78c077aef2e4c258e76f6519767caca5ea681572933773d1c87b"
+ },
+ {
+  "seq": 13,
+  "t": 3240.0,
+  "kind": "stop",
+  "data": {
+   "state": "EMERGENCY_STOP",
+   "cause": "ESTOP_REMOTE"
+  },
+  "prev": "cb7728ef4ddb78c077aef2e4c258e76f6519767caca5ea681572933773d1c87b",
+  "hash": "ffe26e8860e8c9522779b4df40195db4786f3e55b72208618741b7a126533d10"
+ },
+ {
+  "seq": 14,
+  "t": 3259.35,
+  "kind": "reset",
+  "data": {
+   "by": "supervisor",
+   "cleared": "ESTOP_REMOTE"
+  },
+  "prev": "ffe26e8860e8c9522779b4df40195db4786f3e55b72208618741b7a126533d10",
+  "hash": "4b5686d1aaa968b3ecc1de49faa7c15c55b47e981cea986473c697b83ef557b3"
+ }
+]

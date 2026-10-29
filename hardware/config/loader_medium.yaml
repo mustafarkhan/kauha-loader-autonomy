@@ -1,0 +1,47 @@
+# KAUHA reference machine: medium wheel loader (< 24 t, ISO 19014-5 Annex H class).
+# Values are representative of the class and are assumptions until replaced by
+# measurements from the partner machine. Units: SI (m, s, rad, kg, N, m^3).
+
+machine:
+  name: reference-medium-loader
+  operating_mass_kg: 15500
+  # Articulated frame: distances from the articulation joint to each axle.
+  front_axle_to_joint_m: 1.60
+  rear_axle_to_joint_m: 1.60
+  track_width_m: 2.10
+  body_length_m: 7.8
+  body_width_m: 2.55
+  max_articulation_rad: 0.698        # 40 deg; most loaders are 35-40 deg
+  articulation_rate_rad_s: 0.35      # ~20 deg/s steering rate
+  max_speed_m_s: 5.5                 # ~20 km/h gear 2 (site limit applied separately)
+  max_accel_m_s2: 1.2
+  service_brake_decel_m_s2: 2.5      # loaded, gravel surface (conservative)
+  actuator_latency_s: 0.12           # pilot valve + hydraulics response
+  traction_coefficient: 0.55         # tyre / gravel
+
+bucket:
+  rated_volume_m3: 3.0
+  width_m: 2.70
+  # Side-view linkage, simplified to boom + bucket rotation.
+  boom_pivot_forward_m: 0.90         # ahead of front axle
+  boom_pivot_height_m: 1.95
+  boom_length_m: 2.95
+  bucket_length_m: 1.30
+  boom_min_rad: -0.62                # bucket on ground
+  boom_max_rad: 0.95                 # full raise (dump height ~3.5 m)
+  boom_rate_rad_s: 0.27              # full raise in ~5.8 s (6-7 s typical)
+  bucket_min_rad: -0.75              # dumped
+  bucket_max_rad: 0.85               # rolled back (racked)
+  bucket_rate_rad_s: 0.55
+  breakout_force_n: 140000          # typical for the class
+
+materials:   # loose bulk density and resistance coefficient for the FEE-style model
+  sand:          {density_t_m3: 1.60, k_resist: 1.00, friction_deg: 33}
+  gravel:        {density_t_m3: 1.75, k_resist: 1.35, friction_deg: 36}
+  crushed_rock:  {density_t_m3: 1.60, k_resist: 2.10, friction_deg: 42}
+  wood_chips:    {density_t_m3: 0.35, k_resist: 0.45, friction_deg: 40}
+
+site_limits:
+  auto_max_speed_m_s: 3.0
+  warning_field_speed_m_s: 1.0
+  teleop_max_speed_m_s: 3.0

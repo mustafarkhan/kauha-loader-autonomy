@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.hypothesis/
+*.egg-info/
+/runs/
+logs/
+models/*.ckpt.npz
+results/**/replay.json
+results/shift_*/
+.venv/

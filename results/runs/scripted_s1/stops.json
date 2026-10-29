@@ -1,0 +1,44 @@
+[
+ {
+  "t": 720.48,
+  "cause": "REMOTE_LINK",
+  "v": 3.0,
+  "objects": [],
+  "field": "fwd_3.0_R1"
+ },
+ {
+  "t": 1162.2,
+  "cause": "FIELD_FRONT",
+  "v": 1.0,
+  "objects": [],
+  "field": "fwd_1.5_R2",
+  "false": true
+ },
+ {
+  "t": 1252.5,
+  "cause": "FIELD_FRONT",
+  "v": 0.95,
+  "objects": [
+   "pile_A"
+  ],
+  "field": "fwd_1.5_S",
+  "false": false
+ },
+ {
+  "t": 2545.65,
+  "cause": "FIELD_FRONT",
+  "v": 0.55,
+  "objects": [
+   "driver"
+  ],
+  "field": "dock",
+  "false": false
+ },
+ {
+  "t": 2880.2,
+  "cause": "WATCHDOG",
+  "v": 0.0,
+  "objects": [],
+  "field": "dig"
+ }
+]

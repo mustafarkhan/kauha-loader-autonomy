@@ -1,0 +1,77 @@
+[
+ {
+  "t": 395.88,
+  "cause": "FIELD_SIDE",
+  "v": -0.06,
+  "objects": [
+   "truck"
+  ],
+  "field": "standstill",
+  "false": false
+ },
+ {
+  "t": 720.48,
+  "cause": "REMOTE_LINK",
+  "v": 0.0,
+  "objects": [],
+  "field": "dock"
+ },
+ {
+  "t": 1127.1,
+  "cause": "FIELD_FRONT",
+  "v": 1.0,
+  "objects": [
+   "fallen_block"
+  ],
+  "field": "fwd_1.5_R2",
+  "false": false
+ },
+ {
+  "t": 1218.85,
+  "cause": "FIELD_FRONT",
+  "v": 0.95,
+  "objects": [
+   "pile_A"
+  ],
+  "field": "fwd_1.5_S",
+  "false": false
+ },
+ {
+  "t": 1620.9,
+  "cause": "FIELD_REAR",
+  "v": -2.3,
+  "objects": [],
+  "field": "rev_2.5_L1",
+  "false": true
+ },
+ {
+  "t": 1701.35,
+  "cause": "FIELD_REAR",
+  "v": -2.24,
+  "objects": [],
+  "field": "rev_2.5_R1",
+  "false": true
+ },
+ {
+  "t": 2557.3,
+  "cause": "FIELD_SIDE",
+  "v": 0.55,
+  "objects": [],
+  "field": "dock",
+  "false": true
+ },
+ {
+  "t": 2880.2,
+  "cause": "WATCHDOG",
+  "v": 3.0,
+  "objects": [],
+  "field": "fwd_3.0_L1"
+ },
+ {
+  "t": 3240.0,
+  "cause": "ESTOP_REMOTE",
+  "v": 0.48,
+  "objects": [],
+  "field": "dock"
+ }
+]

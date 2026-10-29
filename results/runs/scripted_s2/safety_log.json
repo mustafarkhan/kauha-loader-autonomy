@@ -1,0 +1,109 @@
+[
+ {
+  "seq": 0,
+  "t": 720.475,
+  "kind": "stop",
+  "data": {
+   "state": "PROTECTIVE_STOP",
+   "cause": "REMOTE_LINK",
+   "age": 0.525
+  },
+  "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+  "hash": "5b8dadf6704c119a9e0bb49b70229dd407a6d99ab0c8933bdc97d7854e12d885"
+ },
+ {
+  "seq": 1,
+  "t": 735.15,
+  "kind": "reset",
+  "data": {
+   "by": "supervisor",
+   "cleared": "REMOTE_LINK"
+  },
+  "prev": "5b8dadf6704c119a9e0bb49b70229dd407a6d99ab0c8933bdc97d7854e12d885",
+  "hash": "9156be69a08abe916c4654070007d9abd34bcfb0b5b54b628942f1bcf713fa9e"
+ },
+ {
+  "seq": 2,
+  "t": 1154.3,
+  "kind": "stop",
+  "data": {
+   "state": "PROTECTIVE_STOP",
+   "cause": "FIELD_FRONT",
+   "field": "fwd_1.5_R2",
+   "v": 1.02
+  },
+  "prev": "9156be69a08abe916c4654070007d9abd34bcfb0b5b54b628942f1bcf713fa9e",
+  "hash": "dab3afd9e83fbd3e28a8985546dc314448f66e69dbfb160423632f0e05e79f6d"
+ },
+ {
+  "seq": 3,
+  "t": 1183.5,
+  "kind": "reset",
+  "data": {
+   "by": "supervisor",
+   "cleared": "FIELD_FRONT"
+  },
+  "prev": "dab3afd9e83fbd3e28a8985546dc314448f66e69dbfb160423632f0e05e79f6d",
+  "hash": "d0c93a15713aad078eebc2e3df61fd52f4016002c3cf0cbc7e9693ce484b413d"
+ },
+ {
+  "seq": 4,
+  "t": 1245.0,
+  "kind": "stop",
+  "data": {
+   "state": "PROTECTIVE_STOP",
+   "cause": "FIELD_FRONT",
+   "field": "fwd_1.5_S",
+   "v": 0.65
+  },
+  "prev": "d0c93a15713aad078eebc2e3df61fd52f4016002c3cf0cbc7e9693ce484b413d",
+  "hash": "275b170bb00c931229c985589ac93d6760529b6452d22ed61a3ee0a6086b186d"
+ },
+ {
+  "seq": 5,
+  "t": 1247.8,
+  "kind": "reset",
+  "data": {
+   "by": "supervisor",
+   "cleared": "FIELD_FRONT"
+  },
+  "prev": "275b170bb00c931229c985589ac93d6760529b6452d22ed61a3ee0a6086b186d",
+  "hash": "d8766756bcb8c9c36a17e37a0e87f854a33f114c3935699743600bdb8b64548a"
+ },
+ {
+  "seq": 6,
+  "t": 2880.2,
+  "kind": "stop",
+  "data": {
+   "state": "PROTECTIVE_STOP",
+   "cause": "WATCHDOG",
+   "age": 0.2
+  },
+  "prev": "d8766756bcb8c9c36a17e37a0e87f854a33f114c3935699743600bdb8b64548a",
+  "hash": "cb417fbe87ed5552eaad1977a0832f5e7e3f5b889614ae2d6350cf805c62971a"
+ },
+ {
+  "seq": 7,
+  "t": 2881.45,
+  "kind": "stop",
+  "data": {
+   "state": "PROTECTIVE_STOP",
+   "cause": "FIELD_SIDE",
+   "field": "standstill",
+   "v": 0.06
+  },
+  "prev": "cb417fbe87ed5552eaad1977a0832f5e7e3f5b889614ae2d6350cf805c62971a",
+  "hash": "9ce74db0c7890dd871ec0ce6d4936085aed00fcec15ce7b300ec885feffcdb3c"
+ },
+ {
+  "seq": 8,
+  "t": 3240.0,
+  "kind": "stop",
+  "data": {
+   "state": "EMERGENCY_STOP",
+   "cause": "ESTOP_REMOTE"
+  },
+  "prev": "9ce74db0c7890dd871ec0ce6d4936085aed00fcec15ce7b300ec885feffcdb3c",
+  "hash": "10b197bd4fbc83d9213602866890f90198fc422d04a994428cbc67cf331b21e4"
+ }
+]

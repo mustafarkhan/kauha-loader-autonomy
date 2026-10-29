@@ -1,0 +1,441 @@
+<title>KAUHA Shift Replay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: site-plan canvas + instrument column on top, timeline strip, then a report body in one reading column */
+:root {
+  --bg: #eef0ea; --panel: #f8f9f5; --ink: #1f2420; --muted: #5d665d; --line: #c9cec3;
+  --machine: #e0a100; --machine-ink: #3a2c00;
+  --run: #2f8a4c; --warn: #d9821e; --stop: #c8322b; --estop: #a1279b; --info: #2c6fae;
+  --pile-a: #b9ad98; --pile-b: #9ea0a3; --zone: rgba(44,111,174,0.10); --dock: rgba(161,39,155,0.08);
+  --grid: rgba(31,36,32,0.07);
+  --display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #161a17; --panel: #1e231f; --ink: #e6e9e2; --muted: #9aa398; --line: #343b35;
+  --machine: #f2b616; --machine-ink: #241a00;
+  --run: #4fb66e; --warn: #eb9a3c; --stop: #ef5a50; --estop: #d063c8; --info: #6aa7e0;
+  --pile-a: #6f6656; --pile-b: #5d6064; --zone: rgba(106,167,224,0.12); --dock: rgba(208,99,200,0.10);
+  --grid: rgba(230,233,226,0.06); color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #161a17; --panel: #1e231f; --ink: #e6e9e2; --muted: #9aa398; --line: #343b35;
+  --machine: #f2b616; --machine-ink: #241a00;
+  --run: #4fb66e; --warn: #eb9a3c; --stop: #ef5a50; --estop: #d063c8; --info: #6aa7e0;
+  --pile-a: #6f6656; --pile-b: #5d6064; --zone: rgba(106,167,224,0.12); --dock: rgba(208,99,200,0.10);
+  --grid: rgba(230,233,226,0.06); color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); margin: 0 }
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 24px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; letter-spacing: 0.01em; text-wrap: balance; margin: 0 }
+h1 { font-size: clamp(30px, 4.4vw, 46px); line-height: 1.02 }
+h2 { font-size: 28px; margin-bottom: 10px }
+h3 { font-size: 20px; margin-bottom: 6px }
+.lede { color: var(--muted); max-width: 70ch; margin: 8px 0 0 }
+.eyebrow { font: 600 12px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted) }
+header { display: flex; justify-content: space-between; align-items: end; gap: 16px; flex-wrap: wrap; margin-bottom: 18px }
+.stage { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 14px }
+@media (max-width: 900px) { .stage { grid-template-columns: minmax(0, 1fr) } }
+.plan { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; position: relative; min-width: 0 }
+canvas#site { width: 100%; height: auto; display: block; aspect-ratio: 77 / 64; max-width: 100% }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 8px 12px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted) }
+.legend i { display: inline-block; width: 12px; height: 12px; vertical-align: -2px; margin-right: 5px; border-radius: 2px }
+.inst { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 12px; min-width: 0 }
+.clock { font: 500 34px/1 var(--mono); font-variant-numeric: tabular-nums }
+.state { font: 700 22px/1 var(--display); letter-spacing: 0.04em; padding: 8px 10px; border-radius: 4px; color: #fff; text-align: center }
+.rows { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 13px }
+.rows dt { color: var(--muted) } .rows dd { margin: 0; text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums }
+.chips { display: flex; gap: 6px; flex-wrap: wrap }
+.chip { font: 500 11px/1 var(--mono); padding: 5px 7px; border-radius: 3px; border: 1px solid var(--line); color: var(--muted) }
+.chip.on { background: var(--stop); color: #fff; border-color: transparent }
+.controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 12px }
+button, select { font: 600 13px var(--body); padding: 7px 12px; border-radius: 4px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer }
+button.primary { background: var(--machine); color: var(--machine-ink); border-color: transparent; min-width: 84px }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--info); outline-offset: 2px }
+.timeline { position: relative; flex: 1 1 320px; min-width: 0 }
+input#scrub { width: 100%; accent-color: var(--machine) }
+canvas#events { width: 100%; height: 34px; display: block }
+.jumps { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px }
+.jumps button { font: 500 12px var(--body); padding: 5px 9px }
+section { margin-top: 48px }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px }
+.scroll { overflow-x: auto }
+table { border-collapse: collapse; width: 100%; font-size: 14px }
+th, td { padding: 7px 10px; border-bottom: 1px solid var(--line); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap }
+th:first-child, td:first-child { text-align: left; white-space: normal }
+thead th { font: 600 12px var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted) }
+.range { color: var(--muted); font-size: 12px; margin-left: 4px }
+td.good { color: var(--run); font-weight: 600 } td.bad { color: var(--stop); font-weight: 600 }
+.note { color: var(--muted); font-size: 13px; max-width: 75ch }
+.bars { display: flex; flex-direction: column; gap: 8px }
+.bar { display: grid; grid-template-columns: 120px minmax(0, 1fr) 64px; gap: 10px; align-items: center; font-size: 13px }
+.track { height: 16px; background: var(--grid); position: relative; border-radius: 2px }
+.fill { position: absolute; inset: 0 auto 0 0; border-radius: 2px }
+.stack { display: flex; height: 30px; border-radius: 3px; overflow: hidden; position: relative }
+.stack span { display: block; height: 100% }
+.bench { position: absolute; top: -6px; bottom: -6px; width: 2px; background: var(--ink) }
+.keys { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--muted); margin-top: 8px }
+.keys i { display: inline-block; width: 10px; height: 10px; margin-right: 5px; border-radius: 2px; vertical-align: -1px }
+ul.plain { padding-left: 18px; margin: 6px 0 } ul.plain li { margin: 4px 0; max-width: 75ch }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">KAUHA · digital twin · simulated 60-minute shift</div>
+      <h1>Autonomous wheel loader, loading trucks</h1>
+      <p class="lede">A 15.5 t loader with a 3 m³ bucket loads 20 t trucks from two stockpiles. The full stack is in the loop: autonomy computer, CAN bus with end-to-end checks, drive-by-wire gateway, safety PLC with ray-cast safety scanners, and a remote supervisor. The scenario adds people, a radio drop, an unmapped obstacle, dust, a GNSS outage, a material change, a computer freeze and a remote e-stop.</p>
+    </div>
+  </header>
+
+  <div class="stage">
+    <div class="plan">
+      <canvas id="site" width="1232" height="1024" aria-label="Top-down site plan with the loader, piles, truck, people and the active safety fields"></canvas>
+      <div class="legend">
+        <span><i style="background:var(--machine)"></i>Loader</span>
+        <span><i style="background:var(--stop);opacity:.45"></i>Protective field</span>
+        <span><i style="border:1.5px dashed var(--warn)"></i>Warning field</span>
+        <span><i style="background:var(--zone);border:1px solid var(--info)"></i>Dig zone</span>
+        <span><i style="background:var(--dock);border:1px solid var(--estop)"></i>Dock zone</span>
+        <span><i style="background:var(--info);border-radius:50%"></i>Person</span>
+        <span>◇ Survey post</span>
+      </div>
+    </div>
+    <aside class="inst" aria-live="polite">
+      <div class="clock" id="clock">00:00</div>
+      <div class="state" id="state">RUN</div>
+      <dl class="rows">
+        <dt>Phase</dt><dd id="phase">—</dd>
+        <dt>Mode</dt><dd id="mode">—</dd>
+        <dt>Speed</dt><dd id="speed">—</dd>
+        <dt>Safety limit</dt><dd id="limit">—</dd>
+        <dt>Field set</dt><dd id="fset">—</dd>
+        <dt>Bucket load</dt><dd id="load">—</dd>
+        <dt>Truck</dt><dd id="truck">—</dd>
+        <dt>Loc. error</dt><dd id="locerr">—</dd>
+      </dl>
+      <div class="chips"><span class="chip" id="c-dust">DUST</span><span class="chip" id="c-gnss">GNSS OUT</span><span class="chip" id="c-link">LINK LOST</span></div>
+      <div class="note" id="eventnote"></div>
+    </aside>
+  </div>
+
+  <div class="controls">
+    <button class="primary" id="play" type="button">Play</button>
+    <label class="eyebrow" for="rate">Speed</label>
+    <select id="rate"><option value="1">1×</option><option value="5">5×</option><option value="20" selected>20×</option><option value="60">60×</option></select>
+    <div class="timeline">
+      <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Shift time">
+      <canvas id="events" width="1600" height="68" aria-hidden="true"></canvas>
+    </div>
+  </div>
+  <div class="jumps" id="jumps"></div>
+
+  <section>
+    <h2>Shift results</h2>
+    <p class="note">The same 60-minute scenario was run with the learned bucket controller, with the tuned rule-based controller, and with the learned controller under winter braking (lower speed cap), each on several random seeds. One shift is one sample: small timing differences change where a person crosses or which stop happens, so every number is a mean with its range. These are simulation outputs, not field data.</p>
+    <div class="scroll"><table id="kpi"></table></div>
+    <p class="note" id="kpinote"></p>
+  </section>
+
+  <section class="grid2">
+    <div>
+      <h3>Where a cycle's time goes</h3>
+      <p class="note">Mean seconds per completed truck-loading cycle, excluding stops and teleoperation. The black mark is the ~30 s cycle of a skilled operator on a short V-pattern.</p>
+      <div class="stack" id="stack"></div>
+      <div class="keys" id="stackkeys"></div>
+      <p class="note" id="stacknote"></p>
+    </div>
+    <div>
+      <h3>Learned bucket filling vs tuned rule-based operator</h3>
+      <p class="note">PPO policy trained on a randomised bucket–pile model, tested on held-out seeds. Bars show bucket-loading productivity (m³/h over the whole V-cycle).</p>
+      <div class="bars" id="bucketbars"></div>
+      <div class="scroll"><table id="buckettab"></table></div>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <div>
+      <h3>Person / PPE detector</h3>
+      <p class="note" id="ppenote"></p>
+      <div class="scroll"><table id="ppetab"></table></div>
+    </div>
+    <div>
+      <h3>Safety stops in the learned run</h3>
+      <p class="note">Every protective stop, with the ground-truth objects inside the active field when it tripped. "False" means no real object was there (dust).</p>
+      <div class="scroll"><table id="stoptab"></table></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Reading these results</h2>
+    <div class="grid2">
+      <div>
+        <h3>What the twin demonstrates</h3>
+        <ul class="plain">
+          <li>The safety channel stops the machine before people, independent of the autonomy computer. This was checked closed-loop at every speed band, forward and reverse, dry and winter.</li>
+          <li>Faults degrade to a safe state and come back: radio loss, a frozen autonomy computer, an unmapped obstacle and a GNSS outage.</li>
+          <li>The full CAN path, with end-to-end checks and timeouts, carries every command.</li>
+          <li>Learned bucket filling digs faster than a tuned rule set, but slightly shallower.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>What it does not prove</h3>
+        <ul class="plain">
+          <li>Productivity on a real machine. The soil model is a reduced FEE-style model, not validated against measured bucket forces.</li>
+          <li>Real braking and scanner response. These are assumptions until measured, dry and on snow.</li>
+          <li>Detection of real people in dust and snow. The scanners are ray-cast against ideal shapes.</li>
+          <li>Certification. The safety logic is a reference model to re-implement in a certified PLC toolchain.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const DATA = /*__DATA__*/null;
+const R = DATA.replay, F = R.frames, S = R.site, FIELDS = R.fields, M = R.machine;
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const $ = id => document.getElementById(id);
+const fmtT = t => { const m = Math.floor(t / 60), s = Math.floor(t % 60); return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0"); };
+const STATE = ["RUN", "WARNING", "PROTECTIVE STOP", "EMERGENCY STOP"];
+const STATE_C = ["--run", "--warn", "--stop", "--estop"];
+const MODE = ["IDLE", "AUTO", "TELEOP"];
+const PHASES = ["GOTO_PILE", "APPROACH", "DIG", "BACKOUT", "WAIT_TRUCK", "GOTO_TRUCK", "DOCK", "DUMP", "BACKOFF"];
+const PH_C = ["#7c8b74", "#a7b06a", "#e0a100", "#b8763a", "#8d8d8d", "#5d86b0", "#7a62a8", "#c0504d", "#9a6b8e"];
+
+// toe snapshots
+const toeFrames = F.filter(f => f.toes);
+function toesAt(t) { let cur = toeFrames[0] ? toeFrames[0].toes : null; for (const f of toeFrames) { if (f.t <= t) cur = f.toes; else break; } return cur; }
+
+// ---------- site canvas
+const cv = $("site"), ctx = cv.getContext("2d");
+const X0 = -6, X1 = 71, Y0 = -33, Y1 = 31;
+const sc = cv.width / (X1 - X0);
+const P = (x, y) => [(x - X0) * sc, (Y1 - y) * sc];
+function poly(pts, fill, stroke, dash) {
+  ctx.beginPath(); pts.forEach((p, i) => { const [a, b] = P(p[0], p[1]); i ? ctx.lineTo(a, b) : ctx.moveTo(a, b); }); ctx.closePath();
+  if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  if (stroke) { ctx.strokeStyle = stroke; ctx.setLineDash(dash || []); ctx.stroke(); ctx.setLineDash([]); }
+}
+function rect(cx, cy, th, fwd, back, hw) {
+  const c = Math.cos(th), s = Math.sin(th);
+  return [[fwd, hw], [fwd, -hw], [back, -hw], [back, hw]].map(([a, b]) => [cx + a * c - b * s, cy + a * s + b * c]);
+}
+function toWorld(ox, oy, th, pts) { const c = Math.cos(th), s = Math.sin(th); return pts.map(([a, b]) => [ox + a * c - b * s, oy + a * s + b * c]); }
+function tipLocal(boom, bkt) { return 0.9 + 2.95 * Math.cos(boom) + 1.3 * Math.cos(-0.35 * bkt); }
+
+function drawSite(f) {
+  const W = cv.width, H = cv.height;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = css("--panel"); ctx.fillRect(0, 0, W, H);
+  ctx.lineWidth = 1; ctx.strokeStyle = css("--grid");
+  ctx.font = `500 ${Math.round(sc * 0.9)}px ${css("--mono")}`; ctx.fillStyle = css("--muted");
+  for (let x = 0; x <= 70; x += 10) { const [a] = P(x, 0); ctx.beginPath(); ctx.moveTo(a, 0); ctx.lineTo(a, H); ctx.stroke(); ctx.fillText(x + " m", a + 3, H - 6); }
+  for (let y = -30; y <= 30; y += 10) { const [, b] = P(0, y); ctx.beginPath(); ctx.moveTo(0, b); ctx.lineTo(W, b); ctx.stroke(); ctx.fillText(y + " m", 4, b - 3); }
+  poly(S.area, null, css("--muted"), [8, 6]);
+  ctx.lineWidth = 3; ctx.strokeStyle = css("--ink");
+  for (const w of S.walls) { const [a, b] = P(w[0], w[1]), [c, d] = P(w[2], w[3]); ctx.beginPath(); ctx.moveTo(a, b); ctx.lineTo(c, d); ctx.stroke(); }
+  ctx.lineWidth = 1;
+  for (const z of Object.values(S.dig_zones)) poly(z, css("--zone"), css("--info"), [4, 4]);
+  poly(S.dock_zone, css("--dock"), css("--estop"), [4, 4]);
+  const toes = toesAt(f.t);
+  for (const [name, p] of Object.entries(S.piles)) {
+    p.slots.forEach(([yc, w], j) => {
+      const tx = toes ? toes[name][j] : 50;
+      poly([[tx, yc - w / 2], [p.back_x, yc - w / 2], [p.back_x, yc + w / 2], [tx, yc + w / 2]], css(name === "A" ? "--pile-a" : "--pile-b"), css("--line"));
+      const [a, b] = P(tx, yc - w / 2), [, d] = P(tx, yc + w / 2);
+      ctx.strokeStyle = css("--ink"); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(a, b); ctx.lineTo(a, d); ctx.stroke(); ctx.lineWidth = 1;
+    });
+    const [lx, ly] = P(p.back_x - 17, p.slots[p.slots.length - 1][0] + 1.9);
+    ctx.fillStyle = css("--ink"); ctx.font = `600 ${Math.round(sc * 1.3)}px ${css("--display")}`;
+    ctx.fillText(`PILE ${name} · ${p.material.replace("_", " ")}`, lx, ly);
+  }
+  // truck
+  const [tcx, tcy, tl, tw] = S.truck;
+  const truckPts = rect(tcx, tcy, 0, tl / 2, -tl / 2, tw / 2);
+  if (f.tr[0]) {
+    poly(truckPts, css("--line"), css("--ink"));
+    const frac = Math.min(1, f.tr[1] / 20);
+    poly([[tcx - tl / 2 + 0.3, tcy - tw / 2 + 0.3], [tcx - tl / 2 + 0.3 + (tl - 0.6) * frac, tcy - tw / 2 + 0.3], [tcx - tl / 2 + 0.3 + (tl - 0.6) * frac, tcy + tw / 2 - 0.3], [tcx - tl / 2 + 0.3, tcy + tw / 2 - 0.3]], css(f.tr[1] > 0 ? "--pile-a" : "--line"));
+  } else poly(truckPts, null, css("--muted"), [3, 5]);
+  const [ta, tb] = P(tcx - tl / 2, tcy - tw / 2 - 0.6);
+  ctx.fillStyle = css("--muted"); ctx.font = `500 ${Math.round(sc * 0.9)}px ${css("--mono")}`;
+  ctx.fillText(f.tr[0] ? `truck ${f.tr[2]} · ${f.tr[1].toFixed(1)} t` : "truck bay · next truck arriving", ta, tb + sc);
+  // landmarks
+  ctx.strokeStyle = css("--ink");
+  for (const [lx, ly] of S.landmarks) { const [a, b] = P(lx, ly); const r = sc * 0.5; ctx.beginPath(); ctx.moveTo(a, b - r); ctx.lineTo(a + r, b); ctx.lineTo(a, b + r); ctx.lineTo(a - r, b); ctx.closePath(); ctx.stroke(); }
+  for (const [ox, oy, r] of f.obs || []) { const [a, b] = P(ox, oy); ctx.fillStyle = css("--ink"); ctx.fillRect(a - r * sc, b - r * sc, 2 * r * sc, 2 * r * sc); }
+  // loader geometry
+  const th = f.th, g = f.g, x = f.x, y = f.y;
+  const jx = x - M.lf * Math.cos(th), jy = y - M.lf * Math.sin(th), thr = th - g;
+  const rx = jx - M.lr * Math.cos(thr), ry = jy - M.lr * Math.sin(thr);
+  // safety fields
+  const fs = FIELDS[f.fs];
+  if (fs) {
+    const front = [x, y, th], rear = [rx, ry, thr + Math.PI];
+    const draw = (body, pts, kind) => {
+      if (!pts || !pts.length) return;
+      const w = toWorld(body[0], body[1], body[2], pts);
+      if (kind === "p") poly(w, hexA(css(f.st >= 2 ? "--stop" : "--stop"), f.st >= 2 ? 0.45 : 0.22), css("--stop"));
+      else poly(w, null, css("--warn"), [6, 5]);
+    };
+    if (fs.dir >= 0) { draw(front, fs.warn, "w"); draw(front, fs.prot, "p"); }
+    if (fs.dir <= 0) { draw(rear, fs.warn, "w"); draw(rear, fs.prot, "p"); }
+    if (fs.side && fs.side.length) { draw(front, fs.side, "p"); draw(front, fs.side.map(([a, b]) => [a, -b]), "p"); }
+  }
+  // bodies
+  const hw = M.width / 2;
+  poly(rect(rx, ry, thr, M.lr, -1.7, hw), css("--machine"), css("--machine-ink"));
+  poly(rect(x, y, th, 1.9, -M.lf, hw), css("--machine"), css("--machine-ink"));
+  const tip = tipLocal(f.boom, f.bkt);
+  poly(rect(x, y, th, tip, tip - 1.3, 1.35), f.load > 0.05 ? css("--pile-a") : css("--panel"), css("--machine-ink"));
+  // cab
+  poly(rect(x, y, th, 0.2, -1.2, 0.8), css("--machine-ink"));
+  // EKF estimate
+  const [ea, eb] = P(f.ex, f.ey); ctx.strokeStyle = css("--info"); ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(ea, eb, sc * 0.6, 0, 7); ctx.stroke(); ctx.lineWidth = 1;
+  // people
+  for (const [n, px, py] of f.ppl) {
+    const [a, b] = P(px, py); ctx.fillStyle = css("--info"); ctx.beginPath(); ctx.arc(a, b, Math.max(5, sc * 0.35), 0, 7); ctx.fill();
+    ctx.fillStyle = css("--ink"); ctx.font = `600 ${Math.round(sc * 1.0)}px ${css("--body")}`; ctx.fillText(n, a + 9, b - 7);
+  }
+}
+function hexA(c, a) {
+  if (c.startsWith("#")) { const n = parseInt(c.slice(1), 16); return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${a})`; }
+  return c;
+}
+
+// ---------- instruments
+function panel(f) {
+  $("clock").textContent = fmtT(f.t);
+  const st = $("state"); st.textContent = STATE[f.st]; st.style.background = css(STATE_C[f.st]);
+  $("phase").textContent = f.ph.replace("_", " ").toLowerCase();
+  $("mode").textContent = MODE[f.mode];
+  $("speed").textContent = f.v.toFixed(2) + " m/s";
+  $("limit").textContent = f.lim.toFixed(2) + " m/s";
+  $("fset").textContent = FIELDS[f.fs] ? FIELDS[f.fs].name : f.fs;
+  $("load").textContent = f.load.toFixed(2) + " m³";
+  $("truck").textContent = f.tr[0] ? `#${f.tr[2]} · ${f.tr[1].toFixed(1)} t` : "swapping";
+  $("locerr").textContent = (Math.hypot(f.ex - f.x, f.ey - f.y) * 100).toFixed(0) + " cm";
+  $("c-dust").classList.toggle("on", f.dust); $("c-gnss").classList.toggle("on", !f.gnss); $("c-link").classList.toggle("on", !f.link);
+  const ev = R.stops.filter(e => e.t <= f.t && f.t - e.t < 25).pop();
+  const iv = R.interventions.filter(i => i.t_response <= f.t && f.t <= i.t_done + 3).pop();
+  $("eventnote").textContent = iv ? `Remote operator: ${iv.kind} (${iv.reason.replace(/_/g, " ")})` :
+    ev ? `Stop at ${fmtT(ev.t)}: ${ev.cause.replace(/_/g, " ").toLowerCase()}${ev.objects && ev.objects.length ? " · " + ev.objects.join(", ") : ""}` : "";
+}
+
+// ---------- timeline
+const T_END = F[F.length - 1].t;
+const ecv = $("events"), ectx = ecv.getContext("2d");
+function drawEvents() {
+  const W = ecv.width, H = ecv.height; ectx.clearRect(0, 0, W, H);
+  const xs = t => t / T_END * W;
+  let prev = null;
+  for (const f of F) { const i = PHASES.indexOf(f.ph); if (prev) { ectx.fillStyle = PH_C[i] || "#888"; ectx.fillRect(xs(prev.t), 26, Math.max(1, xs(f.t) - xs(prev.t)) + 0.5, 16); } prev = f; }
+  ectx.globalAlpha = 0.35;
+  for (const f of F) { if (f.dust) { ectx.fillStyle = css("--warn"); ectx.fillRect(xs(f.t), 0, 2, 22); } if (!f.gnss) { ectx.fillStyle = css("--info"); ectx.fillRect(xs(f.t), 0, 2, 22); } }
+  ectx.globalAlpha = 1;
+  for (const e of R.stops) { ectx.fillStyle = css(e.cause.includes("ESTOP") ? "--estop" : "--stop"); ectx.fillRect(xs(e.t) - 1.5, 0, 3, 24); }
+  for (const i of R.interventions) { ectx.fillStyle = css("--info"); ectx.fillRect(xs(i.t_response), 46, Math.max(3, xs(i.t_done) - xs(i.t_response)), 12); }
+}
+
+let idx = 0, playing = false, last = null;
+function show(i) { idx = Math.max(0, Math.min(F.length - 1, i)); drawSite(F[idx]); panel(F[idx]); $("scrub").value = Math.round(idx / (F.length - 1) * 1000); }
+function frameAt(t) { let lo = 0, hi = F.length - 1; while (lo < hi) { const m = (lo + hi) >> 1; if (F[m].t < t) lo = m + 1; else hi = m; } return lo; }
+function tick(ts) {
+  if (!playing) return;
+  if (last != null) { const t = F[idx].t + (ts - last) / 1000 * +$("rate").value; const j = frameAt(t); show(j); if (j >= F.length - 1) { toggle(false); } }
+  last = ts; requestAnimationFrame(tick);
+}
+function toggle(on) { playing = on; $("play").textContent = on ? "Pause" : "Play"; last = null; if (on) requestAnimationFrame(tick); }
+$("play").addEventListener("click", () => toggle(!playing));
+$("scrub").addEventListener("input", e => { show(Math.round(e.target.value / 1000 * (F.length - 1))); });
+ecv.addEventListener("click", e => { const r = ecv.getBoundingClientRect(); show(frameAt((e.clientX - r.left) / r.width * T_END)); });
+
+// scenario jump points
+const jumps = [["Start", 0], ["Worker crosses lane", 360], ["Radio link drop", 718], ["Fallen block", 1080], ["Dust", 1440], ["Pile B, crushed rock", 1800], ["GNSS outage", 2160], ["Driver leaves cab", 2520], ["Computer freeze", 2878], ["Remote e-stop", 3238]];
+for (const [label, t] of jumps) { if (t > T_END) continue; const b = document.createElement("button"); b.type = "button"; b.textContent = `${fmtT(t)} ${label}`; b.addEventListener("click", () => show(frameAt(t))); $("jumps").appendChild(b); }
+
+// ---------- KPI table (campaign: mean and range over seeds)
+const C = DATA.campaign, cols = Object.keys(C);
+const COLNAME = { learned: "Learned bucket", scripted: "Rule-based bucket", winter: "Learned, winter braking" };
+const nSeeds = C[cols[0]].seeds.length;
+const cell = (c, key, fmt) => { const s = C[c].summary[key]; return `${fmt(s.mean)} <span class="range">${fmt(s.min)}–${fmt(s.max)}</span>`; };
+const f0 = v => v.toFixed(0), f1 = v => v.toFixed(1), f2 = v => v.toFixed(2), cm = v => (v * 100).toFixed(1);
+const rowsDef = [
+  ["Tonnes loaded in 60 min", "tonnes", f0],
+  ["Trucks filled (20 t)", "trucks", f1],
+  ["Truck-loading cycles", "cycles", f1],
+  ["Cycle time, median, no stops (s)", "clean_cycle_time_median_s", f1],
+  ["Dig time, mean (s)", "dig_time_mean_s", f1],
+  ["Bucket fill factor", "fill_factor_mean", f2],
+  ["Waiting for trucks (s)", "truck_wait_s", f0],
+  ["Remote interventions per hour", "interventions_per_hour", f1],
+  ["Protective / emergency stops", "protective_stops", f1],
+  ["False stops (no real object)", "false_stops", f1],
+  ["Closest person to the moving machine, ground level (m)", "min_person_distance_moving_m", f2],
+  ["Person entered a protective field while moving", "person_field_entries_while_moving", f1],
+  ["Person under the raised bucket while moving (s)", "person_under_raised_bucket_moving_s", f1],
+  ["Localisation error RMS (cm)", "loc_rms_m", cm],
+  ["Localisation error in GNSS outage (cm)", "loc_rms_gnss_outage_m", cm],
+  ["Teleop glass-to-glass p95 (ms), budget 150", "teleop_latency_p95_ms", f0],
+  ["Fuel (L/t)", "fuel_l_per_t", v => v.toFixed(3)],
+  ["CAN frames rejected by E2E", "e2e_errors", f0],
+];
+$("kpi").innerHTML = `<thead><tr><th>Measure · mean <span class="range">min–max</span> over ${nSeeds} seeds</th>${cols.map(c => `<th>${COLNAME[c] || c}</th>`).join("")}</tr></thead><tbody>` +
+  rowsDef.map(([n, key, fn]) => `<tr><td>${n}</td>${cols.map(c => `<td>${cell(c, key, fn)}</td>`).join("")}</tr>`).join("") +
+  `<tr><td>Fill factor, pile A gravel / pile B crushed rock</td>${cols.map(c => `<td>${C[c].fill_by_pile.A.toFixed(2)} / ${C[c].fill_by_pile.B.toFixed(2)}</td>`).join("")}</tr>` +
+  `<tr><td>Safety log hash chain, all runs</td>${cols.map(c => `<td>${C[c].log_chain_ok ? "intact" : "BROKEN"}</td>`).join("")}</tr></tbody>`;
+const ivr = Object.entries(C.learned.interventions_by_reason_total).map(([k, v]) => `${k.replace(/_/g, " ")} ${v}`).join(", ");
+$("kpinote").textContent = `Learned runs, interventions by reason (all seeds): ${ivr}.`;
+
+// ---------- cycle breakdown
+(function () {
+  const L = DATA.one; if (!L || !L.cycles) return;
+  const per = Object.fromEntries(Object.entries(DATA.breakdown).map(([k, v]) => [k, v / L.cycles]));
+  const total = PHASES.reduce((a, p) => a + (per[p] || 0), 0);
+  const max = Math.max(total, 32);
+  const st = $("stack");
+  PHASES.forEach((p, i) => { if (!per[p]) return; const s = document.createElement("span"); s.style.width = (per[p] / max * 100) + "%"; s.style.background = PH_C[i]; s.title = `${p}: ${per[p].toFixed(1)} s`; st.appendChild(s); });
+  const b = document.createElement("div"); b.className = "bench"; b.style.left = (30 / max * 100) + "%"; st.appendChild(b);
+  $("stackkeys").innerHTML = PHASES.filter(p => per[p]).map((p, i) => `<span><i style="background:${PH_C[PHASES.indexOf(p)]}"></i>${p.replace("_", " ").toLowerCase()} ${per[p].toFixed(1)} s</span>`).join("");
+  $("stacknote").textContent = `Total ${total.toFixed(1)} s per cycle in autonomous running, including waiting for trucks. Travel to and docking at the truck take the most time, because the safety fields force a slow approach: the dock field is granted only below 0.6 m/s, and the warning field caps speed at 1 m/s near the truck and the face.`;
+})();
+
+// ---------- bucket filling
+(function () {
+  const T = DATA.bucket.test, names = Object.keys(T);
+  const max = Math.max(...names.flatMap(n => [T[n].learned.cycle_m3_per_h, T[n].baseline.cycle_m3_per_h]));
+  const label = n => n === "randomised" ? "all materials" : n.replace("_", " ");
+  $("bucketbars").innerHTML = names.map(n => {
+    const a = T[n].learned.cycle_m3_per_h, b = T[n].baseline.cycle_m3_per_h, d = (a / b - 1) * 100;
+    return `<div class="bar"><span>${label(n)}</span><div class="track"><div class="fill" style="width:${b / max * 100}%;background:var(--line)"></div><div class="fill" style="width:${a / max * 100}%;background:var(--machine);height:50%;top:25%"></div></div><span class="${d >= 0 ? "good" : "bad"}" style="text-align:right;font-family:var(--mono)">${d >= 0 ? "+" : ""}${d.toFixed(1)}%</span></div>`;
+  }).join("") + `<div class="keys"><span><i style="background:var(--machine)"></i>learned</span><span><i style="background:var(--line)"></i>rule-based</span></div>`;
+  $("buckettab").innerHTML = `<thead><tr><th>Material</th><th>Fill learned / rule</th><th>Dig time learned / rule</th><th>Success</th></tr></thead><tbody>` +
+    names.map(n => { const a = T[n].learned, b = T[n].baseline; return `<tr><td>${label(n)}</td><td>${a.fill_factor_mean.toFixed(2)} / ${b.fill_factor_mean.toFixed(2)}</td><td>${a.time_s_mean.toFixed(1)} / ${b.time_s_mean.toFixed(1)} s</td><td>${(a.success_rate * 100).toFixed(0)}%</td></tr>`; }).join("") + "</tbody>";
+})();
+
+// ---------- detector
+(function () {
+  const p = DATA.ppe;
+  if (!p) { $("ppenote").textContent = "Detector training had not finished when this page was built; the twin used an assumed camera recall of 0.85."; return; }
+  $("ppenote").textContent = `${p.model}, ${p.epochs} epochs at ${p.imgsz} px on CPU, tested on ${p.test_images} held-out images. The twin's camera model uses the person recall and false-positive rate below. Licence: ${p.licence}.`;
+  const rows = [["Person recall @ conf " + p.conf_threshold, p.person_recall.toFixed(3)], ["Person precision", p.person_precision.toFixed(3)], ["False person detections per image", p.person_fp_per_image.toFixed(3)], ["mAP50, all classes (test)", p.test_mAP50_all.toFixed(3)], ["mAP50-95, all classes (test)", p.test_mAP50_95_all.toFixed(3)]];
+  for (const c of ["Person", "helmet", "vest", "no_helmet"]) if (p.per_class[c]) rows.push([`mAP50 · ${c}`, p.per_class[c].mAP50.toFixed(3)]);
+  rows.push(["CPU inference, mean / p95", `${p.cpu_ms_mean.toFixed(0)} / ${p.cpu_ms_p95.toFixed(0)} ms`]);
+  $("ppetab").innerHTML = `<tbody>${rows.map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join("")}</tbody>`;
+})();
+
+// ---------- stops table
+$("stoptab").innerHTML = `<thead><tr><th>Time</th><th>Cause</th><th>Speed</th><th>Field set</th><th>Objects</th></tr></thead><tbody>` +
+  R.stops.map(e => `<tr><td><button type="button" data-t="${e.t}" style="padding:2px 6px;font-family:var(--mono)">${fmtT(e.t)}</button></td><td>${e.cause.replace(/_/g, " ").toLowerCase()}</td><td>${e.v.toFixed(2)}</td><td>${e.field}</td><td>${e.false ? "<span class='bad'>false (dust)</span>" : (e.objects || []).join(", ") || "—"}</td></tr>`).join("") + "</tbody>";
+$("stoptab").addEventListener("click", e => { const t = e.target.dataset.t; if (t) { show(frameAt(+t)); window.scrollTo({ top: 0, behavior: "smooth" }); } });
+
+drawEvents();
+show(frameAt(0));
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { drawEvents(); show(idx); });
+new MutationObserver(() => { drawEvents(); show(idx); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+</script>

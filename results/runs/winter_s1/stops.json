@@ -1,0 +1,73 @@
+[
+ {
+  "t": 403.9,
+  "cause": "FIELD_REAR",
+  "v": -0.0,
+  "objects": [
+   "worker"
+  ],
+  "field": "standstill",
+  "false": false
+ },
+ {
+  "t": 720.48,
+  "cause": "REMOTE_LINK",
+  "v": 1.0,
+  "objects": [],
+  "field": "fwd_1.5_S"
+ },
+ {
+  "t": 1150.85,
+  "cause": "FIELD_FRONT",
+  "v": 1.0,
+  "objects": [
+   "fallen_block"
+  ],
+  "field": "fwd_1.5_R1",
+  "false": false
+ },
+ {
+  "t": 1249.75,
+  "cause": "FIELD_FRONT",
+  "v": 0.5,
+  "objects": [
+   "truck"
+  ],
+  "field": "fwd_0.5_S",
+  "false": false
+ },
+ {
+  "t": 2555.55,
+  "cause": "FIELD_SIDE",
+  "v": 0.55,
+  "objects": [
+   "driver"
+  ],
+  "field": "dock",
+  "false": false
+ },
+ {
+  "t": 2606.75,
+  "cause": "FIELD_FRONT",
+  "v": 0.68,
+  "objects": [
+   "truck"
+  ],
+  "field": "fwd_1.5_R2",
+  "false": false
+ },
+ {
+  "t": 2880.2,
+  "cause": "WATCHDOG",
+  "v": 0.48,
+  "objects": [],
+  "field": "dock"
+ },
+ {
+  "t": 3240.0,
+  "cause": "ESTOP_REMOTE",
+  "v": -0.01,
+  "objects": [],
+  "field": "dig"
+ }
+]

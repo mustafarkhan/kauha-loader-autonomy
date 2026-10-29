@@ -1,0 +1,22 @@
+{
+ "params": {
+  "throttle": 1.0,
+  "pen_lift": 0.05,
+  "boom1": 0.7,
+  "f_thr": 0.6,
+  "load_end": 1.0,
+  "t_end": 0.5
+ },
+ "tuning_eval": {
+  "episodes": 24,
+  "fill_factor_mean": 0.949841348816007,
+  "score_mean": 0.965378128240626,
+  "fill_factor_p10": 0.8188896845810278,
+  "time_s_mean": 8.514583333333322,
+  "success_rate": 1.0,
+  "stall_s_mean": 0.0,
+  "spilled_m3_mean": 0.021600310880893925,
+  "fuel_l_per_m3": 0.03179498365212742,
+  "cycle_m3_per_h": 336.32528338705674
+ }
+}

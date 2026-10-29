@@ -1,0 +1,77 @@
+VERSION "KAUHA machine bus 0.3"
+
+
+NS_ :
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	BA_DEF_DEF_
+	SIG_VALTYPE_
+
+BS_:
+
+BU_: AUTONOMY SAFETY_PLC REMOTE_GW MACHINE_GW
+
+BO_ 2365526144 DriveCmd: 8 AUTONOMY
+ SG_ SpeedReq : 0|16@1- (0.001,0) [-6|6] "m/s" MACHINE_GW,SAFETY_PLC
+ SG_ ArticulationReq : 16|16@1- (0.0001,0) [-0.8|0.8] "rad" MACHINE_GW
+ SG_ Mode : 32|4@1+ (1,0) [0|15] "" MACHINE_GW,SAFETY_PLC
+ SG_ BrakeReq : 36|1@1+ (1,0) [0|1] "" MACHINE_GW
+ SG_ DigFieldReq : 37|1@1+ (1,0) [0|1] "" SAFETY_PLC
+ SG_ DockFieldReq : 38|1@1+ (1,0) [0|1] "" SAFETY_PLC
+ SG_ AliveCounter : 48|4@1+ (1,0) [0|15] "" MACHINE_GW,SAFETY_PLC
+ SG_ Crc : 56|8@1+ (1,0) [0|255] "" MACHINE_GW,SAFETY_PLC
+
+BO_ 2365526400 ImplementCmd: 8 AUTONOMY
+ SG_ BoomRate : 0|8@1- (0.01,0) [-1|1] "" MACHINE_GW
+ SG_ BucketRate : 8|8@1- (0.01,0) [-1|1] "" MACHINE_GW
+ SG_ Hold : 16|1@1+ (1,0) [0|1] "" MACHINE_GW
+ SG_ AliveCounter : 48|4@1+ (1,0) [0|15] "" MACHINE_GW
+ SG_ Crc : 56|8@1+ (1,0) [0|255] "" MACHINE_GW
+
+BO_ 2298421377 SafetyStatus: 8 SAFETY_PLC
+ SG_ State : 0|4@1+ (1,0) [0|3] "" MACHINE_GW,AUTONOMY,REMOTE_GW
+ SG_ ResetPending : 4|1@1+ (1,0) [0|1] "" REMOTE_GW
+ SG_ ActiveFieldSet : 8|8@1+ (1,0) [0|255] "" AUTONOMY,REMOTE_GW
+ SG_ Cause : 16|16@1+ (1,0) [0|65535] "" AUTONOMY,REMOTE_GW
+ SG_ SpeedLimit : 32|16@1+ (0.001,0) [0|6] "m/s" MACHINE_GW,AUTONOMY
+ SG_ AliveCounter : 48|4@1+ (1,0) [0|15] "" MACHINE_GW,AUTONOMY,REMOTE_GW
+ SG_ Crc : 56|8@1+ (1,0) [0|255] "" MACHINE_GW,AUTONOMY,REMOTE_GW
+
+BO_ 2365534339 MachineState1: 8 MACHINE_GW
+ SG_ Speed : 0|16@1- (0.001,0) [-6|6] "m/s" AUTONOMY,SAFETY_PLC
+ SG_ Articulation : 16|16@1- (0.0001,0) [-0.8|0.8] "rad" AUTONOMY
+ SG_ Boom : 32|16@1- (0.001,0) [-1|1] "rad" AUTONOMY
+ SG_ AliveCounter : 48|4@1+ (1,0) [0|15] "" AUTONOMY,SAFETY_PLC
+ SG_ Crc : 56|8@1+ (1,0) [0|255] "" AUTONOMY,SAFETY_PLC
+
+BO_ 2365534595 MachineState2: 8 MACHINE_GW
+ SG_ Bucket : 0|16@1- (0.001,0) [-1|1] "rad" AUTONOMY
+ SG_ Payload : 16|16@1+ (10,0) [0|20000] "kg" AUTONOMY
+ SG_ OperatorPresent : 32|1@1+ (1,0) [0|1] "" SAFETY_PLC
+ SG_ ParkBrake : 33|1@1+ (1,0) [0|1] "" AUTONOMY,SAFETY_PLC
+ SG_ AliveCounter : 48|4@1+ (1,0) [0|15] "" AUTONOMY
+ SG_ Crc : 56|8@1+ (1,0) [0|255] "" AUTONOMY
+
+BO_ 2365538434 RemoteHeartbeat: 8 REMOTE_GW
+ SG_ EStop : 0|1@1+ (1,0) [0|1] "" SAFETY_PLC
+ SG_ ResetReq : 1|1@1+ (1,0) [0|1] "" SAFETY_PLC
+ SG_ ModeReq : 4|4@1+ (1,0) [0|15] "" SAFETY_PLC,AUTONOMY
+ SG_ AliveCounter : 48|4@1+ (1,0) [0|15] "" SAFETY_PLC
+ SG_ Crc : 56|8@1+ (1,0) [0|255] "" SAFETY_PLC
+
+
+CM_ BU_ AUTONOMY "Autonomy computer (non-safety). J1939 source address 0x80.";
+CM_ BU_ SAFETY_PLC "Safety PLC (PL d target). J1939 source address 0x81.";
+CM_ BU_ REMOTE_GW "Remote station radio gateway. J1939 source address 0x82.";
+CM_ BU_ MACHINE_GW "Drive-by-wire gateway to OEM machine bus. J1939 source address 0x83.";
+CM_ BO_ 2365526144 "PGN 0xFF10 prio 3. 20 Hz, receiver timeout 150 ms. E2E: AliveCounter + CRC8 (SAE J1850) over bytes 0-6 and data ID.";
+CM_ BO_ 2365526400 "PGN 0xFF11 prio 3. 20 Hz, receiver timeout 150 ms.";
+CM_ BO_ 2298421377 "PGN 0xFF20 prio 2. 40 Hz (PLC cycle 25 ms). Informational copy of safety state; the stop itself is hardwired.";
+CM_ BO_ 2365534339 "PGN 0xFF30 prio 3. 40 Hz.";
+CM_ BO_ 2365534595 "PGN 0xFF31 prio 3. 20 Hz.";
+CM_ BO_ 2365538434 "PGN 0xFF40 prio 3. 20 Hz. Loss > 500 ms forces a protective stop.";
+CM_ SG_ 2298421377 Cause "Bitfield: see kauha.safety.plc.Cause.";
+VAL_ 2365526144 Mode 0 "IDLE" 1 "AUTO" 2 "TELEOP" ;
+VAL_ 2298421377 State 0 "RUN" 1 "WARNING" 2 "PROTECTIVE_STOP" 3 "EMERGENCY_STOP" ;

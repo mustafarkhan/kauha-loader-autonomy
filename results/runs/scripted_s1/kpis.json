@@ -1,0 +1,59 @@
+{
+ "sim_minutes": 60.0,
+ "controller": "scripted",
+ "cycles": 36,
+ "tonnes": 172.3,
+ "trucks": 8,
+ "buckets_per_truck": 4.0,
+ "tonnes_per_hour": 172.3,
+ "cycles_per_hour": 36.0,
+ "cycle_time_median_s": 74.2,
+ "cycle_time_p90_s": 88.3,
+ "clean_cycle_time_median_s": 73.3,
+ "dig_time_mean_s": 9.11,
+ "fill_factor_mean": 0.949,
+ "fill_factor_by_pile": {
+  "A": 1.021,
+  "B": 0.803
+ },
+ "truck_wait_s": 7.6,
+ "interventions": 7,
+ "interventions_per_hour": 7.0,
+ "interventions_by_reason": {
+  "remote_link": 1,
+  "blocked_path": 2,
+  "phase_timeout_goto_pile": 1,
+  "no_route_to_face": 2,
+  "watchdog": 1
+ },
+ "protective_stops": 5,
+ "stops_by_cause": {
+  "REMOTE_LINK": 1,
+  "FIELD_FRONT": 3,
+  "WATCHDOG": 1
+ },
+ "false_stops": 1,
+ "false_stops_per_hour": 1.0,
+ "person_stop_response_s": [
+  0.05
+ ],
+ "min_person_distance_m": 0.76,
+ "min_person_distance_moving_m": 0.76,
+ "person_field_entries_while_moving": 1,
+ "person_under_raised_bucket_moving_s": 6.55,
+ "loc_rms_m": 0.017,
+ "loc_rms_gnss_outage_m": 0.025,
+ "loc_max_m": 0.066,
+ "loc_filter_resets": 19,
+ "teleop_latency_p50_ms": 101.5,
+ "teleop_latency_p95_ms": 128.1,
+ "teleop_budget_ms": 150.0,
+ "fuel_l": 13.26,
+ "fuel_l_per_t": 0.077,
+ "spill_t": 0.0,
+ "e2e_errors": 0,
+ "gateway_timeouts": 2,
+ "log_chain_ok": true,
+ "log_records": 13,
+ "wall_time_s": 155.1
+}

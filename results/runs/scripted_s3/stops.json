@@ -1,0 +1,63 @@
+[
+ {
+  "t": 720.48,
+  "cause": "REMOTE_LINK",
+  "v": 2.98,
+  "objects": [],
+  "field": "fwd_3.0_R1"
+ },
+ {
+  "t": 1159.4,
+  "cause": "FIELD_FRONT",
+  "v": 1.0,
+  "objects": [
+   "fallen_block"
+  ],
+  "field": "fwd_1.5_R2",
+  "false": false
+ },
+ {
+  "t": 1283.6,
+  "cause": "FIELD_FRONT",
+  "v": 0.95,
+  "objects": [
+   "pile_A"
+  ],
+  "field": "fwd_1.5_S",
+  "false": false
+ },
+ {
+  "t": 2531.7,
+  "cause": "FIELD_SIDE",
+  "v": 0.55,
+  "objects": [
+   "driver"
+  ],
+  "field": "dock",
+  "false": false
+ },
+ {
+  "t": 2588.7,
+  "cause": "FIELD_FRONT",
+  "v": 0.55,
+  "objects": [
+   "driver"
+  ],
+  "field": "dock",
+  "false": false
+ },
+ {
+  "t": 2880.2,
+  "cause": "WATCHDOG",
+  "v": -2.32,
+  "objects": [],
+  "field": "rev_2.5_R2"
+ },
+ {
+  "t": 3240.0,
+  "cause": "ESTOP_REMOTE",
+  "v": 0.37,
+  "objects": [],
+  "field": "dig"
+ }
+]
