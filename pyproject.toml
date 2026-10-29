@@ -9,6 +9,7 @@ dependencies = [
   "gymnasium>=0.29",
   "cantools>=39",
   "python-can>=4.3",
+  "msgpack>=1.0",       # python-can UDP-multicast bus for the multi-process SIL
 ]
 
 [project.optional-dependencies]
@@ -25,6 +26,7 @@ include = ["kauha*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+markers = ["slow: real-time multi-process tests (about 1 min)"]
 
 [tool.ruff]
 line-length = 120

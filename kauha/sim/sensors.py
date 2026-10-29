@@ -21,6 +21,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
+from kauha.geometry import points_in_polygon  # noqa: F401  (re-exported)
 from kauha.safety.fields import FieldSet
 
 
@@ -53,19 +54,6 @@ def raycast(ox: float, oy: float, angles: np.ndarray, max_range: float,
     return rng
 
 
-def points_in_polygon(px: np.ndarray, py: np.ndarray, poly) -> np.ndarray:
-    """Vectorised even-odd point-in-polygon test."""
-    P = np.asarray(poly, dtype=float)
-    xi, yi = P[:, 0], P[:, 1]
-    xj, yj = np.roll(xi, 1), np.roll(yi, 1)
-    Y = py[:, None]
-    cond = (yi[None, :] > Y) != (yj[None, :] > Y)
-    with np.errstate(divide="ignore", invalid="ignore"):
-        xc = (xj - xi)[None, :] * (Y - yi[None, :]) / (yj - yi + 1e-12)[None, :] + xi[None, :]
-    crossings = cond & (px[:, None] < xc)
-    return (crossings.sum(axis=1) % 2) == 1
-
-
 @dataclass
 class ScannerMount:
     name: str
@@ -73,15 +61,17 @@ class ScannerMount:
     x: float             # in body frame (rear frame: x points backwards)
     y: float
     heading: float       # in body frame
-    fov: float = math.radians(200)
+    fov: float = math.radians(275)
     resolution: float = math.radians(1.0)
     max_range: float = 15.0
 
 
-FRONT_MOUNTS = (ScannerMount("front_left", "front", 2.0, 1.35, math.radians(20)),
-                ScannerMount("front_right", "front", 2.0, -1.35, math.radians(-20)))
-REAR_MOUNTS = (ScannerMount("rear_left", "rear", 1.7, -1.2, math.radians(-20)),
-               ScannerMount("rear_right", "rear", 1.7, 1.2, math.radians(20)))
+# Four outdoor safety scanners (275 deg field of view), one at each corner,
+# turned 45 deg outward so each also covers its side of the frame it is on.
+FRONT_MOUNTS = (ScannerMount("front_left", "front", 2.0, 1.35, math.radians(45)),
+                ScannerMount("front_right", "front", 2.0, -1.35, math.radians(-45)))
+REAR_MOUNTS = (ScannerMount("rear_left", "rear", 1.7, -1.2, math.radians(-45)),
+               ScannerMount("rear_right", "rear", 1.7, 1.2, math.radians(45)))
 
 
 @dataclass
@@ -91,6 +81,7 @@ class ScanResult:
     rear_prot: bool
     rear_warn: bool
     side_prot: bool
+    side_contact: bool            # SR-12 contact band beside either frame (always evaluated)
     points_front: np.ndarray      # (N,2) in front frame, for logging/visualisation
     points_rear: np.ndarray       # (N,2) in rear frame
 
@@ -98,7 +89,7 @@ class ScanResult:
 class SafetyScanners:
     def __init__(self, rng: np.random.Generator):
         self.rng = rng
-        self._prev = {"fp": False, "fw": False, "rp": False, "rw": False, "sp": False}
+        self._prev = {"fp": False, "fw": False, "rp": False, "rw": False, "sp": False, "sc": False}
 
     @staticmethod
     def _adjacent_hits(mask: np.ndarray) -> bool:
@@ -142,18 +133,22 @@ class SafetyScanners:
         side_polys = [fs.side, [(x, -y) for x, y in fs.side]] if fs.side else []
         front_p, front_w = (eval_fields("front", [fs.protective, fs.warning])
                             if fs.direction >= 0 else (False, False))
-        rear_p, rear_w = (eval_fields("rear", [fs.protective, fs.warning])
+        rear_p, rear_w = (eval_fields("rear", [fs.protective_for("rear"), fs.warning_for("rear")])
                           if fs.direction <= 0 else (False, False))
         side = any(eval_fields("front", side_polys)) if side_polys else False
+        if fs.side_rear:
+            side = side or any(eval_fields("rear", [fs.side_rear, [(x, -y) for x, y in fs.side_rear]]))
+        contact = any(eval_fields("front", [fs.side_contact, [(x, -y) for x, y in fs.side_contact]])) or \
+            any(eval_fields("rear", [fs.side_contact_rear, [(x, -y) for x, y in fs.side_contact_rear]]))
         # Multiple sampling: a field counts as violated in two consecutive scans.
-        now = {"fp": front_p, "fw": front_w, "rp": rear_p, "rw": rear_w, "sp": side}
+        now = {"fp": front_p, "fw": front_w, "rp": rear_p, "rw": rear_w, "sp": side, "sc": contact}
         out = {k: now[k] and self._prev[k] for k in now}
         self._prev = now
         pf = np.column_stack([np.concatenate([h[0][h[2]] for h in hits["front"]]),
                               np.concatenate([h[1][h[2]] for h in hits["front"]])])
         pr = np.column_stack([np.concatenate([h[0][h[2]] for h in hits["rear"]]),
                               np.concatenate([h[1][h[2]] for h in hits["rear"]])])
-        return ScanResult(out["fp"], out["fw"], out["rp"], out["rw"], out["sp"], pf, pr)
+        return ScanResult(out["fp"], out["fw"], out["rp"], out["rw"], out["sp"], out["sc"], pf, pr)
 
 
 # ------------------------------------------------------------------- GNSS etc

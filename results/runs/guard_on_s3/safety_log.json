@@ -1,0 +1,118 @@
+[
+ {
+  "seq": 0,
+  "t": 720.475,
+  "kind": "stop",
+  "data": {
+   "state": "PROTECTIVE_STOP",
+   "cause": "REMOTE_LINK",
+   "age": 0.525
+  },
+  "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+  "hash": "5b8dadf6704c119a9e0bb49b70229dd407a6d99ab0c8933bdc97d7854e12d885"
+ },
+ {
+  "seq": 1,
+  "t": 735.05,
+  "kind": "reset",
+  "data": {
+   "by": "supervisor",
+   "cleared": "REMOTE_LINK"
+  },
+  "prev": "5b8dadf6704c119a9e0bb49b70229dd407a6d99ab0c8933bdc97d7854e12d885",
+  "hash": "831a28f24d0a74f82693e3052436716299c12dba88b30f419916d3f74f66ca9a"
+ },
+ {
+  "seq": 2,
+  "t": 1127.0,
+  "kind": "stop",
+  "data": {
+   "state": "PROTECTIVE_STOP",
+   "cause": "FIELD_FRONT",
+   "field": "fwd_1.5_R1",
+   "v": 1.0
+  },
+  "prev": "831a28f24d0a74f82693e3052436716299c12dba88b30f419916d3f74f66ca9a",
+  "hash": "25a9e775951c775dad4172e0628ee92b1e3e76ef907321ed63a5d40f7125c7de"
+ },
+ {
+  "seq": 3,
+  "t": 1165.75,
+  "kind": "reset",
+  "data": {
+   "by": "supervisor",
+   "cleared": "FIELD_FRONT"
+  },
+  "prev": "25a9e775951c775dad4172e0628ee92b1e3e76ef907321ed63a5d40f7125c7de",
+  "hash": "2a1ab6061dcbc4bf4ae80df3d06010681c452c4e9d108a02d635eec333ec3d36"
+ },
+ {
+  "seq": 4,
+  "t": 1700.2,
+  "kind": "stop",
+  "data": {
+   "state": "PROTECTIVE_STOP",
+   "cause": "FIELD_REAR",
+   "field": "rev_2.5_S",
+   "v": -1.73
+  },
+  "prev": "2a1ab6061dcbc4bf4ae80df3d06010681c452c4e9d108a02d635eec333ec3d36",
+  "hash": "746c46b6e131f86c055c7d754a85caa398623a0dfa95bb3e0a6430d020fcfaf3"
+ },
+ {
+  "seq": 5,
+  "t": 1703.25,
+  "kind": "reset",
+  "data": {
+   "by": "auto",
+   "cleared": "FIELD_REAR"
+  },
+  "prev": "746c46b6e131f86c055c7d754a85caa398623a0dfa95bb3e0a6430d020fcfaf3",
+  "hash": "833dd23454c3b8e1726fe51616042f88b1c54587443b56dbe629fb4788edcf79"
+ },
+ {
+  "seq": 6,
+  "t": 2880.2,
+  "kind": "stop",
+  "data": {
+   "state": "PROTECTIVE_STOP",
+   "cause": "WATCHDOG",
+   "age": 0.2
+  },
+  "prev": "833dd23454c3b8e1726fe51616042f88b1c54587443b56dbe629fb4788edcf79",
+  "hash": "f2c4eddb61880bf6203a575ebafdacba7aea3289c57a8571821ee3282b7ae594"
+ },
+ {
+  "seq": 7,
+  "t": 2890.1,
+  "kind": "reset",
+  "data": {
+   "by": "supervisor",
+   "cleared": "WATCHDOG"
+  },
+  "prev": "f2c4eddb61880bf6203a575ebafdacba7aea3289c57a8571821ee3282b7ae594",
+  "hash": "85be20da8a969962c7feef71fdf05b5fecac12d898c9fc5f0de7524ccb8c66ff"
+ },
+ {
+  "seq": 8,
+  "t": 3240.0,
+  "kind": "stop",
+  "data": {
+   "state": "EMERGENCY_STOP",
+   "cause": "ESTOP_REMOTE"
+  },
+  "prev": "85be20da8a969962c7feef71fdf05b5fecac12d898c9fc5f0de7524ccb8c66ff",
+  "hash": "f7b6faf381bfbbdeae38c246c35bb1cf9fbf73d2c7a5edb8a217507b458af098"
+ },
+ {
+  "seq": 9,
+  "t": 3257.9,
+  "kind": "reset",
+  "data": {
+   "by": "supervisor",
+   "cleared": "ESTOP_REMOTE"
+  },
+  "prev": "f7b6faf381bfbbdeae38c246c35bb1cf9fbf73d2c7a5edb8a217507b458af098",
+  "hash": "d7b0f69bbd913cb6a8fc11f7e52bb0522559f427bc4d6b4f3b884eb0e526394b"
+ }
+]

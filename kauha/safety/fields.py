@@ -41,6 +41,21 @@ class FieldSet:
     protective: Polygon       # in the leading body's frame
     warning: Polygon
     side: Polygon = field(default_factory=list)   # mirrored on both sides of the front frame
+    side_rear: Polygon = field(default_factory=list)   # mirrored on both sides of the rear frame (moving sets)
+    # SR-12 contact bands: a narrow strip beside each frame, evaluated at the same
+    # time as the active set (a second simultaneous field on the same scanners).
+    # Teleop recovery from a side stop is refused while a band is occupied.
+    side_contact: Polygon = field(default_factory=lambda: contact_band("front"))
+    side_contact_rear: Polygon = field(default_factory=lambda: contact_band("rear"))
+    # Standstill only: the rear frame has its own contour, so it gets its own fields.
+    rear_protective: Polygon | None = None
+    rear_warning: Polygon | None = None
+
+    def protective_for(self, body: str) -> Polygon:
+        return self.rear_protective if body == "rear" and self.rear_protective is not None else self.protective
+
+    def warning_for(self, body: str) -> Polygon:
+        return self.rear_warning if body == "rear" and self.rear_warning is not None else self.warning
 
 
 @dataclass(frozen=True)
@@ -49,11 +64,25 @@ class Geometry:
     rear_contour_x: float = 1.7      # counterweight, behind rear axle (rear-frame x)
     half_width: float = 1.4          # bucket is the widest part (2.7 m)
     wheelbase_half: float = 1.6      # lf = lr
+    rear_half_width: float = 1.3     # rear frame (2.55 m wide) plus a little
     scanner_x: float = 2.0           # front scanners on the front-frame fenders
     dock_field_end_x: float = 2.8    # truck side must stay beyond this when docked
     dig_side_end_x: float = 1.0      # DIG side fields cover the cab/articulation area only;
                                      # further forward the pile flanks beside the bucket
                                      # would trip them on every pass
+
+
+CONTACT_BAND_M = 0.35
+
+
+def contact_band(body: str, g: "Geometry | None" = None) -> Polygon:
+    """Strip beside one frame (positive-y side; mirrored by the evaluator)."""
+    g = g or Geometry()
+    if body == "front":
+        return [(0.0, g.half_width), (g.front_contour_x, g.half_width),
+                (g.front_contour_x, g.half_width + CONTACT_BAND_M), (0.0, g.half_width + CONTACT_BAND_M)]
+    y0, y1 = g.rear_half_width, g.rear_half_width + CONTACT_BAND_M
+    return [(-g.wheelbase_half, y0), (g.rear_contour_x, y0), (g.rear_contour_x, y1), (-g.wheelbase_half, y1)]
 
 
 def _arc_edges(x0: float, length: float, half_w: float, kappa: float, n: int = 8):
@@ -139,9 +168,16 @@ def build_field_sets(b: StopBudget, g: Geometry | None = None) -> dict[int, Fiel
         w = min(SCANNER_WARNING_RANGE_M, p + 2.0 + 1.5 * v)
         return p, w
 
+    # Rear-frame sides, in the rear frame (x backwards from the rear axle): from the
+    # articulation joint to the counterweight. A person beside the rear frame is
+    # where an articulating loader pinches and where reversing passes close.
+    rear_side = [(-g.wheelbase_half, g.rear_half_width), (g.rear_contour_x, g.rear_half_width),
+                 (g.rear_contour_x, g.rear_half_width + 0.6), (-g.wheelbase_half, g.rear_half_width + 0.6)]
     p, w = lengths(STANDSTILL)
     sets[0] = FieldSet(0, "standstill", 0, STANDSTILL,
-                       _swept(g.front_contour_x, p, hw, 0.0), _swept(g.front_contour_x, w, hw, 0.0), side)
+                       _swept(g.front_contour_x, p, hw, 0.0), _swept(g.front_contour_x, w, hw, 0.0), side,
+                       side_rear=rear_side, rear_protective=_swept(g.rear_contour_x, p, hw, 0.0),
+                       rear_warning=_swept(g.rear_contour_x, w, hw, 0.0))
     fid = 1
     for direction in (1, -1):
         x0 = g.front_contour_x if direction > 0 else g.rear_contour_x
@@ -153,7 +189,8 @@ def build_field_sets(b: StopBudget, g: Geometry | None = None) -> dict[int, Fiel
                 # suffix = articulation sector, not the turn direction of the body
                 name = f"{'fwd' if direction > 0 else 'rev'}_{v:.1f}_{label}"
                 sets[fid] = FieldSet(fid, name, direction, v, _swept_envelope(x0, p, hw, *ks),
-                                     _swept_envelope(x0, w, hw, *ks), side if direction > 0 else [])
+                                     _swept_envelope(x0, w, hw, *ks), side if direction > 0 else [],
+                                     side_rear=rear_side)
                 fid += 1
     # DIG: the front protective field is muted (the bucket is meant to enter the
     # pile); side fields stop short of the bucket so the pile flanks do not trip

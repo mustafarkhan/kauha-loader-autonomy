@@ -5,6 +5,24 @@ digital twin before anything moves. The same scenario files and pass criteria
 as the software tests are used, so a result on the bench can be compared
 directly with a result in CI.
 
+## Before the bench: process-level SIL (built)
+
+`kauha/sil` already runs the machine, the safety PLC logic, the autonomy computer and
+the remote station as four operating-system processes. They share a CAN bus
+(python-can over UDP multicast, standing in for the cable) and a separate
+hardwired-I/O link between the machine and the PLC. `tests/sil` kills processes
+mid-run and measures the response:
+
+| Fault | Measured response (CI machine) | Requirement |
+|---|---|---|
+| Autonomy process killed at 2 m/s | Gateway brake 0.20 s, PLC watchdog stop, standstill 1.1 s | SR-06 |
+| Remote station killed | Protective stop at 0.48 s | SR-05 |
+| Safety PLC killed | Relays drop at 0.12 s (fail-safe wiring model), standstill 1.0 s | SR-15 |
+| Person appears 8 m ahead at 2.5 m/s | Stop with 1.37 m to spare | SR-02 |
+
+The bench replaces the UDP bus with socketcan on real CAN interfaces, and the
+I/O link with the digital I/O simulator described below.
+
 ## Bench layout
 
 ```

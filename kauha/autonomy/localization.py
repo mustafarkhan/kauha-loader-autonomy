@@ -30,6 +30,9 @@ class EKF:
     gnss_rejects: int = 0      # consecutive
     gnss_resets: int = 0
     reset_after: int = 10      # consecutive RTK rejections (1 s at 10 Hz)
+    lm_rejects: int = 0        # consecutive landmark rejections
+    inflate_after: int = 6
+    inflations: int = 0
 
     def init(self, x: float, y: float, th: float, sigma: float = 0.1) -> None:
         self.x = np.array([x, y, th])
@@ -83,7 +86,16 @@ class EKF:
         rr = math.sqrt(q)
         h = np.array([rr, wrap(math.atan2(dy, dx) - th)])
         H = np.array([[-dx / rr, -dy / rr, 0], [dy / q, -dx / q, -1]])
-        return self._update(np.array([r, b]), h, H, np.diag([s_r ** 2, s_b ** 2]), angle_idx=(1,))
+        ok = self._update(np.array([r, b]), h, H, np.diag([s_r ** 2, s_b ** 2]), angle_idx=(1,))
+        self.lm_rejects = 0 if ok else self.lm_rejects + 1
+        if self.lm_rejects >= self.inflate_after:
+            # Several surveyed posts in a row disagree with the estimate: the filter
+            # has become over-confident (typically after wheel slip). Inflate the
+            # covariance so the next observations can pull it back.
+            self.P = self.P + np.diag([0.25, 0.25, 0.005])
+            self.lm_rejects = 0
+            self.inflations += 1
+        return ok
 
     @property
     def sigma_xy(self) -> float:

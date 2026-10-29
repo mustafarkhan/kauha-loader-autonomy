@@ -78,6 +78,14 @@ def test_sr03_warning_field_limits_speed_without_stopping(plc):
 
 
 # ---------------------------------------------------------------- SR-04
+@pytest.mark.req("SR-03")
+def test_sr03_warning_ignored_inside_access_controlled_zones(plc):
+    out = run(plc, 4, **nominal(front_warn=True, in_dock_zone=True))
+    assert out.state == State.RUN and out.speed_limit > 2.5
+    out = run(plc, 4, t0=1.0, **nominal(front_prot=True, in_dock_zone=True))
+    assert out.state == State.PROTECTIVE_STOP, "protective fields still apply in zones"
+
+
 @pytest.mark.req("SR-04")
 def test_sr04_overspeed_trips(plc):
     out = run(plc, 4, **nominal(speed_a=3.6, speed_b=3.6))
@@ -244,6 +252,41 @@ def test_sr12_recovery_allows_backing_away_only():
 
 
 @pytest.mark.req("SR-12")
+def test_sr12_side_recovery_refused_while_someone_is_right_beside_the_frame():
+    plc = SafetyPLC()
+    run(plc, 2, **nominal(mode=Mode.TELEOP, side_prot=True, side_contact=True))
+    out = run(plc, 2, t0=1.0, **nominal(mode=Mode.TELEOP, speed_a=0, speed_b=0, side_prot=True,
+                                         side_contact=True, reset_req=True))
+    assert out.state == State.PROTECTIVE_STOP, "no direction is 'away' from a person beside the frame"
+    # Object further out (truck side, pile face): recovery is allowed ...
+    out = run(plc, 2, t0=2.0, **nominal(mode=Mode.TELEOP, speed_a=0, speed_b=0, side_prot=True))
+    out = run(plc, 2, t0=3.0, **nominal(mode=Mode.TELEOP, speed_a=0, speed_b=0, side_prot=True, reset_req=True))
+    assert out.state == State.RUN and not out.implement_enable
+    # ... and stops again if anyone steps into the contact band while it creeps away.
+    out = run(plc, 2, t0=4.0, **nominal(mode=Mode.TELEOP, speed_a=-0.3, speed_b=-0.3, side_prot=True,
+                                         side_contact=True))
+    assert out.state == State.PROTECTIVE_STOP and Cause.FIELD_SIDE in out.cause
+
+
+@pytest.mark.req("SR-12")
+def test_sr12_contact_band_does_not_block_recovery_in_access_controlled_zones():
+    kw = dict(mode=Mode.TELEOP, side_prot=True, side_contact=True, in_dock_zone=True)
+    plc = SafetyPLC()
+    run(plc, 2, **nominal(**kw))
+    out = run(plc, 2, t0=1.0, **nominal(speed_a=0, speed_b=0, reset_req=True, **kw))
+    assert out.state == State.RUN, "driver in the cab: the object in the band is the truck"
+    plc = SafetyPLC()
+    run(plc, 2, **nominal(**kw))
+    out = run(plc, 2, t0=1.0, **nominal(speed_a=0, speed_b=0, reset_req=True, truck_door_open=True, **kw))
+    assert out.state == State.PROTECTIVE_STOP, "cab door open: it may be the driver"
+    plc = SafetyPLC()
+    kw = dict(mode=Mode.TELEOP, side_prot=True, side_contact=True, in_dig_zone=True)
+    run(plc, 2, **nominal(**kw))
+    out = run(plc, 2, t0=1.0, **nominal(speed_a=0, speed_b=0, reset_req=True, **kw))
+    assert out.state == State.RUN, "dig zone: the pile flank must not lock the machine in the slot"
+
+
+@pytest.mark.req("SR-12")
 def test_sr12_no_recovery_in_auto(plc):
     run(plc, 2, **nominal(front_prot=True))
     out = run(plc, 2, t0=1.0, **nominal(speed_a=0, speed_b=0, front_prot=True, reset_req=True))
@@ -257,3 +300,26 @@ def test_sr13_every_stop_and_reset_is_logged(plc):
     run(plc, 2, t0=1.0, **nominal(speed_a=0, speed_b=0, reset_req=True))
     kinds = [r["kind"] for r in plc.log.records]
     assert kinds == ["stop", "reset"] and plc.log.verify() is None
+
+
+# ---------------------------------------------------------------- SR-14
+@pytest.mark.req("SR-14")
+def test_sr14_dock_refused_while_truck_door_open(plc):
+    kw = dict(speed_a=0.5, speed_b=0.5, dock_req=True, in_dock_zone=True)
+    out = run(plc, 4, **nominal(truck_door_open=True, **kw))
+    assert out.field_set != 101 and out.dock_blocked
+    out = run(plc, 4, t0=1.0, **nominal(**kw))
+    assert out.field_set == 101 and not out.dock_blocked
+
+
+@pytest.mark.req("SR-14")
+def test_sr14_door_opening_while_docking_stops_and_clears(plc):
+    kw = dict(speed_a=0.5, speed_b=0.5, dock_req=True, in_dock_zone=True)
+    run(plc, 4, **nominal(**kw))
+    out = run(plc, 2, t0=1.0, **nominal(truck_door_open=True, **kw))
+    assert out.state == State.PROTECTIVE_STOP and Cause.TRUCK_DOOR in out.cause
+    out = run(plc, int(5 / CYCLE_S), t0=2.0, **nominal(speed_a=0, speed_b=0, truck_door_open=True,
+                                                      dock_req=True, in_dock_zone=True))
+    assert out.state == State.PROTECTIVE_STOP, "no restart while the door is open"
+    out = run(plc, int(4 / CYCLE_S), t0=8.0, **nominal(speed_a=0, speed_b=0, dock_req=True, in_dock_zone=True))
+    assert out.state == State.RUN, "auto restart once the door has been closed for 3 s"

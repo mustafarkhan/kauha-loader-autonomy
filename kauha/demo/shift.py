@@ -41,7 +41,18 @@ from kauha.sim.world import Event, Person, load_site
 from kauha.train.bucket_env import ScriptedOperator
 
 SIM_DT = 0.025
+
+
+def field_polygons(fs) -> list[tuple[str, list]]:
+    """(body, polygon) for every protective area of a field set, including the side fields."""
+    out = [("front", fs.protective if fs.direction >= 0 else []),
+           ("rear", fs.protective_for("rear") if fs.direction <= 0 else [])]
+    for body, side in (("front", fs.side), ("rear", fs.side_rear)):
+        if side:
+            out += [(body, side), (body, [(x, -y) for x, y in side])]
+    return out
 RECORD_EVERY = 8          # 5 Hz replay frames
+WALK_AROUND_AFTER_S = 15.0
 
 
 # ------------------------------------------------------------------ scenario
@@ -118,8 +129,13 @@ class Kpis:
 
 class ShiftSim:
     def __init__(self, controller: str = "learned", minutes: float = 60.0, seed: int = 1,
-                 winter: bool = False, policy_path: Path | None = None):
+                 winter: bool = False, policy_path: Path | None = None, guard: bool = False,
+                 careless: bool = False):
         self.rng = np.random.default_rng(seed)
+        # Pedestrian clearance (m): (from a moving machine, from a stopped one). The
+        # default assumes site-trained people keep about a metre away; "careless"
+        # walkers come within 0.3 m and only hold back from a moving machine at 1 m.
+        self.yield_m = (1.0, 0.3) if careless else (1.5, 1.0)
         self.cfg = load_machine()
         self.site = load_site(self.cfg)          # ground truth
         site_map = load_site(self.cfg)           # the autonomy's survey map
@@ -141,7 +157,8 @@ class ShiftSim:
         self.scanners = SafetyScanners(self.rng)
         self.bus = VirtualBus()
         self.gw = MachineGateway()
-        self.auto = AutonomyComputer(self.cfg, site_map, ctrl, schedule)
+        self.auto = AutonomyComputer(self.cfg, site_map, ctrl, schedule, budget=budget,
+                                     guard_enabled=guard)
         self.remote = RemoteStation(self.rng)
         self.mcodec = Codec()
         self.plc_codec = Codec()
@@ -180,6 +197,7 @@ class ShiftSim:
         self._phase_prev = None
         self._stop_events: list[dict] = []
         self._person_in_field_since: dict[str, float] = {}
+        self._blocked_since: dict[str, float] = {}
         self._prev_state = State.RUN
         self._wait_start = None
         self.truck_wait = 0.0
@@ -232,9 +250,7 @@ class ShiftSim:
                 for a, b in zip(cs, cs[1:] + cs[:1]):
                     objs.append(("truck", a[0] + u * (b[0] - a[0]), a[1] + u * (b[1] - a[1])))
         for n, px, py in objs:
-            for body, poly in (("front", fs.protective if fs.direction >= 0 else []),
-                               ("rear", fs.protective if fs.direction <= 0 else []),
-                               ("front", fs.side), ("front", [(x, -y) for x, y in fs.side])):
+            for body, poly in field_polygons(fs):
                 if not poly:
                     continue
                 lx, ly = self._to_body(body, px, py)
@@ -250,9 +266,7 @@ class ShiftSim:
             for x0, y0, x1, y1 in pile.footprint_segments():
                 for u in np.linspace(0, 1, 25):
                     px, py = x0 + u * (x1 - x0), y0 + u * (y1 - y0)
-                    for body, poly in (("front", fs.protective if fs.direction >= 0 else []),
-                                       ("rear", fs.protective if fs.direction <= 0 else []),
-                                       ("front", fs.side), ("front", [(x, -y) for x, y in fs.side])):
+                    for body, poly in field_polygons(fs):
                         if poly:
                             lx, ly = self._to_body(body, px, py)
                             if points_in_polygon(np.array([lx]), np.array([ly]), poly)[0]:
@@ -265,30 +279,32 @@ class ShiftSim:
         They can still walk into the safety fields ahead of a moving machine,
         which is the case the safety channel has to handle.
         """
-        fp = self.loader.footprint()
+        polys, _ = self.loader.body_polygons()   # same ground-level outline as the contact metric
         moving = abs(self.loader.state.v) > 0.05
+
+        def clearance(pos):
+            return min(self._poly_distance(pos[0], pos[1], poly) for poly in polys)
+
         for p in self.site.people:
             nxt = p.position(t + SIM_DT)
             if nxt is None:
                 continue
-            d = self._dist_to_body(nxt[0], nxt[1], fp)
-            # keep clear of a moving machine; walk around a stationary one
-            if (moving and d < 1.0) or d < 0.3:
+            d = clearance(nxt)
+            if (moving and d < self.yield_m[0]) or d < self.yield_m[1]:
                 p.delay += SIM_DT
-
-    @staticmethod
-    def _dist_to_body(px: float, py: float, fp) -> float:
-        best = 99.0
-        for poly in (fp[:4], fp[4:]):
-            if point_in_poly(px, py, poly):
-                return 0.0
-            for i in range(4):
-                ax, ay = poly[i]
-                bx, by = poly[(i + 1) % 4]
-                dx, dy = bx - ax, by - ay
-                u = max(0.0, min(1.0, ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy)))
-                best = min(best, math.hypot(px - ax - u * dx, py - ay - u * dy))
-        return best
+                since = self._blocked_since.setdefault(p.name, t)
+                if not moving and t - since > WALK_AROUND_AFTER_S:
+                    # Nobody waits forever beside a parked machine: they walk round it.
+                    # Modelled as a skip along the route to the first point clear of the
+                    # machine; the walk itself is not simulated.
+                    for skip in np.arange(1.0, 90.0, 0.5):
+                        q = p.position(t + skip)
+                        if q is None or clearance(q) >= self.yield_m[0]:
+                            p.delay -= skip
+                            break
+                    self._blocked_since.pop(p.name, None)
+            else:
+                self._blocked_since.pop(p.name, None)
 
     @staticmethod
     def _poly_distance(px: float, py: float, poly) -> float:
@@ -373,17 +389,18 @@ class ShiftSim:
         inp = SafetyInputs(
             t=t, mode=mode, speed_a=speed_a, speed_b=speed_b, articulation=s.gamma,
             front_prot=sc.front_prot, front_warn=sc.front_warn, rear_prot=sc.rear_prot, rear_warn=sc.rear_warn,
-            side_prot=sc.side_prot, remote_hb_age=hb_age,
+            side_prot=sc.side_prot, side_contact=sc.side_contact, remote_hb_age=hb_age,
             remote_estop=bool(self.plc_hb.get("EStop", 0)) and hb_fresh,
             reset_req=bool(self.plc_hb.get("ResetReq", 0)) and hb_fresh,
             autonomy_cmd_age=cmd_age, dig_req=bool(self.plc_drive.get("DigFieldReq", 0)),
-            dock_req=bool(self.plc_drive.get("DockFieldReq", 0)), **fence)
+            dock_req=bool(self.plc_drive.get("DockFieldReq", 0)),
+            truck_door_open=any(n == "driver" for n, _, _ in site.people_at(t)), **fence)
         out = self.plc.step(inp)
         self.plc_out = out
         self.bus.send(t, *self.plc_codec.encode("SafetyStatus", {
             "State": int(out.state), "ActiveFieldSet": out.field_set if out.field_set < 256 else 255,
             "Cause": int(out.cause) & 0xFFFF, "SpeedLimit": max(0.0, min(6.0, out.speed_limit)),
-            "ResetPending": int(out.reset_pending)}))
+            "ResetPending": int(out.reset_pending), "DockBlocked": int(out.dock_blocked)}))
         self._track_stops(out, fs)
 
         # --- autonomy computer (20 Hz)
@@ -581,9 +598,7 @@ class ShiftSim:
         moving = abs(s.v) > 0.1
         for n, px, py in self.site.people_at(self.t):
             inside = False
-            for body, poly in (("front", fsx.protective if fsx.direction >= 0 else []),
-                               ("rear", fsx.protective if fsx.direction <= 0 else []),
-                               ("front", fsx.side), ("front", [(x, -y) for x, y in fsx.side])):
+            for body, poly in field_polygons(fsx):
                 if poly:
                     lx, ly = self._to_body(body, px, py)
                     if any(points_in_polygon(np.array([lx + ox]), np.array([ly + oy]), poly)[0]
@@ -702,9 +717,12 @@ def main() -> None:
     ap.add_argument("--minutes", type=float, default=60.0)
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--winter", action="store_true")
+    ap.add_argument("--guard", action="store_true", help="enable field-aware speed limiting (AR-04)")
+    ap.add_argument("--careless", action="store_true", help="pedestrians come within 0.3 m (stress case)")
     ap.add_argument("--out", type=Path, default=Path("results/shift"))
     args = ap.parse_args()
-    sim = ShiftSim(args.controller, args.minutes, args.seed, args.winter)
+    sim = ShiftSim(args.controller, args.minutes, args.seed, args.winter, guard=args.guard,
+                   careless=args.careless)
     k = sim.run()
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out / "kpis.json").write_text(json.dumps(asdict(k), indent=1))
@@ -719,6 +737,7 @@ def main() -> None:
             "truck": [sim.site.truck.cx, sim.site.truck.cy, sim.site.truck.length, sim.site.truck.width],
             "landmarks": sim.site.landmarks},
         "fields": {fid: {"name": f.name, "dir": f.direction, "prot": f.protective, "warn": f.warning,
+                         "rprot": f.protective_for("rear"), "rwarn": f.warning_for("rear"), "rside": f.side_rear,
                          "side": f.side} for fid, f in sim.plc.sets.items()},
         "machine": {"lf": sim.cfg.lf, "lr": sim.cfg.lr, "width": sim.cfg.body_width},
         "stops": sim._stop_events,

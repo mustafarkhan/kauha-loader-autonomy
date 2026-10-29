@@ -88,3 +88,42 @@ def test_ekf_drifts_without_any_aiding():
     for _ in range(1200):
         ekf.predict(2.0, 0.0, 0.05)
     assert ekf.sigma_xy > 0.6, "dead reckoning alone must report growing uncertainty"
+
+
+@pytest.mark.req("AR-04")
+def test_field_guard_slows_before_a_mapped_object_enters_the_field():
+    from kauha.autonomy.field_guard import FieldGuard
+    from kauha.autonomy.paths import straight
+    g = FieldGuard()
+    path = straight((0.0, 0.0), 0.0, 40.0, reverse=False)
+    g.set_map([(30.0, -5.0, 30.0, 5.0)], [])          # a wall across the path at x = 30
+    caps = [g.speed_cap(path.pts, path.heading, path.s, path.nearest(x, 0.0), False, (0.0,))
+            for x in (5.0, 18.0, 21.0, 22.5, 24.0)]
+    assert caps[0] >= 2.8, "far away: full speed"
+    assert all(a >= b for a, b in zip(caps, caps[1:])), "cap falls as the wall gets closer"
+    assert caps[-1] == 0.0, "no band is clear once the wall is inside the slowest field"
+    g.set_map([], [])
+    assert g.speed_cap(path.pts, path.heading, path.s, 0, False, (0.0,)) >= 2.8
+
+
+@pytest.mark.req("AR-04")
+def test_field_guard_uses_the_rear_fields_when_reversing():
+    from kauha.autonomy.field_guard import FieldGuard
+    from kauha.autonomy.paths import straight
+    g = FieldGuard()
+    path = straight((0.0, 0.0), math.pi, 20.0, reverse=True)   # rear axle path heading -x
+    g.set_map([(-6.0, -5.0, -6.0, 5.0)], [])
+    cap = g.speed_cap(path.pts, path.heading, path.s, 0, True, (0.0,))
+    assert 0.0 < cap < 2.0, "a wall 6 m behind the rear axle limits reversing speed"
+
+
+@pytest.mark.req("AR-02")
+def test_ekf_recovers_from_overconfident_error_using_posts():
+    """A 2 m error with a tight covariance (e.g. after slip) is recovered without GNSS."""
+    lms = [(0, -30), (30, -30), (60, -30), (68, 9.5), (30, 28), (0, 28), (-3, 0)]
+    ekf = EKF(landmarks=lms)
+    ekf.init(12.0, 1.5, 0.0, sigma=0.02)            # truth is (10, 0, 0)
+    for _ in range(40):
+        for i, (lx, ly) in enumerate(lms):
+            ekf.update_landmark(i, math.hypot(lx - 10, ly), math.atan2(ly, lx - 10))
+    assert math.hypot(ekf.x[0] - 10, ekf.x[1]) < 0.2 and ekf.inflations > 0

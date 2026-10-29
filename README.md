@@ -15,16 +15,18 @@ physical machine is involved:
 | Safety channel | Deterministic safety PLC logic: speed-banded field sets, protective/warning fields, speed envelope, heartbeat, watchdog, geofence, dig/dock muting, supervised recovery, hash-chained event log | `kauha/safety` |
 | Machine bus | DBC, encoder/decoder, end-to-end protection (counter + CRC-8 J1850), drive-by-wire gateway | `kauha/can` |
 | Digital twin | Articulated loader dynamics, bucket–pile interaction, depleting stockpiles, trucks, people, ray-cast safety scanners, lidar/camera/GNSS/IMU models, dust, outages | `kauha/sim` |
-| Autonomy | EKF localisation (GNSS + survey posts), pile/truck/people perception, V-cycle planner, articulated pure pursuit, supervisor, learned bucket filling | `kauha/autonomy` |
+| Autonomy | EKF localisation (GNSS + survey posts), pile/truck/people perception, V-cycle planner, articulated pure pursuit, field-aware speed limiting, supervisor, learned bucket filling | `kauha/autonomy` |
 | Learning | PPO bucket-filling policy with domain randomisation; YOLO11n person/PPE detector fine-tuned on Construction-PPE | `kauha/train`, `models/` |
 | Verification | Requirement-traced unit, property-based, closed-loop and end-to-end tests; CAN tests over python-can | `tests/`, `docs/safety/requirements.md` |
+| Multi-process SIL | Machine, safety PLC, autonomy and remote station as separate processes on a shared CAN bus; fault injection by killing processes | `kauha/sil`, `tests/sil` |
 | Demonstration | 60-minute shift with people, link loss, an obstacle, dust, a GNSS outage, a material change, a computer freeze and a remote e-stop; KPIs and replay | `kauha/demo/shift.py`, `docs/results` |
 
 ## Quick start
 
 ```bash
 pip install -e ".[dev]"            # core + tests
-pytest                             # ~2 min
+pytest -m "not slow"               # ~1 min
+pytest -m slow                     # real-time multi-process SIL, ~1 min
 python -m kauha.demo.shift --controller learned --minutes 60 --out results/shift_learned
 ```
 

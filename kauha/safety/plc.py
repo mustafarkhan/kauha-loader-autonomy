@@ -61,9 +61,12 @@ class Cause(IntFlag):
     ESTOP_MACHINE = 1 << 10
     ESTOP_REMOTE = 1 << 11
     POSITION_INVALID = 1 << 12
+    TRUCK_DOOR = 1 << 13
 
 
 FIELD_CAUSES = Cause.FIELD_FRONT | Cause.FIELD_REAR | Cause.FIELD_SIDE
+# Causes that clear by themselves (the object or person moves away); eligible for SR-11 auto restart.
+CLEARING_CAUSES = FIELD_CAUSES | Cause.TRUCK_DOOR
 
 
 @dataclass(frozen=True)
@@ -98,6 +101,7 @@ class SafetyInputs:
     rear_prot: bool = False
     rear_warn: bool = False
     side_prot: bool = False
+    side_contact: bool = False           # SR-12: someone (or something) right beside the frame
     scanners_ok: bool = True
     remote_hb_age: float = 0.0
     remote_estop: bool = False
@@ -109,6 +113,7 @@ class SafetyInputs:
     in_operating_area: bool = True
     in_dig_zone: bool = False
     in_dock_zone: bool = False
+    truck_door_open: bool = False        # SR-14: cab-door switch of the truck in the bay
     position_valid: bool = True
 
 
@@ -121,6 +126,7 @@ class SafetyOutputs:
     brake_release: bool          # False => service + park brake applied, drive cut (hardwired)
     implement_enable: bool       # False => hydraulic pilot supply cut (hardwired)
     reset_pending: bool
+    dock_blocked: bool = False           # SR-14: tells the autonomy to hold off docking
 
 
 @dataclass
@@ -181,7 +187,12 @@ class SafetyPLC:
 
         # Field-set selection (SR-02, SR-10). Dig/dock sets need zone + speed agreement.
         dig_ok = i.dig_req and i.in_dig_zone and abs(v) <= DIG_SPEED + p.overspeed_tol and i.position_valid
-        dock_ok = i.dock_req and i.in_dock_zone and abs(v) <= DOCK_SPEED + p.overspeed_tol and i.position_valid
+        dock_ok = (i.dock_req and i.in_dock_zone and abs(v) <= DOCK_SPEED + p.overspeed_tol and i.position_valid
+                   and not i.truck_door_open)
+        # SR-14: the driver leaving the cab while the loader is docking stops it; the
+        # raised bucket would otherwise pass over a person standing by the truck.
+        if i.truck_door_open and self.field_set == 101 and i.in_dock_zone:
+            self._trip(t, Cause.TRUCK_DOOR)
         if dig_ok and v > -STANDSTILL:          # the front field is actually muted
             self._mute_since = t if self._mute_since is None else self._mute_since
             if t - self._mute_since > p.max_mute_s:
@@ -210,6 +221,10 @@ class SafetyPLC:
                     self.recovery &= ~Cause.FIELD_REAR
                 if at_rest and Cause.FIELD_SIDE in self.recovery and not i.side_prot:
                     self.recovery &= ~Cause.FIELD_SIDE
+                # Beside the frame no direction is "away": the bucket is wider than the
+                # front frame and slides past a person standing there either way.
+                if Cause.FIELD_SIDE in self.recovery and i.side_contact and not self._band_exempt(i):
+                    self._trip(t, Cause.FIELD_SIDE, field="recovery_contact", v=round(v, 2))
                 if Cause.FIELD_FRONT in self.recovery and v > p.standstill:
                     self._trip(t, Cause.FIELD_FRONT, field="recovery", v=round(v, 2))
                 if Cause.FIELD_REAR in self.recovery and v < -p.standstill:
@@ -250,8 +265,12 @@ class SafetyPLC:
         else:
             self._disc_since = None
 
-        # SR-03 warning field -> speed limit (non-latching).
-        if (i.front_warn and fs.direction >= 0) or (i.rear_warn and fs.direction <= 0):
+        # SR-03 warning field -> speed limit (non-latching). Inside the access-
+        # controlled dig and dock zones the warning field is not used: there it
+        # only ever sees the stockpile or the truck, and the zones exclude people
+        # on foot. Protective fields are unaffected.
+        in_zone = i.in_dig_zone or i.in_dock_zone
+        if not in_zone and ((i.front_warn and fs.direction >= 0) or (i.rear_warn and fs.direction <= 0)):
             self._warn_until = t + p.warning_hold_s
         warning = t < self._warn_until
 
@@ -289,7 +308,8 @@ class SafetyPLC:
         if self.state >= State.PROTECTIVE_STOP:
             remaining = self.latched & active
             if (rising_reset and i.mode == Mode.TELEOP and self.state == State.PROTECTIVE_STOP
-                    and remaining and not (remaining & ~FIELD_CAUSES)):
+                    and remaining and not (remaining & ~FIELD_CAUSES)
+                    and not (remaining & Cause.FIELD_SIDE and i.side_contact and not self._band_exempt(i))):
                 # SR-12: enter recovery instead of refusing the reset.
                 self.recovery = remaining
                 self.log.append(t, "recovery", fields=remaining.name or str(int(remaining)))
@@ -300,7 +320,7 @@ class SafetyPLC:
                 self._clear_since = None
             auto_ok = (self.state == State.PROTECTIVE_STOP
                        and p.auto_restart_clear_s is not None
-                       and self.latched & ~FIELD_CAUSES == Cause.NONE
+                       and self.latched & ~CLEARING_CAUSES == Cause.NONE
                        and self._clear_since is not None
                        and t - self._clear_since >= p.auto_restart_clear_s
                        and not warning)
@@ -321,7 +341,15 @@ class SafetyPLC:
             # so a load is never lowered over the person who caused the stop.
             implement_enable=not stopped and not self.recovery,
             reset_pending=stopped and not (self.latched & self._active_causes(i, fs)),
+            dock_blocked=i.truck_door_open,
         )
+
+    @staticmethod
+    def _band_exempt(i: SafetyInputs) -> bool:
+        """Inside the access-controlled zones the object in the contact band is taken
+        to be the pile flank (dig zone) or the truck (dock zone, driver in the cab).
+        Same organisational measure the dig-field muting already relies on (SR-10)."""
+        return i.in_dig_zone or (i.in_dock_zone and not i.truck_door_open)
 
     def _active_causes(self, i: SafetyInputs, fs: FieldSet) -> Cause:
         """Causes whose condition is still present (blocks reset)."""
@@ -349,4 +377,6 @@ class SafetyPLC:
             c |= Cause.SPEED_DISCREPANCY
         if i.mode == Mode.AUTO and not i.position_valid:
             c |= Cause.POSITION_INVALID
+        if i.truck_door_open and i.in_dock_zone:
+            c |= Cause.TRUCK_DOOR
         return c

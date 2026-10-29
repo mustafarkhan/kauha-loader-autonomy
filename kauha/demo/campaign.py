@@ -20,7 +20,9 @@ import numpy as np
 from kauha.config import REPO_ROOT
 
 CONFIGS = {"learned": ["--controller", "learned"], "scripted": ["--controller", "scripted"],
-           "winter": ["--controller", "learned", "--winter"]}
+           "winter": ["--controller", "learned", "--winter"],
+           "guard_on": ["--controller", "learned", "--guard"],
+           "careless": ["--controller", "scripted", "--careless"]}
 NUMERIC = ("tonnes", "tonnes_per_hour", "cycles", "trucks", "cycle_time_median_s", "clean_cycle_time_median_s",
            "dig_time_mean_s", "fill_factor_mean", "truck_wait_s", "interventions_per_hour", "protective_stops",
            "false_stops", "min_person_distance_moving_m", "person_field_entries_while_moving",
@@ -43,9 +45,10 @@ def main() -> None:
     ap.add_argument("--workers", type=int, default=2)
     ap.add_argument("--out", type=Path, default=REPO_ROOT / "results" / "runs")
     ap.add_argument("--aggregate-only", action="store_true")
+    ap.add_argument("--only", nargs="+", default=None, help="run only these configurations, then aggregate all")
     args = ap.parse_args()
     if not args.aggregate_only:
-        jobs = [(c, s) for c in CONFIGS for s in args.seeds]
+        jobs = [(c, s) for c in (args.only or CONFIGS) for s in args.seeds]
         with ThreadPoolExecutor(args.workers) as ex:
             list(ex.map(lambda j: run(j[0], j[1], args.minutes, args.out), jobs))
     agg = {}

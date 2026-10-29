@@ -13,6 +13,7 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
+from kauha.autonomy.field_guard import FieldGuard
 from kauha.autonomy.localization import EKF
 from kauha.autonomy.perception import PeopleTracker, PileMap, TruckTracker
 from kauha.autonomy.planner import Command, CyclePlanner, Percept
@@ -20,6 +21,7 @@ from kauha.can.codec import Codec
 from kauha.config import MachineConfig
 from kauha.kinematics import bucket_tip_local
 from kauha.safety.plc import Mode
+from kauha.safety.stopping import StopBudget
 from kauha.train.bucket_env import MAX_T
 
 DT = 0.05
@@ -40,6 +42,8 @@ class AutonomyComputer:
     codec: Codec = field(default_factory=Codec)
     mode: Mode = Mode.AUTO
     teleop_cmd: Command | None = None
+    budget: StopBudget = field(default_factory=StopBudget)   # same stop budget the PLC uses
+    guard_enabled: bool = False   # measured: costs throughput once fields and zones are right
 
     def __post_init__(self) -> None:
         s = self.site
@@ -51,7 +55,9 @@ class AutonomyComputer:
         self.people = PeopleTracker()
         self.planner = CyclePlanner(self.cfg, self.piles, self.truck, self.people, self.bucket_controller,
                                     dock_offset=s.dock_offset, pile_schedule=self.pile_schedule,
-                                    area=list(s.operating_area))
+                                    area=list(s.operating_area),
+                                    guard=FieldGuard(self.budget) if self.guard_enabled else None)
+        self._map_t = -1e9
         self.sup = SupervisorState()
         self.machine: dict = {}
         self.safety: dict = {}
@@ -61,6 +67,27 @@ class AutonomyComputer:
         self._stopped_since = 0.0
         self._asked_for_this_stop = False
         self.densities = {n: p.material.density_t_m3 for n, p in s.piles.items()}
+
+    def _update_guard_map(self, truck_present: bool) -> None:
+        """Static objects the safety fields can see, from the autonomy's own map."""
+        s = self.site
+        segs = list(s.walls)
+        for name, slots in self.piles.slots.items():
+            back = s.piles[name].back_x
+            off = 0.5 / math.tan(math.radians(self.piles.repose_deg[name]))
+            for sl in slots:
+                x = sl.toe_x + off
+                y0, y1 = sl.y_c - sl.width / 2, sl.y_c + sl.width / 2
+                segs += [(x, y0, x, y1), (x, y0, back, y0), (x, y1, back, y1)]
+        if truck_present:
+            tx, ty, th = self.truck.best()
+            tr = s.truck
+            c, sn = math.cos(th), math.sin(th)
+            hl, hw = tr.length / 2, tr.width / 2
+            corners = ((hl, hw), (-hl, hw), (-hl, -hw), (hl, -hw))
+            pts = [(tx + c * dx - sn * dy, ty + sn * dx + c * dy) for dx, dy in corners]
+            segs += [(*pts[i], *pts[(i + 1) % 4]) for i in range(4)]
+        self.planner.guard.set_map(segs, list(s.landmarks))
 
     # ---------------------------------------------------------------- inputs
     def receive(self, frame_id: int, data: bytes) -> None:
@@ -112,7 +139,7 @@ class AutonomyComputer:
                     signals.get("force_ratio", 0.0), signals.get("stalled", False), state,
                     min(self.safety.get("SpeedLimit", 0.0), self.sup.speed_cap),
                     int(self.safety.get("ActiveFieldSet", 0)), signals.get("truck_present", False),
-                    ekf.sigma_xy)
+                    ekf.sigma_xy, bool(self.safety.get("DockBlocked", 0)))
 
         # Supervisor: localisation quality -> speed cap or hold.
         sig = ekf.sigma_xy
@@ -145,6 +172,9 @@ class AutonomyComputer:
         elif state >= 2:
             cmd = Command(brake=True)
         else:
+            if self.planner.guard is not None and t - self._map_t > 1.0:
+                self._update_guard_map(signals.get("truck_present", False))
+                self._map_t = t
             cmd = self.planner.tick(p, self.dig_obs)
             if self.planner.assist_request:
                 self.assist = self.planner.assist_request

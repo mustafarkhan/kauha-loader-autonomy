@@ -135,7 +135,7 @@ ul.plain { padding-left: 18px; margin: 6px 0 } ul.plain li { margin: 4px 0; max-
 
   <section>
     <h2>Shift results</h2>
-    <p class="note">The same 60-minute scenario was run with the learned bucket controller, with the tuned rule-based controller, and with the learned controller under winter braking (lower speed cap), each on several random seeds. One shift is one sample: small timing differences change where a person crosses or which stop happens, so every number is a mean with its range. These are simulation outputs, not field data.</p>
+    <p class="note">The same 60-minute scenario was run in five configurations, each on several random seeds: learned bucket controller; tuned rule-based controller; learned under winter braking (lower speed cap); learned with the field-aware speed guard on; and a stress case where people on foot come within 0.3 m of a stopped machine and 1 m of a moving one, instead of the default 1 m and 1.5 m. One shift is one sample: small timing differences change where a person crosses or which stop happens, so every number is a mean with its range. These are simulation outputs, not field data.</p>
     <div class="scroll"><table id="kpi"></table></div>
     <p class="note" id="kpinote"></p>
   </section>
@@ -150,7 +150,7 @@ ul.plain { padding-left: 18px; margin: 6px 0 } ul.plain li { margin: 4px 0; max-
     </div>
     <div>
       <h3>Learned bucket filling vs tuned rule-based operator</h3>
-      <p class="note">PPO policy trained on a randomised bucket–pile model, tested on held-out seeds. Bars show bucket-loading productivity (m³/h over the whole V-cycle).</p>
+      <p class="note">PPO residual policy on top of the tuned rule-based operator, trained on a randomised bucket–pile model and tested on held-out seeds. The objective uses the measured 60 s remainder of KAUHA's cycle. Bars show bucket-loading productivity (m³/h over the whole cycle).</p>
       <div class="bars" id="bucketbars"></div>
       <div class="scroll"><table id="buckettab"></table></div>
     </div>
@@ -177,8 +177,9 @@ ul.plain { padding-left: 18px; margin: 6px 0 } ul.plain li { margin: 4px 0; max-
         <ul class="plain">
           <li>The safety channel stops the machine before people, independent of the autonomy computer. This was checked closed-loop at every speed band, forward and reverse, dry and winter.</li>
           <li>Faults degrade to a safe state and come back: radio loss, a frozen autonomy computer, an unmapped obstacle and a GNSS outage.</li>
-          <li>The full CAN path, with end-to-end checks and timeouts, carries every command.</li>
-          <li>Learned bucket filling digs faster than a tuned rule set, but slightly shallower.</li>
+          <li>The full CAN path, with end-to-end checks and timeouts, carries every command; killing the autonomy, remote or safety-PLC process in the multi-process test stops the machine.</li>
+          <li>Bucket filling: once the training objective used the cycle time the twin measured, a learned policy no longer beat a well-tuned rule set: it ties overall and is 7 % worse on crushed rock. It stays in the campaign so the comparison is visible in every run.</li>
+          <li>The twin finds safety-design errors before metal is cut. In this round it found that the side fields did not cover the rear frame, that teleop recovery could slide the bucket past a person standing beside the frame, and that the fix for that could lock the machine against a pile flank. Each is fixed and has a test.</li>
         </ul>
       </div>
       <div>
@@ -187,6 +188,7 @@ ul.plain { padding-left: 18px; margin: 6px 0 } ul.plain li { margin: 4px 0; max-
           <li>Productivity on a real machine. The soil model is a reduced FEE-style model, not validated against measured bucket forces.</li>
           <li>Real braking and scanner response. These are assumptions until measured, dry and on snow.</li>
           <li>Detection of real people in dust and snow. The scanners are ray-cast against ideal shapes.</li>
+          <li>How real people behave around the machine. Pedestrians follow scripted routes and a simple keep-clear rule; the stress case narrows that rule but is still a model.</li>
           <li>Certification. The safety logic is a reference model to re-implement in a certified PLC toolchain.</li>
         </ul>
       </div>
@@ -283,8 +285,9 @@ function drawSite(f) {
       else poly(w, null, css("--warn"), [6, 5]);
     };
     if (fs.dir >= 0) { draw(front, fs.warn, "w"); draw(front, fs.prot, "p"); }
-    if (fs.dir <= 0) { draw(rear, fs.warn, "w"); draw(rear, fs.prot, "p"); }
+    if (fs.dir <= 0) { draw(rear, fs.rwarn || fs.warn, "w"); draw(rear, fs.rprot || fs.prot, "p"); }
     if (fs.side && fs.side.length) { draw(front, fs.side, "p"); draw(front, fs.side.map(([a, b]) => [a, -b]), "p"); }
+    if (fs.rside && fs.rside.length) { draw(rear, fs.rside, "p"); draw(rear, fs.rside.map(([a, b]) => [a, -b]), "p"); }
   }
   // bodies
   const hw = M.width / 2;
@@ -361,7 +364,7 @@ for (const [label, t] of jumps) { if (t > T_END) continue; const b = document.cr
 
 // ---------- KPI table (campaign: mean and range over seeds)
 const C = DATA.campaign, cols = Object.keys(C);
-const COLNAME = { learned: "Learned bucket", scripted: "Rule-based bucket", winter: "Learned, winter braking" };
+const COLNAME = { learned: "Learned bucket", scripted: "Rule-based bucket", winter: "Learned, winter braking", guard_on: "Learned, field guard on", careless: "Rule-based, careless walkers (0.3 m)" };
 const nSeeds = C[cols[0]].seeds.length;
 const cell = (c, key, fmt) => { const s = C[c].summary[key]; return `${fmt(s.mean)} <span class="range">${fmt(s.min)}–${fmt(s.max)}</span>`; };
 const f0 = v => v.toFixed(0), f1 = v => v.toFixed(1), f2 = v => v.toFixed(2), cm = v => (v * 100).toFixed(1);

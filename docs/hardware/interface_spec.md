@@ -56,6 +56,7 @@ The DBC is the reference. Key points:
   - ResetPending.
   - ActiveFieldSet.
   - Cause: bitfield, see `kauha.safety.plc.Cause`.
+  - DockBlocked: the truck driver's cab door is open (SR-14); the autonomy holds short of the truck.
   - SpeedLimit: 0.001 m/s per bit.
   - This message is informational. The stop itself is hardwired.
 - **RemoteHeartbeat**
@@ -69,12 +70,14 @@ The DBC is the reference. Key points:
 |---|---|---|---|---|
 | Front/rear scanner OSSD pairs (protective) | in | 2 × 2 per scanner | Protective field violated | SR-02 |
 | Scanner warning outputs | in | 1 per scanner | Warning field violated | SR-03 |
+| Scanner contact-band outputs (second simultaneous field) | in | 2 per scanner | Someone or something within 0.35 m of the frame side; blocks teleop side recovery | SR-12 |
 | Field-set select | out | 4–6 per scanner (encoded) | Selects speed/direction/sector set | SR-02, SR-10 |
 | Machine e-stops (3) | in | 2 each | Emergency stop | SR-01 |
 | Safety radio e-stop | in | 2 | Remote e-stop, loss of signal = stop | SR-01 |
 | Driveline speed sensor | in | 2 | Independent speed | SR-04, SR-08 |
 | Articulation angle | in | analog/encoder | Field sector | SR-02 |
 | Mode key switch | in | 2 | MANUAL / AUTO / TELEOP | — |
+| Truck cab-door switch (via the bay's safety radio receiver) | in | 2 | Driver out of the cab: no dock field set, stop if docking | SR-14 |
 | Park brake + transmission neutral relays | out | 2 (force-guided, monitored) | Drive stop | all stops |
 | Pilot supply cut-off valve | out | 1 + feedback | Implement stop | all stops |
 | Beacon, horn | out | 1 each | Warning to people | — |

@@ -7,13 +7,14 @@ from `results/campaign.json` and the model files.
 
 ## 1. Bucket filling: learned vs tuned rule-based operator
 
-| | Learned (PPO) | Rule-based (grid-tuned) |
-|---|---|---|
-| Cycle productivity, randomised materials (m³/h over the V-cycle) | 338.6 | 328.8 (+3.0 %) |
-| Fill factor | 0.90 | 0.93 |
-| Dig time | 6.7 s | 8.4 s |
-| Success rate | 100 % | 100 % |
-| Sand / gravel / crushed rock / wood chips (m³/h) | 392 / 353 / 290 / 429 | 383 / 352 / 285 / 421 |
+| Test set (m³/h over the V-cycle) | Learned (PPO) | Rule-based (grid-tuned) | Difference |
+|---|---|---|---|
+| Randomised materials, 200 episodes | 147.9 | 146.7 | +0.8 % |
+| Sand | 167.7 | 168.0 | −0.2 % |
+| Gravel | 157.9 | 159.1 | −0.7 % |
+| Crushed rock | 130.1 | 139.5 | −6.7 % |
+| Wood chips | 187.8 | 183.4 | +2.4 % |
+| Fill factor / dig time, randomised | 0.94 / 8.7 s | 0.94 / 9.1 s | |
 
 **Method.**
 - PPO (Stable-Baselines3) on the bucket–pile model with domain randomisation:
@@ -23,8 +24,9 @@ from `results/campaign.json` and the model files.
   - pile height 1.8–4 m;
   - entry speed 0.5–1.0 m/s;
   - sensor noise ×0.5–1.5.
-- The objective is cycle productivity: fill × V / (dig time + 22 s for the rest
-  of the cycle).
+- The objective is cycle productivity: fill × V / (dig time + 60 s for the rest
+  of the cycle). The 60 s is the measured rest of the cycle in the shift
+  simulation.
 - The policy sees only signals a retrofit kit can measure, and is trained inside
   the safety PLC's 1.0 m/s dig speed cap.
 - The baseline's six thresholds were grid-searched on the same objective
@@ -33,14 +35,20 @@ from `results/campaign.json` and the model files.
   held-out test episodes plus 50 per fixed material.
 
 **What to take from it.**
-- The learned policy digs about 20 % faster. It takes a slightly lighter
-  bucket, and comes out about 3 % ahead on cycle productivity.
-- That is a modest gain over a well-tuned rule set, not a step change.
-- PPO training was unstable past about 0.65 M steps: the policy drifted toward
-  shallower, quicker fills. The selected checkpoint is the best on validation.
-  `models/bucket_training.json` has the full log.
-- The soil model is not validated. The sign and size of the gain must be
-  re-measured on a machine.
+- **The learned policy no longer beats the tuned rule set.** v1 assumed 22 s for
+  the rest of the cycle, which rewarded fast, light fills; with that objective
+  the policy was 3 % ahead. With the measured 60 s, a full bucket matters more
+  than a quick one. The tuned rule set then ties overall and wins clearly on
+  crushed rock.
+- The default shift controller is still the learned policy, so the
+  learned-vs-rule comparison stays visible in every campaign. The difference in
+  tonnes is within the seed spread (section 3).
+- PPO training was unstable: validation score fell after the first checkpoints.
+  The selected checkpoint is the best on validation. `models/bucket_training.json`
+  has the full log.
+- The soil model is not validated. The sign and size of any gain must be
+  re-measured on a machine. A learned bucket controller is not yet justified
+  by these results.
 
 ## 2. Person / PPE detector
 
@@ -63,18 +71,28 @@ a non-safety function.
 
 ## 3. Full shift (60 min, 3 seeds per configuration)
 
-| | Learned bucket | Rule-based bucket | Learned, winter braking |
-|---|---|---|---|
-| Tonnes loaded | 196 (174–207) | 177 (171–187) | 197 (189–202) |
-| Trucks filled (20 t) | 9.7 | 8.3 | 9.7 |
-| Cycle time, median without stops | 71 s | 73 s | 71 s |
-| Remote interventions per hour | 9.0 | 7.7 | 8.3 |
-| Protective / emergency stops | 8.0 | 5.3 | 6.7 |
-| Closest person to the moving machine (ground level) | 0.55 m | 1.18 m | 0.94 m |
-| Person under the raised bucket while moving | 2.2 s | 4.4 s | 0.0 s |
-| Localisation RMS | 3.5 cm | 2.1 cm | 3.4 cm |
-| Teleop glass-to-glass p95 | 129 ms | 129 ms | 128 ms |
-| CAN frames rejected | 0 | 0 | 0 |
+Mean over three seeds, with the min–max range in brackets.
+
+| | Learned bucket | Rule-based bucket | Learned, winter braking | Learned, field guard on | Rule-based, careless walkers |
+|---|---|---|---|---|---|
+| Tonnes loaded | 213 (200–221) | 212 (199–233) | 212 (193–222) | 212 (199–221) | 220 (199–233) |
+| Trucks filled (20 t) | 10.3 | 10.0 | 10.3 | 10.0 | 10.3 |
+| Cycle time, median without stops | 68.0 s | 68.9 s | 70.1 s | 69.1 s | 68.8 s |
+| Remote interventions per hour | 7.0 | 6.7 | 5.7 | 6.3 | 6.7 |
+| Protective / emergency stops | 6.0 | 7.0 | 6.7 | 7.7 | 6.7 |
+| False stops (no real object) | 0.3 | 0.7 | 0.7 | 2.3 | 0.3 |
+| Closest person to the moving machine (ground level) | 1.44 m | 1.32 m | 1.36 m | 1.24 m | 1.17 m (0.76–1.39) |
+| Person entered a protective field while moving | 0 | 0 | 0 | 0 | 0 |
+| Person under the raised bucket while moving | 0 s | 0 s | 0 s | 0 s | 0 s |
+| Localisation RMS | 2.1 cm | 2.0 cm | 1.9 cm | 2.0 cm | 2.1 cm |
+| Teleop glass-to-glass p95 | 130 ms | 129 ms | 129 ms | 129 ms | 129 ms |
+| CAN frames rejected | 0 | 0 | 0 | 0 | 0 |
+
+"Careless walkers" is a stress case. By default people on foot keep 1 m from a
+stopped machine and 1.5 m from a moving one. In the stress case they come within
+0.3 m and 1 m. Learned-controller trajectories never brought anyone that close,
+so the stress case runs on the rule-based controller, whose seed 2 produced the
+close encounters.
 
 **Scenario events per shift.**
 - A worker crosses the loading lane.
@@ -87,42 +105,106 @@ a non-safety function.
 - The autonomy computer freezes for 0.8 s.
 - The supervisor tests the remote e-stop.
 
-**What the shift shows.**
-- **No ground-level contact in any run.** When a person entered a protective
-  field, the stop followed within 0.05–0.075 s of the twin's first detection
-  of the entry.
+### What changed since v1
+
+| Learned bucket, mean of 3 seeds | v1 | v2 |
+|---|---|---|
+| Tonnes loaded | 196 | 213 |
+| Cycle time, median without stops | 71.0 s | 68.0 s |
+| Remote interventions per hour | 9.0 | 7.0 |
+| Protective / emergency stops | 8.0 | 6.0 |
+| Closest person to the moving machine | 0.55 m | 1.44 m |
+| Person under the raised bucket while moving | 2.2 s | 0 s |
+| Localisation RMS | 3.5 cm | 2.1 cm |
+
+The gains come from:
+- **Truck cab-door interlock (SR-14).** The driver who steps out is no longer
+  under the raised bucket. This was the open finding from v1.
+- **Planner changes.**
+  - Shorter reverse run-outs.
+  - Repositioning instead of re-planning when the approach is blocked.
+  - Phase timeouts.
+  - Holding the dig/dock field request for the first metre of reversing.
+- **EKF changes.**
+  - A GNSS reset after repeated rejections.
+  - Landmark covariance inflation after slip.
+
+Read the closest-person row with care. The default pedestrian model also
+changed: in v1 people walked to within 0.3 m of the machine. The stress column
+is the like-for-like comparison: 0.76 m at worst, against 0.24 m in v1.
+
+### What the shift shows
+
+- **No ground-level contact while moving in any of the 15 runs.** No person
+  entered a protective field while the machine moved, and nobody was under a
+  raised bucket.
 - **Faults are handled as designed.** Each fault produced the designed
   response, and a supervised reset returned the machine to work:
   - link loss: protective stop at 0.5 s;
   - computer freeze: gateway brake at 0.15 s, PLC watchdog stop at 0.2 s;
   - remote e-stop: emergency stop.
-- **Cycle time is about 71 s against about 30 s for a skilled operator.** The
-  breakdown in the replay shows where the time goes:
-  - the safety fields force slow approaches to the truck and the face (dock
-    set only below 0.6 m/s, warning fields capping at 1 m/s);
-  - the simple planner backs up and re-plans when it cannot find a drivable
-    approach.
-  - This is the main engineering gap to close, mostly in planning and in
-    zone-specific field design.
-- **Interventions run at 8–9 per hour**, most of them `blocked_path` after
-  nuisance stops on stockpile flanks and truck corners during curved
-  approaches. Commercial targets are below 1 per hour.
+- **Cycle time is about 68 s against about 30 s for a skilled operator.** This
+  is still the main gap. The slow, safety-limited approaches to the truck and
+  the face dominate (see the breakdown in the replay).
+- **Interventions run at 6–7 per hour.** Most are `blocked_path` after a stop
+  next to a pile flank or the truck. Commercial targets are below 1 per hour.
+- **Covering the rear frame costs throughput.** Side fields on the rear frame
+  added side stops. Learned-bucket tonnes fell from 222 to 213, and
+  interventions rose from 6.0 to 7.0 per hour, against the same v2 code before
+  this change. That is the price of closing a real gap.
+- **The field-aware speed guard (AR-04) does not pay for itself yet.** It did not
+  raise throughput or cut interventions, and it added false stops
+  (2.3 per shift). It stays off by default.
 - **Winter braking barely changed throughput.** The machine rarely travels
   above the winter cap of 2.61 m/s on this short site.
 
-**Safety findings from the twin.** Each was fixed or documented in
-`docs/safety/safety_concept.md`.
+### Process-level SIL
+
+The machine, the safety PLC, the autonomy computer and the remote station run
+as four OS processes. They share a CAN bus (UDP multicast) and a separate
+hardwired-I/O link. Results are in `docs/hardware/hil_bench.md`:
+
+| Fault | Measured response |
+|---|---|
+| Autonomy process killed at 2 m/s | Gateway brake 0.20 s, PLC watchdog stop, standstill 1.1 s |
+| Remote station killed | Protective stop at 0.48 s |
+| Safety PLC killed | Relays drop at 0.12 s, standstill 1.0 s |
+| Person appears 8 m ahead at 2.5 m/s | Stop with 1.37 m to spare |
+
+### Safety findings from the twin
+
+Each was fixed or documented in `docs/safety/safety_concept.md`.
+
 1. **Fields could miss part of a sharp turn.** Field sets built at one nominal
    articulation did not cover the full articulation range.
    - Fix: convex envelopes over five sectors.
    - Test: `test_field_covers_swept_path_for_any_articulation`.
 2. **A load could be lowered over the person who caused a stop.** During
    teleop recovery the operator could lower the bucket over that person.
-   - Fix: SR-12 now disables the implement during recovery.
+   - Fix: SR-12 disables the implement during recovery.
    - Recovery clears only at standstill.
-3. **A truck driver standing beside the truck is under the raised bucket for 1–2 s
-   during the final approach.** This is open. Candidate fixes are in the safety
-   concept.
+3. **The truck driver could be under the raised bucket.** A driver standing
+   beside the truck was under it for 1–2 s during the final approach.
+   - Fix: truck cab-door interlock (SR-14).
+4. **The standstill rear field was in the wrong place.** It was placed at the
+   bucket's reach instead of the counterweight, leaving 3.4 m behind a stopped
+   machine uncovered.
+   - Fix: per-body standstill fields.
+5. **The rear frame's sides were not covered.** The scanners were yawed ±20°, so
+   nothing saw beside the rear frame.
+   - Fix: scanners turned 45° outward using their 275° scan angle, plus side
+     fields on the rear frame.
+6. **Teleop recovery could brush a person standing beside the frame.** Recovery
+   from a side stop allowed creep in either direction. Because the bucket is
+   wider than the front frame, reversing slid its corner past the person.
+   - Fix: a 0.35 m contact band beside each frame, as a second simultaneous
+     scanner field. Recovery is refused while the band is occupied.
+7. **The fix for 6 could lock the machine in place.** A pile flank, or the truck
+   at the dock, sat in the contact band and blocked recovery for the rest of the
+   shift.
+   - Fix: the band does not block recovery inside the access-controlled dig
+     zone, or in the dock zone while the cab door is closed.
+   - This is a stated residual risk.
 
 ## 4. Reproduce
 
@@ -134,5 +216,5 @@ python -m kauha.demo.campaign --seeds 1 2 3
 python -m kauha.demo.report
 ```
 
-On 2 CPU cores the whole set takes about 1.5 h: about 40 min for the detector,
-15 min for PPO and 15 min for the 9 shifts.
+On 2 CPU cores the whole set takes about 2 h: about 40 min for the detector,
+15 min for PPO and about 60 min for the 15 shifts.

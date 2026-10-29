@@ -19,6 +19,9 @@ the safety channel in the normal conformity route.
   and comfort. They are never relied on for protection.
 - The autonomy channel slows down for people it sees. That reduces how often
   the safety channel has to act, but the safety channel never relies on it.
+- The autonomy channel also limits its own speed so that mapped objects
+  (stockpiles, the truck, walls) stay outside the field the PLC will select
+  (AR-04). That removes most nuisance stops without touching the safety logic.
 
 ## 2. Hazards addressed and how
 
@@ -27,8 +30,8 @@ the safety channel in the normal conformity route.
 | Person struck while travelling | Speed-banded protective fields (SR-02), with the speed cap from the scanner range (SR-04) | Warning fields (SR-03), camera/lidar person slowdown, beacon and horn |
 | Person struck while reversing | Rear fields (SR-02). Dig and dock sets are never used in reverse (SR-10). | Rear camera |
 | Person in the pile face during digging | Dig zone is access-controlled. The front field is muted only inside the zone, at 1 m/s or less, for 25 s at most (SR-10). | Lidar/camera slowdown before entering the zone. Side fields stay active around the cab and articulation. |
-| Person between the truck and the loader | Dock field covers the ground between the tyres and the truck side (SR-10). Dock zone speed cap 0.6 m/s. | Truck drivers stay in the cab (site rule). The demo scenario tests a driver who leaves the cab. |
-| Crushing at the articulation joint | Side fields while moving (SR-02) | Site rule: no approach on foot in AUTO |
+| Person between the truck and the loader | Dock field covers the ground between the tyres and the truck side (SR-10). Dock zone speed cap 0.6 m/s. Truck cab-door interlock (SR-14). | Truck drivers stay in the cab (site rule). The demo scenario tests a driver who leaves the cab. |
+| Crushing at the articulation joint; person beside the frames | Side fields on both frames while moving (SR-02). Teleop recovery from a side stop is refused while the contact band beside the frame is occupied (SR-12). | Site rule: no approach on foot in AUTO |
 | Machine leaves the work area | Geofence on the independent safety position (SR-07) | Autonomy map |
 | Autonomy computer fails or hangs | PLC watchdog (SR-06), gateway timeout | Hardwired stop path |
 | Loss of remote supervision | Heartbeat monitor (SR-05) | Separate safety radio for the e-stop |
@@ -52,13 +55,36 @@ the safety channel in the normal conformity route.
    it, at the cost of more supervisor interventions.
 5. **People under the raised bucket during the final approach to the truck (found by the twin).**
    - The dock field covers the ground between the front tyres and the truck side.
-   - A truck driver who steps out and stands beside the truck is under the raised bucket for about 1–2 s before the dock field reaches them, while the loader creeps in at 0.55 m/s.
-   - The bucket does not touch them, because its bottom is above 2.5 m, but this is the "nobody under a raised load" hazard.
-   - The demo scenario reproduces it on purpose, and the KPI `person_under_raised_bucket_moving_s` measures it.
-   - Candidate fixes, both to be evaluated:
-     - a downward-looking safety sensor on the boom;
-     - a site rule enforced by a cab-door switch on the truck, which stops the loader when a truck door opens.
-6. **Substantial modification.** Retrofitting autonomy to a machine already in
+     A truck driver who steps out and stands beside the truck was under the raised
+     bucket for 1–2 s before the dock field reached them.
+   - Mitigated for the truck driver by SR-14: a cab-door switch on the truck, read
+     through the bay's safety radio. With the door open the PLC refuses the dock
+     field set (so the loader cannot get close) and stops a docking loader. The
+     shift KPI `person_under_raised_bucket_moving_s` fell to zero in every run.
+   - Still open for anyone else on foot in the dock zone. The zone is
+     access-controlled like the dig zone. A downward-looking safety sensor on
+     the boom would close it fully. It is listed as a candidate, not designed.
+6. **Field geometry errors are easy to make and hard to see.** The twin found two:
+   - fields built at one nominal articulation did not cover the full sector;
+   - at standstill the rear field was placed at the bucket's reach instead of
+     the counterweight, leaving 3.4 m behind the machine uncovered until it
+     started moving.
+   - the side fields covered only the front frame, so a person beside the rear
+     frame was unprotected while the machine moved.
+   All three are fixed and covered by tests. The lesson for the real machine is that
+   every field set must be verified with a test body, not just reviewed.
+8. **Teleop recovery beside the machine (found by the twin).** Recovery motion
+   (SR-12) used to be allowed in either direction after a side-field stop. A
+   person standing right beside the front frame was brushed by the bucket corner
+   when the operator reversed, because the bucket is wider than the frame. Recovery
+   is now refused while the contact band is occupied. Two dependencies remain:
+   - a person 0.4–0.6 m out is outside the band, and recovery at 0.3 m/s past
+     them relies on the operator watching the side cameras;
+   - inside the dig zone, and the dock zone with the cab door closed, the band
+     cannot block recovery, because the pile flank or the truck would block it for
+     good (the twin showed this deadlock). There, protection rests on the zone
+     access control, as for muting (item 1).
+7. **Substantial modification.** Retrofitting autonomy to a machine already in
    service is very likely a substantial modification. Whoever does it takes on
    the manufacturer's obligations for the modified machine: conformity
    assessment, technical file, CE marking.

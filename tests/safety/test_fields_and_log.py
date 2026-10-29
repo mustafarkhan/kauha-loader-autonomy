@@ -78,3 +78,13 @@ def test_log_detects_tampering():
         log2.append(float(i), "stop")
     del log2.records[1]
     assert log2.verify() == 1
+
+
+@pytest.mark.req("SR-02")
+def test_standstill_fields_start_at_each_body_contour():
+    """At standstill the rear field must begin at the counterweight, not at the bucket's reach."""
+    from kauha.safety.fields import Geometry, point_in_polygon
+    g = Geometry()
+    fs = build_field_sets(StopBudget())[0]
+    assert point_in_polygon(g.front_contour_x + 0.3, 0.0, fs.protective_for("front"))
+    assert point_in_polygon(g.rear_contour_x + 0.3, 0.0, fs.protective_for("rear"))

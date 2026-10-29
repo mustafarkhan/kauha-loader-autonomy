@@ -33,6 +33,7 @@ BO_ 2365526400 ImplementCmd: 8 AUTONOMY
 BO_ 2298421377 SafetyStatus: 8 SAFETY_PLC
  SG_ State : 0|4@1+ (1,0) [0|3] "" MACHINE_GW,AUTONOMY,REMOTE_GW
  SG_ ResetPending : 4|1@1+ (1,0) [0|1] "" REMOTE_GW
+ SG_ DockBlocked : 5|1@1+ (1,0) [0|1] "" AUTONOMY,REMOTE_GW
  SG_ ActiveFieldSet : 8|8@1+ (1,0) [0|255] "" AUTONOMY,REMOTE_GW
  SG_ Cause : 16|16@1+ (1,0) [0|65535] "" AUTONOMY,REMOTE_GW
  SG_ SpeedLimit : 32|16@1+ (0.001,0) [0|6] "m/s" MACHINE_GW,AUTONOMY

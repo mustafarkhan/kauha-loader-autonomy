@@ -35,7 +35,10 @@ GAMMA = 1.0         # episodic task with a time-aware terminal reward: no discou
 # alone: a bucket of fill f taking t_dig seconds yields f*V / (t_dig + rest)
 # where `rest` is the remainder of the cycle (reversing, travel, dump).
 # Leaving early with a part-filled bucket and digging too long both lose.
-REST_OF_CYCLE_S = 22.0
+# The first build assumed 22 s (a skilled operator's cycle minus digging). The
+# integrated twin measured ~60 s for the rest of KAUHA's cycle, which makes a
+# full bucket worth more than a quick one; the policy is trained on that.
+REST_OF_CYCLE_S = 60.0
 REF_RATE = 1.0 / (REST_OF_CYCLE_S + 9.0)    # full bucket in 9 s -> 1.0
 
 
@@ -201,7 +204,7 @@ class ScriptedOperator:
 
     # throttle, penetration to start lifting, boom rate, force threshold,
     # load to finish, time fraction to finish
-    DEFAULT = (1.0, 0.05, 0.7, 0.6, 1.0, 0.5)   # from models/baseline_params.json
+    DEFAULT = (1.0, 0.05, 0.7, 0.6, 1.0, 0.6)   # from models/baseline_params.json
 
     def __init__(self, params: tuple = DEFAULT):
         self.p = tuple(params)

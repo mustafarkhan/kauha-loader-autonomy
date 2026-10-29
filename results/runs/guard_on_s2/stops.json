@@ -1,0 +1,90 @@
+[
+ {
+  "t": 720.48,
+  "cause": "REMOTE_LINK",
+  "v": -1.73,
+  "objects": [],
+  "field": "rev_2.5_S"
+ },
+ {
+  "t": 1155.4,
+  "cause": "FIELD_FRONT",
+  "v": 1.0,
+  "objects": [
+   "fallen_block"
+  ],
+  "field": "fwd_1.5_R1",
+  "false": false
+ },
+ {
+  "t": 1255.7,
+  "cause": "FIELD_FRONT",
+  "v": 0.95,
+  "objects": [
+   "pile_A"
+  ],
+  "field": "fwd_1.5_S",
+  "false": false
+ },
+ {
+  "t": 1476.85,
+  "cause": "FIELD_SIDE",
+  "v": 2.55,
+  "objects": [],
+  "field": "fwd_3.0_R1",
+  "false": true
+ },
+ {
+  "t": 1506.9,
+  "cause": "FIELD_REAR",
+  "v": -2.32,
+  "objects": [],
+  "field": "rev_2.5_L2",
+  "false": true
+ },
+ {
+  "t": 1581.7,
+  "cause": "FIELD_REAR",
+  "v": -2.46,
+  "objects": [],
+  "field": "rev_2.5_S",
+  "false": true
+ },
+ {
+  "t": 1711.35,
+  "cause": "FIELD_REAR",
+  "v": -2.07,
+  "objects": [],
+  "field": "rev_2.5_L1",
+  "false": true
+ },
+ {
+  "t": 1739.0,
+  "cause": "FIELD_REAR",
+  "v": -2.32,
+  "objects": [],
+  "field": "rev_2.5_R2",
+  "false": true
+ },
+ {
+  "t": 2520.0,
+  "cause": "TRUCK_DOOR",
+  "v": 0.49,
+  "objects": [],
+  "field": "fwd_1.5_S"
+ },
+ {
+  "t": 2880.2,
+  "cause": "WATCHDOG",
+  "v": 0.48,
+  "objects": [],
+  "field": "dock"
+ },
+ {
+  "t": 3240.0,
+  "cause": "ESTOP_REMOTE",
+  "v": 2.83,
+  "objects": [],
+  "field": "fwd_3.0_S"
+ }
+]

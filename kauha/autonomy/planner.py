@@ -32,7 +32,7 @@ DIG_TIMEOUT_S = 14.0
 LINE_UP_M = 4.0         # straight before the dig entry point
 RUN_IN_M = 5.0          # straight approach to the face (room to settle lateral error)
 PRE_DOCK_M = 2.0        # straight final approach to the truck
-SQUARE_ON_M = 8.0       # straight run lined up with the truck before the pre-dock point
+SQUARE_ON_M = 4.0       # straight run lined up with the truck before the pre-dock point
 
 
 class Phase(str, Enum):
@@ -70,6 +70,7 @@ class Percept:
     field_set: int
     truck_present: bool
     loc_sigma: float
+    dock_blocked: bool = False      # SR-14: truck driver out of the cab
 
 
 @dataclass
@@ -113,6 +114,7 @@ class CyclePlanner:
     dig_zone_entry_x: float = 41.0
     pile_schedule: list[tuple[float, str]] = field(default_factory=lambda: [(0.0, "A")])
     area: list | None = None                   # operating area polygon from the site map
+    guard: object | None = None                # FieldGuard: keeps mapped objects out of the fields
     boundary_clearance: float = 6.5            # rear contour + reverse field + margin
     phase: Phase = Phase.GOTO_PILE
     path: Path | None = None
@@ -137,6 +139,9 @@ class CyclePlanner:
         self.next_slot: int | None = None
         self.repositions = 0
         self._timeout_flag = None
+        self._guard_block_since: float | None = None
+        self._after_backoff: Phase | None = None
+        self.guard_cap = 3.0
 
     # ---------------------------------------------------------------- helpers
     def _enter(self, phase: Phase, t: float) -> None:
@@ -161,7 +166,7 @@ class CyclePlanner:
         side_y = ty + 1.25
         return (tx + along, side_y + self.dock_offset, -math.pi / 2)
 
-    def _speed_profile(self, p: Percept, v_max: float, v_end: float = 0.0, decel: float = 0.7,
+    def _speed_profile(self, p: Percept, v_max: float, v_end: float = 0.0, decel: float = 1.0,
                        end_margin: float = 0.0) -> float:
         rem = self.path.length - float(self.path.s[self.pp.idx]) if self.path is not None else 0.0
         j = min(len(self.path.kappa) - 1, self.pp.idx + 10) if self.path is not None else 0
@@ -213,14 +218,14 @@ class CyclePlanner:
                 # curve to a lead point, then line up square to the face
                 lead = (ex - LINE_UP_M, ey)
                 curve = bezier((p.x, p.y), p.th, lead, eth, self.kmax, reverse=False)
-                ahead = (lead[0] - p.x) * math.cos(p.th) + (lead[1] - p.y) * math.sin(p.th)
-                if not curve.feasible or ahead < 4.0:
+                if not self._drivable((p.x, p.y, p.th), lead, eth):
                     # No drivable forward route from here: back up and re-plan.
                     self.next_slot = self.slot
                     self._reposition(p, "no_route_to_face")
                     return Command(brake=True)
                 line = straight(lead, eth, LINE_UP_M, reverse=False)
                 self.path = from_points(np.vstack([curve.pts, line.pts[1:]]), reverse=False)
+                self.repositions = 0
                 self.cur = CycleRecord(p.t, pile=self.pile, slot=self.slot)
             g, rem = self._follow(p)
             v = self._people_gate(p, self._speed_profile(p, 3.0, v_end=DIG_SPEED))
@@ -242,7 +247,9 @@ class CyclePlanner:
             tip_x = p.x + bucket_tip_local(self.cfg, p.boom, p.bucket)[0] * math.cos(p.th)
             pen = tip_x - s.toe_x
             granted = p.field_set == DIG_FIELD_ID
-            v = DIG_SPEED * 0.95
+            # Outside the dig zone the field guard sets the pace; inside it the
+            # machine must be at dig speed for the PLC to grant the dig field set.
+            v = 2.0 if p.x < self.dig_zone_entry_x - 0.5 else DIG_SPEED * 0.95
             if not granted and s.toe_x - tip_x < 1.0:
                 v = 0.0     # never touch the face without the dig field set
                 if p.t - self.t_phase > 12.0:
@@ -287,7 +294,7 @@ class CyclePlanner:
 
         elif ph == Phase.BACKOUT:
             g, rem = self._follow(p)
-            v = -self._people_gate(p, self._speed_profile(p, 2.5))
+            v = -self._people_gate(p, self._speed_profile(p, 2.9))
             travelled = self.path.s[self.pp.idx]
             # Keep the dig field set until moving backwards (the PLC then uses the
             # rear fields), so the pile flanks do not trip the standstill set.
@@ -309,13 +316,23 @@ class CyclePlanner:
                 # Finish with a straight, square-on run so no corner of the truck
                 # swings into a curved protective field before the dock set is granted.
                 lead = (pre[0] - SQUARE_ON_M * math.cos(dth), pre[1] - SQUARE_ON_M * math.sin(dth))
+                if not self._drivable((p.x, p.y, p.th), lead, dth):
+                    self.path = None
+                    self._reposition_keep(p, Phase.GOTO_TRUCK)
+                    return Command(brake=True)
                 curve = bezier((p.x, p.y), p.th, lead, dth, self.kmax, reverse=False)
                 line = straight(lead, dth, SQUARE_ON_M, reverse=False)
                 self.path = from_points(np.vstack([curve.pts, line.pts[1:]]), reverse=False)
+                self.repositions = 0
             g, rem = self._follow(p)
             # Be at dock speed before the truck can reach the normal protective
             # field, i.e. before entering the dock zone (~3.5 m before pre-dock).
             v = self._people_gate(p, self._speed_profile(p, 3.0, v_end=DOCK_SPEED * 0.8, end_margin=4.5))
+            if p.dock_blocked and rem < 9.0:
+                # Driver is out of the cab: hold short of the truck until the door closes.
+                v = 0.0
+                self.t_phase = p.t
+                self.hold_reason = "truck_door_open"
             raise_boom = rem < 10.0
             cmd = Command(v, g, servo(BOOM_DUMP if raise_boom else BOOM_CARRY, p.boom),
                           servo(BUCKET_CARRY, p.bucket), False, dock_req=rem < 6.0)
@@ -330,6 +347,8 @@ class CyclePlanner:
             # distance from front axle to the dock pose, along the heading
             rem = (dx - p.x) * math.cos(dth) + (dy - p.y) * math.sin(dth)
             v = min(DOCK_SPEED * 0.92, math.sqrt(2 * 0.5 * max(0.0, rem))) if granted else 0.0
+            if p.dock_blocked:
+                self.t_phase = p.t
             if not granted and p.t - self.t_phase > 20.0:
                 self.assist_request = "dock_field_not_granted"
             cmd = Command(v, g, servo(BOOM_DUMP, p.boom), servo(BUCKET_CARRY, p.bucket), False,
@@ -349,7 +368,7 @@ class CyclePlanner:
 
         elif ph == Phase.BACKOFF:
             g, rem = self._follow(p)
-            v = -self._people_gate(p, self._speed_profile(p, 2.5))
+            v = -self._people_gate(p, self._speed_profile(p, 2.9))
             travelled = self.path.s[self.pp.idx]
             boom_t = BOOM_DUMP if (travelled < 1.5 and p.boom > 0.5) else BOOM_CARRY
             # Keep the dock field set until moving backwards; the PLC then
@@ -358,9 +377,52 @@ class CyclePlanner:
                           dock_req=travelled < 1.0)
             if rem < 0.15 and abs(p.v) < 0.1:
                 self.path = None
-                self._enter(Phase.GOTO_PILE, p.t)
+                nxt, self._after_backoff = (self._after_backoff or Phase.GOTO_PILE), None
+                self._enter(nxt, p.t)
 
+        return self._apply_guard(p, cmd)
+
+    TRAVEL = (Phase.GOTO_PILE, Phase.APPROACH, Phase.BACKOUT, Phase.GOTO_TRUCK, Phase.DOCK, Phase.BACKOFF)
+
+    def _apply_guard(self, p: Percept, cmd: Command) -> Command:
+        """Cap speed so that no mapped object enters the protective field the PLC will use."""
+        if (self.guard is None or self.path is None or self.phase not in self.TRAVEL
+                or p.field_set in (DIG_FIELD_ID, DOCK_FIELD_ID) or abs(cmd.speed) < 1e-3):
+            self._guard_block_since = None
+            return cmd
+        cap = self.guard.speed_cap(self.path.pts, self.path.heading, self.path.s, self.pp.idx,
+                                   self.path.reverse, (p.gamma, cmd.articulation))
+        self.guard_cap = cap
+        if abs(cmd.speed) > cap:
+            cmd.speed = math.copysign(cap, cmd.speed)
+        if cap <= 0.0:
+            self._guard_block_since = p.t if self._guard_block_since is None else self._guard_block_since
+            if p.t - self._guard_block_since > 6.0:
+                self._guard_block_since = None
+                if self.path.reverse:
+                    self.assist_request = "no_clear_reverse_path"
+                else:
+                    # e.g. the truck or a pile flank sits inside even the slowest field ahead
+                    self.next_slot = self.slot if self.phase in (Phase.GOTO_PILE, Phase.APPROACH) else self.next_slot
+                    if p.load_frac * self.cfg.bucket_volume > 0.3:
+                        self.path = None
+                        self._reposition_keep(p, Phase.GOTO_TRUCK)
+                    else:
+                        self._reposition(p, "no_clear_path")
+        else:
+            self._guard_block_since = None
         return cmd
+
+    def _reposition_keep(self, p: Percept, then: Phase) -> None:
+        """Back up 6 m, then resume `then` with a fresh path."""
+        self.repositions += 1
+        if self.repositions > 2:
+            self.assist_request = "no_clear_path"
+            self.repositions = 0
+        rx, ry, rth = p.rear
+        self.path = straight((rx, ry), rth + math.pi, 6.0, reverse=True)
+        self._after_backoff = then
+        self._enter(Phase.BACKOFF, p.t)
 
     def _reposition(self, p: Percept, reason: str) -> None:
         """Back straight up 6 m and try the approach again; ask for help after two tries."""
@@ -393,34 +455,57 @@ class CyclePlanner:
             self.path = None
 
     # ------------------------------------------------------------ path setup
-    def _fit_reverse(self, p: Percept, dh: float, straight_m: float = 2.0) -> Path:
-        """Reverse arc that keeps the rear clear of the site boundary.
+    def _inside(self, path: Path) -> bool:
+        return self.area is None or all(
+            point_in_poly(x, y, self.area) and dist_to_poly_edge(x, y, self.area) > self.boundary_clearance
+            for x, y in path.pts[::3])
 
-        Shrinks the swing (and then the straight part) until every point of the
-        rear-axle path is at least `boundary_clearance` inside the operating
-        area, so the rear fields never reach the perimeter wall.
+    def _drivable(self, end: tuple[float, float, float], goal: tuple[float, float], goal_th: float,
+                  strict: bool = False) -> bool:
+        """Is there a feasible forward curve from `end` to `goal`, with the goal well ahead?
+
+        Planning a reverse leg uses the strict test; checking from where the machine
+        actually stopped uses the lenient one, so tracking error on the reverse leg
+        does not flip the decision.
         """
-        best = None
-        for scale in (1.0, 0.7, 0.45, 0.2, 0.0):
-            for runout in (3.0, 1.5):
-                path, _ = reverse_arc((p.x, p.y, p.th), dh * scale, self.W, straight_m=straight_m, runout_m=runout)
-                if self.area is None or all(
-                        point_in_poly(x, y, self.area) and dist_to_poly_edge(x, y, self.area) > self.boundary_clearance
-                        for x, y in path.pts[::3]):
+        min_ahead, k_scale = (4.5, 1.0) if strict else (2.5, 1.5)
+        ahead = (goal[0] - end[0]) * math.cos(end[2]) + (goal[1] - end[1]) * math.sin(end[2])
+        if ahead < min_ahead:
+            return False
+        b = bezier(end[:2], end[2], goal, goal_th, self.kmax, reverse=False)
+        return float(np.abs(b.kappa).max()) <= k_scale * self.kmax
+
+    def _fit_reverse(self, p: Percept, dh: float, straight_m: float = 2.0,
+                     goal: tuple[float, float] | None = None, goal_th: float = 0.0) -> Path:
+        """Reverse arc that keeps the rear clear of the boundary and sets up the next leg.
+
+        Tries the full swing first, then smaller swings; for each, the shortest
+        straight run-out after the arc from which the next forward leg (to `goal`)
+        is drivable. Choosing this here avoids stopping and re-planning later.
+        """
+        fallback = None
+        for scale in (1.0, 0.8, 0.6, 0.4, 0.2, 0.0):
+            for runout in (3.0, 1.5, 0.8):
+                path, end = reverse_arc((p.x, p.y, p.th), dh * scale, self.W, straight_m=straight_m,
+                                        runout_m=runout)
+                if not self._inside(path):
+                    break                       # longer run-outs only go further out
+                if goal is None or self._drivable(end, goal, goal_th, strict=True):
                     return path
-                best = best or path
-        return best
+                fallback = fallback or path
+        return fallback or reverse_arc((p.x, p.y, p.th), 0.0, self.W, straight_m=straight_m, runout_m=0.8)[0]
 
     def _plan_backout(self, p: Percept) -> None:
-        dx, dy, _ = self._dock_pose()
+        dx, dy, dth = self._dock_pose()
         # V-pattern: back out of the face swinging the rear away from the truck
         # (clockwise), so the front ends up pointing at the truck.
         dh = -1.0
         for _ in range(3):
             _, end = reverse_arc((p.x, p.y, p.th), dh, self.W)
-            want = math.atan2(dy + PRE_DOCK_M - end[1], dx - end[0])
+            want = math.atan2(dy + PRE_DOCK_M + SQUARE_ON_M - end[1], dx - end[0])
             dh = float(np.clip(-((p.th - want) % (2 * math.pi)), -1.5, -0.3))   # clockwise
-        self.path = self._fit_reverse(p, dh)
+        lead = (dx - (PRE_DOCK_M + SQUARE_ON_M) * math.cos(dth), dy - (PRE_DOCK_M + SQUARE_ON_M) * math.sin(dth))
+        self.path = self._fit_reverse(p, dh, goal=lead, goal_th=dth)
 
     def _plan_backoff(self, p: Percept) -> None:
         self.pile = self.current_pile(p.t)
@@ -434,4 +519,5 @@ class CyclePlanner:
             _, end = reverse_arc((p.x, p.y, p.th), dh, self.W)
             want = math.atan2(s.y_c - end[1], (s.toe_x - 18.0) - end[0])
             dh = float(np.clip((want - p.th) % (2 * math.pi), 0.3, 1.5))        # counter-clockwise
-        self.path = self._fit_reverse(p, dh, straight_m=2.5)
+        lead = (s.toe_x - 5.1 - RUN_IN_M - LINE_UP_M, s.y_c)
+        self.path = self._fit_reverse(p, dh, straight_m=2.5, goal=lead, goal_th=0.0)

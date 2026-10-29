@@ -1,0 +1,297 @@
+{
+ "selected_step": 655360,
+ "validation_score": 0.988,
+ "log": [
+  {
+   "episodes": 80,
+   "fill_factor_mean": 0.168,
+   "score_mean": 0.185,
+   "fill_factor_p10": 0.119,
+   "time_s_mean": 6.214,
+   "success_rate": 1.0,
+   "stall_s_mean": 0.0,
+   "spilled_m3_mean": 0.0,
+   "fuel_l_per_m3": 0.046,
+   "cycle_m3_per_h": 64.427,
+   "step": 131072,
+   "minutes": 0.3,
+   "train_ep_return": 1.015
+  },
+  {
+   "episodes": 80,
+   "fill_factor_mean": 0.48,
+   "score_mean": 0.552,
+   "fill_factor_p10": 0.382,
+   "time_s_mean": 4.951,
+   "success_rate": 1.0,
+   "stall_s_mean": 0.0,
+   "spilled_m3_mean": 0.0,
+   "fuel_l_per_m3": 0.022,
+   "cycle_m3_per_h": 192.466,
+   "step": 262144,
+   "minutes": 0.7,
+   "train_ep_return": 5.187
+  },
+  {
+   "episodes": 80,
+   "fill_factor_mean": 0.779,
+   "score_mean": 0.864,
+   "fill_factor_p10": 0.667,
+   "time_s_mean": 6.0,
+   "success_rate": 1.0,
+   "stall_s_mean": 0.0,
+   "spilled_m3_mean": 0.0,
+   "fuel_l_per_m3": 0.024,
+   "cycle_m3_per_h": 301.091,
+   "step": 393216,
+   "minutes": 1.0,
+   "train_ep_return": 9.959
+  },
+  {
+   "episodes": 80,
+   "fill_factor_mean": 0.873,
+   "score_mean": 0.959,
+   "fill_factor_p10": 0.766,
+   "time_s_mean": 6.282,
+   "success_rate": 1.0,
+   "stall_s_mean": 0.086,
+   "spilled_m3_mean": 0.0,
+   "fuel_l_per_m3": 0.028,
+   "cycle_m3_per_h": 334.028,
+   "step": 524288,
+   "minutes": 1.3,
+   "train_ep_return": 10.965
+  },
+  {
+   "episodes": 80,
+   "fill_factor_mean": 0.911,
+   "score_mean": 0.988,
+   "fill_factor_p10": 0.812,
+   "time_s_mean": 6.635,
+   "success_rate": 1.0,
+   "stall_s_mean": 0.185,
+   "spilled_m3_mean": 0.0,
+   "fuel_l_per_m3": 0.031,
+   "cycle_m3_per_h": 344.134,
+   "step": 655360,
+   "minutes": 1.7,
+   "train_ep_return": 11.358
+  },
+  {
+   "episodes": 80,
+   "fill_factor_mean": 0.894,
+   "score_mean": 0.974,
+   "fill_factor_p10": 0.792,
+   "time_s_mean": 6.519,
+   "success_rate": 1.0,
+   "stall_s_mean": 0.263,
+   "spilled_m3_mean": 0.0,
+   "fuel_l_per_m3": 0.03,
+   "cycle_m3_per_h": 339.277,
+   "step": 786432,
+   "minutes": 2.0,
+   "train_ep_return": 10.93
+  },
+  {
+   "episodes": 80,
+   "fill_factor_mean": 0.873,
+   "score_mean": 0.965,
+   "fill_factor_p10": 0.781,
+   "time_s_mean": 6.073,
+   "success_rate": 1.0,
+   "stall_s_mean": 0.496,
+   "spilled_m3_mean": 0.0,
+   "fuel_l_per_m3": 0.029,
+   "cycle_m3_per_h": 336.257,
+   "step": 917504,
+   "minutes": 2.4,
+   "train_ep_return": 10.694
+  },
+  {
+   "episodes": 80,
+   "fill_factor_mean": 0.851,
+   "score_mean": 0.951,
+   "fill_factor_p10": 0.757,
+   "time_s_mean": 5.799,
+   "success_rate": 1.0,
+   "stall_s_mean": 0.54,
+   "spilled_m3_mean": 0.0,
+   "fuel_l_per_m3": 0.029,
+   "cycle_m3_per_h": 331.239,
+   "step": 1048576,
+   "minutes": 2.7,
+   "train_ep_return": 10.376
+  },
+  {
+   "episodes": 80,
+   "fill_factor_mean": 0.798,
+   "score_mean": 0.913,
+   "fill_factor_p10": 0.704,
+   "time_s_mean": 5.144,
+   "success_rate": 1.0,
+   "stall_s_mean": 0.532,
+   "spilled_m3_mean": 0.0,
+   "fuel_l_per_m3": 0.027,
+   "cycle_m3_per_h": 318.127,
+   "step": 1179648,
+   "minutes": 3.1,
+   "train_ep_return": 9.491
+  },
+  {
+   "episodes": 80,
+   "fill_factor_mean": 0.767,
+   "score_mean": 0.885,
+   "fill_factor_p10": 0.671,
+   "time_s_mean": 4.928,
+   "success_rate": 1.0,
+   "stall_s_mean": 0.544,
+   "spilled_m3_mean": 0.0,
+   "fuel_l_per_m3": 0.026,
+   "cycle_m3_per_h": 308.204,
+   "step": 1310720,
+   "minutes": 3.4,
+   "train_ep_return": 8.997
+  }
+ ],
+ "note": "training stopped at 1310720 steps; validation score had declined for 4 consecutive checkpoints",
+ "test": {
+  "randomised": {
+   "learned": {
+    "episodes": 200,
+    "fill_factor_mean": 0.897944871050746,
+    "score_mean": 0.971837221141792,
+    "fill_factor_p10": 0.787438691016501,
+    "time_s_mean": 6.700999999999985,
+    "success_rate": 1.0,
+    "stall_s_mean": 0.20575000000000002,
+    "spilled_m3_mean": 0.0,
+    "fuel_l_per_m3": 0.03118438650523631,
+    "cycle_m3_per_h": 338.5755480106888
+   },
+   "baseline": {
+    "episodes": 200,
+    "fill_factor_mean": 0.9251775230892337,
+    "score_mean": 0.9438536395536632,
+    "fill_factor_p10": 0.771980181988225,
+    "time_s_mean": 8.405499999999988,
+    "success_rate": 1.0,
+    "stall_s_mean": 0.0,
+    "spilled_m3_mean": 0.04097008139420129,
+    "fuel_l_per_m3": 0.0319855177182482,
+    "cycle_m3_per_h": 328.8264292638568
+   }
+  },
+  "sand": {
+   "learned": {
+    "episodes": 50,
+    "fill_factor_mean": 1.016549170525935,
+    "score_mean": 1.125380688849293,
+    "fill_factor_p10": 1.0102257693763477,
+    "time_s_mean": 6.001999999999986,
+    "success_rate": 1.0,
+    "stall_s_mean": 0.0,
+    "spilled_m3_mean": 0.0,
+    "fuel_l_per_m3": 0.024905402083613845,
+    "cycle_m3_per_h": 392.0681109539471
+   },
+   "baseline": {
+    "episodes": 50,
+    "fill_factor_mean": 1.056419956313518,
+    "score_mean": 1.0986452873238848,
+    "fill_factor_p10": 1.0480689704849415,
+    "time_s_mean": 7.809999999999981,
+    "success_rate": 1.0,
+    "stall_s_mean": 0.0,
+    "spilled_m3_mean": 0.023158998468263498,
+    "fuel_l_per_m3": 0.025636758746976566,
+    "cycle_m3_per_h": 382.75384203541785
+   }
+  },
+  "gravel": {
+   "learned": {
+    "episodes": 50,
+    "fill_factor_mean": 0.9344336694693055,
+    "score_mean": 1.0124147094829614,
+    "fill_factor_p10": 0.9272393275954707,
+    "time_s_mean": 6.611999999999986,
+    "success_rate": 1.0,
+    "stall_s_mean": 0.146,
+    "spilled_m3_mean": 0.0,
+    "fuel_l_per_m3": 0.0304420780307112,
+    "cycle_m3_per_h": 352.71222136825753
+   },
+   "baseline": {
+    "episodes": 50,
+    "fill_factor_mean": 1.0060252310307658,
+    "score_mean": 1.0116120650294822,
+    "fill_factor_p10": 0.9949476006389749,
+    "time_s_mean": 8.82899999999999,
+    "success_rate": 1.0,
+    "stall_s_mean": 0.0,
+    "spilled_m3_mean": 0.0,
+    "fuel_l_per_m3": 0.032804194464194296,
+    "cycle_m3_per_h": 352.43259039736796
+   }
+  },
+  "crushed_rock": {
+   "learned": {
+    "episodes": 50,
+    "fill_factor_mean": 0.781803026315945,
+    "score_mean": 0.8320124124201397,
+    "fill_factor_p10": 0.7732024167413125,
+    "time_s_mean": 7.128999999999983,
+    "success_rate": 1.0,
+    "stall_s_mean": 0.235,
+    "spilled_m3_mean": 0.0,
+    "fuel_l_per_m3": 0.036278305365134086,
+    "cycle_m3_per_h": 289.86238884314537
+   },
+   "baseline": {
+    "episodes": 50,
+    "fill_factor_mean": 0.8084727501710574,
+    "score_mean": 0.8167586274712165,
+    "fill_factor_p10": 0.7972546094761248,
+    "time_s_mean": 8.684999999999988,
+    "success_rate": 1.0,
+    "stall_s_mean": 0.0,
+    "spilled_m3_mean": 0.0,
+    "fuel_l_per_m3": 0.03707923279598178,
+    "cycle_m3_per_h": 284.54816698997223
+   }
+  },
+  "wood_chips": {
+   "learned": {
+    "episodes": 50,
+    "fill_factor_mean": 1.1499440367991947,
+    "score_mean": 1.1773749174706445,
+    "fill_factor_p10": 1.15,
+    "time_s_mean": 6.964999999999983,
+    "success_rate": 1.0,
+    "stall_s_mean": 0.0,
+    "spilled_m3_mean": 0.01617292916449114,
+    "fuel_l_per_m3": 0.013055934427102721,
+    "cycle_m3_per_h": 428.8064655699456
+   },
+   "baseline": {
+    "episodes": 50,
+    "fill_factor_mean": 1.1450799266610447,
+    "score_mean": 1.159695434922635,
+    "fill_factor_p10": 1.1381951563545258,
+    "time_s_mean": 7.446999999999987,
+    "success_rate": 1.0,
+    "stall_s_mean": 0.0,
+    "spilled_m3_mean": 0.8802801670173204,
+    "fuel_l_per_m3": 0.017520461422823513,
+    "cycle_m3_per_h": 420.5574407473669
+   }
+  }
+ },
+ "baseline_params": {
+  "throttle": 1.0,
+  "pen_lift": 0.05,
+  "boom1": 0.7,
+  "f_thr": 0.6,
+  "load_end": 1.0,
+  "t_end": 0.5
+ }
+}

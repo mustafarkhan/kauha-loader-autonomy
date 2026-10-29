@@ -17,6 +17,10 @@
    {
     "test": "tests/autonomy/test_autonomy.py::test_ekf_bounded_through_gnss_outage_with_landmarks",
     "outcome": "passed"
+   },
+   {
+    "test": "tests/autonomy/test_autonomy.py::test_ekf_recovers_from_overconfident_error_using_posts",
+    "outcome": "passed"
    }
   ],
   "all_passed": true
@@ -25,6 +29,19 @@
   "tests": [
    {
     "test": "tests/scenario/test_shift_short.py::test_completes_loading_cycles",
+    "outcome": "passed"
+   }
+  ],
+  "all_passed": true
+ },
+ "AR-04": {
+  "tests": [
+   {
+    "test": "tests/autonomy/test_autonomy.py::test_field_guard_slows_before_a_mapped_object_enters_the_field",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/autonomy/test_autonomy.py::test_field_guard_uses_the_rear_fields_when_reversing",
     "outcome": "passed"
    }
   ],
@@ -114,6 +131,10 @@
     "outcome": "passed"
    },
    {
+    "test": "tests/safety/test_fields_and_log.py::test_standstill_fields_start_at_each_body_contour",
+    "outcome": "passed"
+   },
+   {
     "test": "tests/safety/test_plc.py::test_sr02_protective_field_stops_within_one_cycle[front_prot-1.0]",
     "outcome": "passed"
    },
@@ -164,6 +185,10 @@
    {
     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[-2.5]",
     "outcome": "passed"
+   },
+   {
+    "test": "tests/sil/test_processes.py::test_person_in_path_stops_machine_across_processes",
+    "outcome": "passed"
    }
   ],
   "all_passed": true
@@ -172,6 +197,10 @@
   "tests": [
    {
     "test": "tests/safety/test_plc.py::test_sr03_warning_field_limits_speed_without_stopping",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/safety/test_plc.py::test_sr03_warning_ignored_inside_access_controlled_zones",
     "outcome": "passed"
    }
   ],
@@ -219,6 +248,10 @@
    {
     "test": "tests/safety/test_plc.py::test_sr05_link_stop_needs_supervisor_reset",
     "outcome": "passed"
+   },
+   {
+    "test": "tests/sil/test_processes.py::test_losing_the_remote_station_stops_the_machine",
+    "outcome": "passed"
    }
   ],
   "all_passed": true
@@ -231,6 +264,10 @@
    },
    {
     "test": "tests/safety/test_plc.py::test_sr06_watchdog_not_applied_in_idle",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/sil/test_processes.py::test_killing_the_autonomy_process_stops_the_machine",
     "outcome": "passed"
    }
   ],
@@ -312,6 +349,14 @@
     "outcome": "passed"
    },
    {
+    "test": "tests/safety/test_plc.py::test_sr12_side_recovery_refused_while_someone_is_right_beside_the_frame",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/safety/test_plc.py::test_sr12_contact_band_does_not_block_recovery_in_access_controlled_zones",
+    "outcome": "passed"
+   },
+   {
     "test": "tests/safety/test_plc.py::test_sr12_no_recovery_in_auto",
     "outcome": "passed"
    }
@@ -330,6 +375,28 @@
    },
    {
     "test": "tests/scenario/test_shift_short.py::test_safety_log_intact",
+    "outcome": "passed"
+   }
+  ],
+  "all_passed": true
+ },
+ "SR-14": {
+  "tests": [
+   {
+    "test": "tests/safety/test_plc.py::test_sr14_dock_refused_while_truck_door_open",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/safety/test_plc.py::test_sr14_door_opening_while_docking_stops_and_clears",
+    "outcome": "passed"
+   }
+  ],
+  "all_passed": true
+ },
+ "SR-15": {
+  "tests": [
+   {
+    "test": "tests/sil/test_processes.py::test_killing_the_safety_plc_drops_the_relays",
     "outcome": "passed"
    }
   ],

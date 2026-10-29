@@ -20,8 +20,8 @@ autonomy.
 | # | Function | Candidate | Qty | Requirement it meets | Notes / to confirm |
 |---|---|---|---|---|---|
 | A1 | Safety controller | TTControl HY-TTC 500 family (safety variant) or ifm ecomatController safety | 1 | PL d, 2 CAN, ≥ 8 safe digital in, ≥ 4 safe outputs, 25 ms task | Runs `kauha/safety/plc.py` logic, ported to the vendor's certified toolchain (C / CODESYS Safety). |
-| A2 | Safety laser scanner, front | SICK outdoorScan3 | 2 | Outdoor certified (IEC 62998), 4 m protective range, field-set switching by inputs | The 4 m protective range caps the autonomous speed (3.17 m/s dry, 2.61 m/s winter; see `stopping.py`). Heated window option for winter. |
-| A3 | Safety laser scanner, rear | SICK outdoorScan3 | 2 | as A2 | Mount behind the counterweight, clear of the rear grille. |
+| A2 | Safety laser scanner, front | SICK outdoorScan3 | 2 | Outdoor certified (IEC TS 62998), 275° scan angle, 4 m protective range, field-set switching by inputs, up to 128 fields with 8 monitored at once | The 4 m protective range caps the autonomous speed (3.17 m/s dry, 2.61 m/s winter; see `stopping.py`). Heated window option for winter. |
+| A3 | Safety laser scanner, rear | SICK outdoorScan3 | 2 | as A2 | Mount at the rear corners turned 45° outward, so each one also covers its side of the rear frame. Keep clear of the rear grille. |
 | A4 | Driveline speed sensor | Inductive, two-channel, on the transmission output | 1 | Independent speed for SR-04/SR-08 | Must not share a signal path with the OEM speed on CAN. |
 | A5 | Articulation angle sensor | Contactless angle sensor, safety rated | 1 | Field-set sector selection (SR-02) | Mount on the articulation joint pin. |
 | A6 | Safety GNSS receiver | Standard GNSS + SBAS, separate antenna | 1 | Geofence (SR-07), with dead reckoning from A4/A5 | Not RTK on purpose: independent of the autonomy GNSS. |
