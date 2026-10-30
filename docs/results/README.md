@@ -75,18 +75,22 @@ Mean over three seeds, with the min–max range in brackets.
 
 | | Learned bucket | Rule-based bucket | Learned, winter braking | Learned, field guard on | Rule-based, careless walkers |
 |---|---|---|---|---|---|
-| Tonnes loaded | 213 (200–221) | 212 (199–233) | 212 (193–222) | 212 (199–221) | 220 (199–233) |
-| Trucks filled (20 t) | 10.3 | 10.0 | 10.3 | 10.0 | 10.3 |
-| Cycle time, median without stops | 68.0 s | 68.9 s | 70.1 s | 69.1 s | 68.8 s |
-| Remote interventions per hour | 7.0 | 6.7 | 5.7 | 6.3 | 6.7 |
-| Protective / emergency stops | 6.0 | 7.0 | 6.7 | 7.7 | 6.7 |
-| False stops (no real object) | 0.3 | 0.7 | 0.7 | 2.3 | 0.3 |
-| Closest person to the moving machine (ground level) | 1.44 m | 1.32 m | 1.36 m | 1.24 m | 1.17 m (0.76–1.39) |
+| Tonnes loaded | 221 (221–221) | 216 (201–233) | 220 (216–222) | 211 (196–221) | 219 (201–233) |
+| Trucks filled (20 t) | 11.0 | 10.3 | 10.7 | 10.0 | 10.7 |
+| Cycle time, median without stops | 69.3 s | 68.2 s | 70.8 s | 69.3 s | 68.8 s |
+| Remote interventions per hour | 6.7 | 6.0 | 5.3 | 7.7 | 5.7 |
+| Protective / emergency stops | 7.7 | 7.3 | 6.7 | 7.7 | 9.0 |
+| False stops (no real object) | 1.3 | 1.0 | 1.0 | 0.3 | 0.7 |
+| Closest person to the moving machine (ground level) | 1.32 m | 1.31 m | 1.43 m | 1.08 m | 1.19 m (0.76–1.41) |
 | Person entered a protective field while moving | 0 | 0 | 0 | 0 | 0 |
 | Person under the raised bucket while moving | 0 s | 0 s | 0 s | 0 s | 0 s |
-| Localisation RMS | 2.1 cm | 2.0 cm | 1.9 cm | 2.0 cm | 2.1 cm |
-| Teleop glass-to-glass p95 | 130 ms | 129 ms | 129 ms | 129 ms | 129 ms |
+| Localisation RMS | 2 cm | 2 cm | 2 cm | 2 cm | 2 cm |
+| Teleop glass-to-glass p95 | 128 ms | 129 ms | 130 ms | 130 ms | 130 ms |
 | CAN frames rejected | 0 | 0 | 0 | 0 | 0 |
+
+These are v3 results: the safety PLC with the fixes the proofs found and with
+SR-16 (section 4). The dry speed limit is 2.97 m/s and the winter limit
+2.41 m/s.
 
 "Careless walkers" is a stress case. By default people on foot keep 1 m from a
 stopped machine and 1.5 m from a moving one. In the stress case they come within
@@ -107,15 +111,15 @@ close encounters.
 
 ### What changed since v1
 
-| Learned bucket, mean of 3 seeds | v1 | v2 |
-|---|---|---|
-| Tonnes loaded | 196 | 213 |
-| Cycle time, median without stops | 71.0 s | 68.0 s |
-| Remote interventions per hour | 9.0 | 7.0 |
-| Protective / emergency stops | 8.0 | 6.0 |
-| Closest person to the moving machine | 0.55 m | 1.44 m |
-| Person under the raised bucket while moving | 2.2 s | 0 s |
-| Localisation RMS | 3.5 cm | 2.1 cm |
+| Learned bucket, mean of 3 seeds | v1 | v2 | v3 |
+|---|---|---|---|
+| Tonnes loaded | 196 | 213 | 221 |
+| Cycle time, median without stops | 71.0 s | 68.0 s | 69.3 s |
+| Remote interventions per hour | 9.0 | 7.0 | 6.7 |
+| Protective / emergency stops | 8.0 | 6.0 | 7.7 |
+| Closest person to the moving machine | 0.55 m | 1.44 m | 1.32 m |
+| Person under the raised bucket while moving | 2.2 s | 0 s | 0 s |
+| Localisation RMS | 3.5 cm | 2.1 cm | 2 cm |
 
 The gains come from:
 - **Truck cab-door interlock (SR-14).** The driver who steps out is no longer
@@ -135,7 +139,7 @@ is the like-for-like comparison: 0.76 m at worst, against 0.24 m in v1.
 
 ### What the shift shows
 
-- **No ground-level contact while moving in any of the 15 runs.** No person
+- **No ground-level contact while moving in any of the 15 v3 runs.** No person
   entered a protective field while the machine moved, and nobody was under a
   raised bucket.
 - **Faults are handled as designed.** Each fault produced the designed
@@ -146,17 +150,19 @@ is the like-for-like comparison: 0.76 m at worst, against 0.24 m in v1.
 - **Cycle time is about 68 s against about 30 s for a skilled operator.** This
   is still the main gap. The slow, safety-limited approaches to the truck and
   the face dominate (see the breakdown in the replay).
-- **Interventions run at 6–7 per hour.** Most are `blocked_path` after a stop
+- **Interventions run at 5–8 per hour.** Most are `blocked_path` after a stop
   next to a pile flank or the truck. Commercial targets are below 1 per hour.
-- **Covering the rear frame costs throughput.** Side fields on the rear frame
-  added side stops. Learned-bucket tonnes fell from 222 to 213, and
-  interventions rose from 6.0 to 7.0 per hour, against the same v2 code before
-  this change. That is the price of closing a real gap.
-- **The field-aware speed guard (AR-04) does not pay for itself yet.** It did not
-  raise throughput or cut interventions, and it added false stops
-  (2.3 per shift). It stays off by default.
+- **SR-16 adds stops but did not cost throughput.** The under-bucket fields
+  stopped the machine 3 times in the 3 learned-bucket shifts, twice when the
+  truck driver left the cab. Throughput is 221 t against 213 t in v2. The v2
+  numbers include rear-frame side fields; the rise in v3 is within what seed
+  effects and the changed reset logic can explain, so it is not claimed as a
+  gain.
+- **The field-aware speed guard (AR-04) still does not pay for itself.** It did
+  not raise throughput and had the most interventions (7.7 per hour). It stays
+  off by default.
 - **Winter braking barely changed throughput.** The machine rarely travels
-  above the winter cap of 2.61 m/s on this short site.
+  above the winter limit of 2.41 m/s on this short site.
 
 ### Process-level SIL
 
@@ -205,16 +211,89 @@ Each was fixed or documented in `docs/safety/safety_concept.md`.
    - Fix: the band does not block recovery inside the access-controlled dig
      zone, or in the dock zone while the cab door is closed.
    - This is a stated residual risk.
+8. **Four logic defects found by the proofs** (section 4): an unprotected
+   overspeed band, a recovery reset that dropped occupied fields, a reset
+   clearing a muting timeout, and a one-cycle speed limit. All are fixed.
+9. **The bucket brought down or dragged onto a person, found by the adversarial
+   search** (section 4). Fixed by SR-16.
 
-## 4. Reproduce
+## 4. Assurance: proofs, adversarial search, safety case
+
+### Formal proofs of the safety PLC
+
+The PLC's step function (`kauha/safety/core.py`) is written once and run two
+ways: on floats in the twin and on z3 terms for proof. Method and limits are
+in `docs/safety/verification.md`.
+
+| | Result |
+|---|---|
+| Properties | 30, covering SR-01…SR-16 (except SR-15, which is wiring, tested in the SIL) |
+| Configurations | 4: dry and winter braking, each with and without automatic restart |
+| Proofs | 120 of 120 proven, plus an inductive invariant; about 30 s, run in CI |
+| Defects found | 4, in logic that had passed every test and 15 shifts |
+
+### Adversarial search
+
+CMA-ES searched one pedestrian's route, timing, pause, walking speed and dust
+to minimise the clearance to the moving machine. Random search with the same
+budget ran alongside it. Each episode is 150 s of the full stack.
+
+| Search | Episodes with valid routes | Contacts | Worst clearance: CMA-ES / random |
+|---|---|---|---|
+| Rules kept, before SR-16 | 80 | 1 | −0.25 m / 0.23 m |
+| Rules kept, with SR-16 | 105 | 0 | 0.07 m / 0.23 m |
+| Rules broken (zones entered), with SR-16 | 73 | 1 | −0.21 m / 0.09 m |
+
+- **The contact before SR-16 was a real design gap.**
+  - After dumping, the loader reversed with its bucket raised and lowered it on
+    the way. The adversary walked in front and stood where the bucket came down.
+  - On the next trajectory it stood between the front tyres and the lowered
+    bucket, and the reversing machine dragged the bucket's back edge into it.
+  - No field covered either spot. SR-16 adds under-bucket fields, front-side
+    fields while reversing and a boom-angle sensor. The scenario is kept as a
+    regression test.
+- **The 0.07 m with SR-16 is the end of a correct stop.** The reversing
+  machine stopped on a front-side detection at 2.5 m/s. The person kept walking
+  and reached it as it finished braking: the walker model stops people 0.3 m
+  from the body, so about 0.05 m of edge clearance is that model's floor.
+- **With the rules broken, the search found the zone risk.** The contact route
+  crosses the dig and dock zones, which is what assumption A1 (zone access
+  control) is for. It quantifies that assumption; it is not hidden.
+- **CMA-ES compared with random testing.** Most random routes were invalid,
+  because they crossed a forbidden zone. With the rules broken, CMA-ES put 7
+  episodes under 0.5 m against random's 3, and found the only contact.
+- **The search space is small.** It covers one person, two-leg routes and dust.
+  Two people together, other vehicles and sensor faults during the search are
+  not covered (`safety_concept.md`, item 10).
+
+### Safety case
+
+`python -m kauha.assurance.case` builds a GSN argument from
+`docs/safety/hazards.yaml`: 11 hazards, the requirements allocated to each, and
+the assumptions A1–A3. It attaches the evidence:
+- proofs;
+- requirement-traced tests;
+- the 15 shifts;
+- the adversarial searches;
+- the SIL.
+
+CI fails if any claim loses its evidence. Four goals stay undeveloped because
+only hardware and certification can close them. The rendered argument is
+`safety_case.html`.
+
+## 5. Reproduce
 
 ```bash
 python -m kauha.train.tune_baseline
 python -m kauha.train.train_bucket --steps 2000000
 python -m kauha.train.train_ppe --epochs 12
 python -m kauha.demo.campaign --seeds 1 2 3
-python -m kauha.demo.report
+python -m kauha.verify.prove
+python -m kauha.adversary.search --mode rules-kept --budget 200
+python -m kauha.adversary.search --mode rules-broken --budget 120
+python -m kauha.demo.report && python -m kauha.demo.replay3d
+python -m kauha.assurance.case --check
 ```
 
-On 2 CPU cores the whole set takes about 2 h: about 40 min for the detector,
-15 min for PPO and about 60 min for the 15 shifts.
+On 2 CPU cores the whole set takes about 2.5 h: about 40 min for the detector,
+15 min for PPO, about 35 min for the 15 shifts and 20 min for the two searches.

@@ -31,6 +31,7 @@ the safety channel in the normal conformity route.
 | Person struck while reversing | Rear fields (SR-02). Dig and dock sets are never used in reverse (SR-10). | Rear camera |
 | Person in the pile face during digging | Dig zone is access-controlled. The front field is muted only inside the zone, at 1 m/s or less, for 25 s at most (SR-10). | Lidar/camera slowdown before entering the zone. Side fields stay active around the cab and articulation. |
 | Person between the truck and the loader | Dock field covers the ground between the tyres and the truck side (SR-10). Dock zone speed cap 0.6 m/s. Truck cab-door interlock (SR-14). | Truck drivers stay in the cab (site rule). The demo scenario tests a driver who leaves the cab. |
+| Person under the raised bucket, or between the front tyres and the bucket | Under-bucket fields and front-side fields while reversing, with the boom held on a stop; two-channel boom-angle sensor (SR-16) | Found by the adversarial search; regression scenario in `tests/adversary` |
 | Crushing at the articulation joint; person beside the frames | Side fields on both frames while moving (SR-02). Teleop recovery from a side stop is refused while the contact band beside the frame is occupied (SR-12). | Site rule: no approach on foot in AUTO |
 | Machine leaves the work area | Geofence on the independent safety position (SR-07) | Autonomy map |
 | Autonomy computer fails or hangs | PLC watchdog (SR-06), gateway timeout | Hardwired stop path |
@@ -88,6 +89,18 @@ the safety channel in the normal conformity route.
    service is very likely a substantial modification. Whoever does it takes on
    the manufacturer's obligations for the modified machine: conformity
    assessment, technical file, CE marking.
+
+9. **Under-bucket coverage depends on the zones too.** Inside the dig zone the
+   pile fills the under-bucket fields, and beside a docked truck the truck fills
+   the far one. There the fields are not used, and the zone access control (A1)
+   carries the risk. The adversarial search with the zone rules broken measures
+   how much (`results/adversary_rules-broken.json`).
+10. **Proofs cover the logic, not the requirements.** The z3 proofs show the
+    PLC does what SR-01…SR-16 say (`verification.md`). Whether the requirements
+    are enough is a different question. The adversarial search is the evidence
+    for that, and it is only as good as its search space: one pedestrian,
+    routes of two legs, dust. Two people working together, vehicles other than
+    the truck, and sensor faults during the search are not yet covered.
 
 ## 4. Standards map
 

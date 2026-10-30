@@ -22,8 +22,9 @@ covers the travel field, the side field and the contact band. The twin found
 that with the earlier ±20° yaw the sides of the rear frame were not seen at all.
 
 Each scanner holds 43 field sets (2 directions × 4 speed bands × 5 articulation
-sectors, standstill, dig, dock). It monitors up to four fields at a time:
-protective, warning, side and contact band. The outdoorScan3 stores up to
+sectors, standstill, dig, dock). The front scanners monitor up to seven fields at
+a time: protective, warning, side, contact band, front side, and the near and far
+under-bucket fields (SR-16). The rear scanners monitor four. The outdoorScan3 stores up to
 128 fields and monitors eight at the same time (vendor data; confirm for the
 ordered variant).
 

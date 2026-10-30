@@ -1,23 +1,13 @@
 [
  {
-  "t": 382.15,
-  "cause": "FIELD_SIDE",
-  "v": -0.0,
-  "objects": [
-   "truck"
-  ],
-  "field": "standstill",
-  "false": false
- },
- {
   "t": 720.48,
   "cause": "REMOTE_LINK",
-  "v": 0.95,
+  "v": 1.21,
   "objects": [],
-  "field": "dig"
+  "field": "fwd_1.5_S"
  },
  {
-  "t": 1113.85,
+  "t": 1103.0,
   "cause": "FIELD_SIDE",
   "v": -2.32,
   "objects": [
@@ -27,7 +17,17 @@
   "false": false
  },
  {
-  "t": 1159.75,
+  "t": 1108.55,
+  "cause": "FIELD_SIDE",
+  "v": -2.2,
+  "objects": [
+   "fallen_block"
+  ],
+  "field": "rev_2.5_R2",
+  "false": false
+ },
+ {
+  "t": 1148.7,
   "cause": "FIELD_FRONT",
   "v": 1.0,
   "objects": [
@@ -37,11 +37,22 @@
   "false": false
  },
  {
-  "t": 2520.0,
-  "cause": "TRUCK_DOOR",
-  "v": 0.48,
+  "t": 1606.35,
+  "cause": "FIELD_REAR",
+  "v": -2.32,
   "objects": [],
-  "field": "fwd_0.5_S"
+  "field": "rev_2.5_R2",
+  "false": true
+ },
+ {
+  "t": 2520.0,
+  "cause": "TRUCK_DOOR|UNDER_BUCKET",
+  "v": 0.55,
+  "objects": [
+   "truck"
+  ],
+  "field": "fwd_1.5_S",
+  "false": false
  },
  {
   "t": 2880.2,
@@ -53,8 +64,8 @@
  {
   "t": 3240.0,
   "cause": "ESTOP_REMOTE",
-  "v": 2.77,
+  "v": 2.35,
   "objects": [],
-  "field": "fwd_3.0_S"
+  "field": "fwd_2.5_S"
  }
 ]

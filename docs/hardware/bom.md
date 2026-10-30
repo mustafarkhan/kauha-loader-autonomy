@@ -20,7 +20,7 @@ autonomy.
 | # | Function | Candidate | Qty | Requirement it meets | Notes / to confirm |
 |---|---|---|---|---|---|
 | A1 | Safety controller | TTControl HY-TTC 500 family (safety variant) or ifm ecomatController safety | 1 | PL d, 2 CAN, ≥ 8 safe digital in, ≥ 4 safe outputs, 25 ms task | Runs `kauha/safety/plc.py` logic, ported to the vendor's certified toolchain (C / CODESYS Safety). |
-| A2 | Safety laser scanner, front | SICK outdoorScan3 | 2 | Outdoor certified (IEC TS 62998), 275° scan angle, 4 m protective range, field-set switching by inputs, up to 128 fields with 8 monitored at once | The 4 m protective range caps the autonomous speed (3.17 m/s dry, 2.61 m/s winter; see `stopping.py`). Heated window option for winter. |
+| A2 | Safety laser scanner, front | SICK outdoorScan3 | 2 | Outdoor certified (IEC TS 62998), 275° scan angle, 4 m protective range, field-set switching by inputs, up to 128 fields with 8 monitored at once | The 4 m protective range caps the protected speed at 3.17 m/s dry and 2.61 m/s winter; the PLC grants 0.2 m/s less (2.97 / 2.41 m/s) so the overspeed tolerance stays protected (`stopping.py`, proof SR-04b). Heated window option for winter. |
 | A3 | Safety laser scanner, rear | SICK outdoorScan3 | 2 | as A2 | Mount at the rear corners turned 45° outward, so each one also covers its side of the rear frame. Keep clear of the rear grille. |
 | A4 | Driveline speed sensor | Inductive, two-channel, on the transmission output | 1 | Independent speed for SR-04/SR-08 | Must not share a signal path with the OEM speed on CAN. |
 | A5 | Articulation angle sensor | Contactless angle sensor, safety rated | 1 | Field-set sector selection (SR-02) | Mount on the articulation joint pin. |
@@ -28,6 +28,7 @@ autonomy.
 | A7 | Remote e-stop radio | HBC radiomatic or Autec safety radio | 1 | PL d e-stop over radio, loss-of-signal = stop | Separate from the data radio (C3). |
 | A8 | Machine e-stop buttons | Mushroom head, two-channel, cab + both sides | 3 | SR-01 | Wired to A1 safe inputs. |
 | A9 | Brake / drive cut relays | Force-guided relays, two-channel | 2 | Hardwired stop: park brake apply, transmission neutral | Category 3 architecture with A1 monitoring the feedback contacts. |
+| A11 | Boom angle sensors | Contactless angle sensors on the boom pivot, two independent channels | 2 | SR-16: tells the PLC when the bucket bottom is above 1.0 m, so the under-bucket field can be used | Added after the adversarial search found the bucket lowered onto a person standing under it. |
 | A10 | Hydraulic pilot cut-off valve | 24 V normally-closed cartridge valve on the pilot supply | 1 | Implement stop independent of the gateway | Fail-safe: de-energised = no pilot pressure. |
 | A11 | Beacon + horn | Amber beacon, reversing alarm | 2 | Warns people of autonomous mode | Driven by A1. |
 

@@ -47,6 +47,14 @@ class FieldSet:
     # Teleop recovery from a side stop is refused while a band is occupied.
     side_contact: Polygon = field(default_factory=lambda: contact_band("front"))
     side_contact_rear: Polygon = field(default_factory=lambda: contact_band("rear"))
+    # SR-16 under-bucket fields (simultaneous, front frame): the ground under a raised
+    # bucket, split where a docked truck's side may be.
+    # Front-frame side fields evaluated in every set on a separate output: while
+    # reversing, the bucket's back edge is dragged toward anyone who steps between
+    # it and the front tyres (found by the adversarial search).
+    front_side: Polygon = field(default_factory=lambda: front_side_field())
+    under_near: Polygon = field(default_factory=lambda: under_bucket("near"))
+    under_far: Polygon = field(default_factory=lambda: under_bucket("far"))
     # Standstill only: the rear frame has its own contour, so it gets its own fields.
     rear_protective: Polygon | None = None
     rear_warning: Polygon | None = None
@@ -73,6 +81,20 @@ class Geometry:
 
 
 CONTACT_BAND_M = 0.35
+BOOM_RAISED_M = 1.0          # bucket bottom height above which the scan plane (0.5 m) sees under it
+
+
+def front_side_field(g: "Geometry | None" = None) -> Polygon:
+    g = g or Geometry()
+    return [(0.0, g.half_width), (g.front_contour_x, g.half_width), (g.front_contour_x, g.half_width + 0.6),
+            (0.0, g.half_width + 0.6)]
+
+
+def under_bucket(part: str, g: "Geometry | None" = None) -> Polygon:
+    g = g or Geometry()
+    x0, x1 = (g.scanner_x, g.dock_field_end_x) if part == "near" else (g.dock_field_end_x, g.front_contour_x)
+    hw = g.half_width
+    return [(x0, -hw), (x1, -hw), (x1, hw), (x0, hw)]
 
 
 def contact_band(body: str, g: "Geometry | None" = None) -> Polygon:
@@ -152,6 +174,7 @@ BANDS = (0.5, 1.5, 2.5, 3.0)
 # to the machine's full articulation in the outer sectors.
 SECTORS = (("R2", -0.70, -0.30), ("R1", -0.30, -0.10), ("S", -0.10, 0.10), ("L1", 0.10, 0.30), ("L2", 0.30, 0.70))
 DIG_SPEED = 1.0
+SPEED_CAP_MARGIN = 0.2      # = the PLC's overspeed tolerance (SafetyParams.overspeed_tol)
 DOCK_SPEED = 0.6
 STANDSTILL = 0.1
 
@@ -164,7 +187,7 @@ def build_field_sets(b: StopBudget, g: Geometry | None = None) -> dict[int, Fiel
             (g.front_contour_x, g.half_width + 0.6), (0.0, g.half_width + 0.6)]
 
     def lengths(v: float) -> tuple[float, float]:
-        p = min(SCANNER_PROTECTIVE_RANGE_M, max(1.0, stopping_distance(v, b)))
+        p = protective_length(v, b)
         w = min(SCANNER_WARNING_RANGE_M, p + 2.0 + 1.5 * v)
         return p, w
 
@@ -206,6 +229,35 @@ def build_field_sets(b: StopBudget, g: Geometry | None = None) -> dict[int, Fiel
                  (g.dock_field_end_x, g.half_width + 0.6), (0.0, g.half_width + 0.6)]
     sets[101] = FieldSet(101, "dock", 1, DOCK_SPEED, dock, dock, dock_side)
     return sets
+
+
+def protective_length(v: float, b: StopBudget) -> float:
+    """Protective field length (along the path) for a band whose top speed is v.
+
+    The top band always uses the full scanner range: speeds above its nominal
+    top (up to the overspeed tolerance) must still be covered by a field.
+    """
+    if v >= BANDS[-1]:
+        return SCANNER_PROTECTIVE_RANGE_M
+    return min(SCANNER_PROTECTIVE_RANGE_M, max(1.0, stopping_distance(v, b)))
+
+
+def _v_protected(top: float, b: StopBudget) -> float:
+    """Highest speed a band's protective field stops from. A field sized exactly for
+    the band top protects the band top (no float round-off below it)."""
+    length = protective_length(top, b)
+    v = max_speed_for_field(length, b)
+    return max(v, top) if stopping_distance(top, b) <= length + 1e-12 else v
+
+
+def field_table(b: StopBudget):
+    """The facts about the loaded field sets that the PLC step function uses."""
+    from kauha.safety.core import FieldTable
+    return FieldTable(
+        bands=BANDS, sectors=tuple(lo for _, lo, _ in SECTORS[1:]), n_sectors=len(SECTORS),
+        standstill=STANDSTILL, dig_speed=DIG_SPEED, dock_speed=DOCK_SPEED,
+        v_protected=tuple(_v_protected(v, b) for v in BANDS),
+        field_cap=field_speed_cap(b), speed_cap=field_speed_cap(b) - SPEED_CAP_MARGIN)
 
 
 def select_field_set(sets: dict[int, FieldSet], v: float, gamma: float, dig: bool, dock: bool) -> int:

@@ -1,8 +1,8 @@
 [
  {
-  "t": 389.35,
+  "t": 389.6,
   "cause": "FIELD_SIDE",
-  "v": -0.07,
+  "v": -0.06,
   "objects": [
    "truck"
   ],
@@ -12,12 +12,20 @@
  {
   "t": 720.48,
   "cause": "REMOTE_LINK",
-  "v": 2.19,
+  "v": 1.03,
   "objects": [],
-  "field": "fwd_2.5_L1"
+  "field": "dig"
  },
  {
-  "t": 1132.15,
+  "t": 1123.3,
+  "cause": "FIELD_SIDE",
+  "v": -2.32,
+  "objects": [],
+  "field": "rev_2.5_R2",
+  "false": true
+ },
+ {
+  "t": 1139.95,
   "cause": "FIELD_FRONT",
   "v": 1.0,
   "objects": [
@@ -27,25 +35,25 @@
   "false": false
  },
  {
-  "t": 1591.9,
-  "cause": "FIELD_REAR",
-  "v": -0.63,
+  "t": 1650.9,
+  "cause": "UNDER_BUCKET",
+  "v": 2.81,
   "objects": [],
-  "field": "rev_1.5_S",
+  "field": "fwd_3.0_S",
   "false": true
  },
  {
   "t": 2880.2,
   "cause": "WATCHDOG",
-  "v": -2.34,
+  "v": -2.51,
   "objects": [],
-  "field": "rev_2.5_S"
+  "field": "rev_3.0_S"
  },
  {
   "t": 3240.0,
   "cause": "ESTOP_REMOTE",
-  "v": 0.48,
+  "v": -0.27,
   "objects": [],
-  "field": "dock"
+  "field": "rev_0.5_R1"
  }
 ]

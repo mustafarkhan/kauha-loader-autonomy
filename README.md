@@ -19,7 +19,10 @@ physical machine is involved:
 | Learning | PPO bucket-filling policy with domain randomisation; YOLO11n person/PPE detector fine-tuned on Construction-PPE | `kauha/train`, `models/` |
 | Verification | Requirement-traced unit, property-based, closed-loop and end-to-end tests; CAN tests over python-can | `tests/`, `docs/safety/requirements.md` |
 | Multi-process SIL | Machine, safety PLC, autonomy and remote station as separate processes on a shared CAN bus; fault injection by killing processes | `kauha/sil`, `tests/sil` |
-| Demonstration | 60-minute shift with people, link loss, an obstacle, dust, a GNSS outage, a material change, a computer freeze and a remote e-stop; KPIs and replay | `kauha/demo/shift.py`, `docs/results` |
+| Formal verification | The safety PLC's step function is written once and run two ways: on floats in the machine, on z3 terms for proof. 30 requirement properties proved for every input and every reachable state, in four configurations, in CI | `kauha/safety/core.py`, `kauha/verify`, `docs/safety/verification.md` |
+| Adversarial testing | CMA-ES searches pedestrian routes, timing and dust to minimise clearance to the moving machine, with the site rules kept or broken; found scenarios become regression tests | `kauha/adversary`, `tests/adversary` |
+| Safety case | GSN assurance argument generated from the hazard list and the evidence (proofs, traced tests, shifts, search, SIL); CI fails if any claim loses its evidence | `kauha/assurance`, `docs/safety/hazards.yaml`, `docs/results/safety_case.html` |
+| Demonstration | 60-minute shift with people, link loss, an obstacle, dust, a GNSS outage, a material change, a computer freeze and a remote e-stop; KPIs, 2D and 3D replay | `kauha/demo`, `docs/results` |
 
 ## Quick start
 
@@ -27,7 +30,10 @@ physical machine is involved:
 pip install -e ".[dev]"            # core + tests
 pytest -m "not slow"               # ~1 min
 pytest -m slow                     # real-time multi-process SIL, ~1 min
+python -m kauha.verify.prove       # prove the safety PLC properties (~30 s)
+python -m kauha.assurance.case --check
 python -m kauha.demo.shift --controller learned --minutes 60 --out results/shift_learned
+pip install -e ".[adversary]" && python -m kauha.adversary.search --mode rules-kept --budget 200
 ```
 
 Training (optional, CPU is enough):
@@ -49,8 +55,13 @@ python -m kauha.train.train_ppe --data-root /path/to/construction-ppe --epochs 1
    and short (dock) field sets are granted only from the PLC's own zone and
    speed checks.
 3. **Physics sets the speed limit.** The scanner's protective range and the
-   measured braking decide the top autonomous speed: 3.17 m/s dry and
-   2.61 m/s winter with the current assumptions.
+   measured braking decide the top protected speed: 3.17 m/s dry and 2.61 m/s
+   winter with the current assumptions. The PLC grants 0.2 m/s less (2.97 and
+   2.41 m/s), so that even the overspeed tolerance is covered by a field.
+4. **Prove, then attack.** The safety PLC's step function is proved against its
+   requirements for every input and state, and an optimiser then searches for
+   scenarios in which the whole stack still hits someone. Both have found
+   defects that every test had passed.
 
 ## Status and limits
 

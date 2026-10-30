@@ -323,3 +323,89 @@ def test_sr14_door_opening_while_docking_stops_and_clears(plc):
     assert out.state == State.PROTECTIVE_STOP, "no restart while the door is open"
     out = run(plc, int(4 / CYCLE_S), t0=8.0, **nominal(speed_a=0, speed_b=0, dock_req=True, in_dock_zone=True))
     assert out.state == State.RUN, "auto restart once the door has been closed for 3 s"
+
+
+# ------------------------------------------------- regressions found by the proofs
+@pytest.mark.req("SR-04")
+def test_found_by_proof_speed_above_the_top_band_is_never_unprotected():
+    """SR-04b counterexample: 3.0-3.2 m/s ran on a field sized for 3.0 m/s."""
+    from kauha.safety.fields import BANDS, protective_length
+    from kauha.safety.stopping import stopping_distance
+    for budget in (SafetyPLC().budget, SafetyPLC().budget.winter()):
+        plc = SafetyPLC(budget=budget)
+        top = plc.table.v_protected[-1]
+        assert stopping_distance(top, budget) <= protective_length(BANDS[-1], budget) + 1e-9
+        assert plc.table.speed_cap + plc.params.overspeed_tol <= top + 1e-9
+        out = run(plc, 4, **nominal(speed_a=top + 0.01, speed_b=top + 0.01))
+        assert out.state == State.PROTECTIVE_STOP and Cause.OVERSPEED in out.cause
+
+
+@pytest.mark.req("SR-12")
+def test_found_by_proof_reset_keeps_fields_already_in_recovery():
+    """SR-02a counterexample: a reset replaced the recovery set and dropped the front field."""
+    plc = SafetyPLC()
+    run(plc, 2, **nominal(mode=Mode.TELEOP, front_prot=True))
+    run(plc, 2, t0=1.0, **nominal(mode=Mode.TELEOP, speed_a=0, speed_b=0, front_prot=True, reset_req=True))
+    assert Cause.FIELD_FRONT in plc.recovery
+    # creeping back, a side stop happens; the front field is still occupied
+    run(plc, 2, t0=2.0, **nominal(mode=Mode.TELEOP, speed_a=-0.2, speed_b=-0.2, front_prot=True, side_prot=True))
+    out = run(plc, 2, t0=3.0, **nominal(mode=Mode.TELEOP, speed_a=0, speed_b=0, front_prot=True, side_prot=True,
+                                         reset_req=True))
+    assert Cause.FIELD_FRONT in plc.recovery and Cause.FIELD_SIDE in plc.recovery
+    out = run(plc, 2, t0=4.0, **nominal(mode=Mode.TELEOP, speed_a=0.2, speed_b=0.2, front_prot=True))
+    assert out.state == State.PROTECTIVE_STOP, "moving toward the occupied front field still trips"
+
+
+@pytest.mark.req("SR-10")
+def test_found_by_proof_muting_timeout_cannot_be_reset_while_muting_continues():
+    """SR-10b counterexample: a reset cleared the muting timeout while digging continued."""
+    plc = SafetyPLC()
+    kw = dict(speed_a=0.0, speed_b=0.0, dig_req=True, in_dig_zone=True)
+    out = run(plc, int(26 / CYCLE_S), **nominal(**kw))
+    assert Cause.MUTING_TIMEOUT in out.cause
+    out = run(plc, 3, t0=30.0, **nominal(reset_req=True, **kw))
+    assert out.state == State.PROTECTIVE_STOP, "still muting: reset refused"
+    out = run(plc, 3, t0=31.0, **nominal(speed_a=0.0, speed_b=0.0))
+    out = run(plc, 3, t0=32.0, **nominal(speed_a=0.0, speed_b=0.0, reset_req=True))
+    assert out.state == State.RUN, "dig request dropped: reset accepted"
+
+
+@pytest.mark.req("SR-12")
+def test_found_by_proof_creep_limit_applies_from_the_first_recovery_cycle():
+    """SR-12e counterexample: the cycle that entered recovery still output the full speed limit."""
+    plc = SafetyPLC()
+    run(plc, 2, **nominal(mode=Mode.TELEOP, front_prot=True))
+    plc.step(SafetyInputs(t=1.0, **nominal(mode=Mode.TELEOP, speed_a=0, speed_b=0, front_prot=True)))
+    out = plc.step(SafetyInputs(t=1.025, **nominal(mode=Mode.TELEOP, speed_a=0, speed_b=0, front_prot=True,
+                                                   reset_req=True)))
+    assert out.state == State.RUN and out.speed_limit <= 0.5
+
+
+# ---------------------------------------------------------------- SR-16
+@pytest.mark.req("SR-16")
+def test_sr16_person_under_raised_bucket_stops_travel_and_holds_the_boom(plc):
+    out = run(plc, 4, **nominal(speed_a=-1.5, speed_b=-1.5, boom_raised=True, under_near=True))
+    assert out.state == State.PROTECTIVE_STOP and Cause.UNDER_BUCKET in out.cause and not out.implement_enable
+
+
+@pytest.mark.req("SR-16")
+def test_sr16_ignored_with_the_bucket_down_and_far_field_exempt_at_a_docked_truck():
+    plc = SafetyPLC()
+    out = run(plc, 4, **nominal(boom_raised=False, under_far=True))
+    assert out.state == State.RUN, "bucket low: the far field sees the bucket itself"
+    back = dict(speed_a=-0.5, speed_b=-0.5, boom_raised=True, in_dock_zone=True)
+    out = run(plc, 4, t0=1.0, **nominal(under_far=True, **back))
+    assert out.state == State.RUN, "truck side in the far field while backing off the truck"
+    out = run(plc, 4, t0=2.0, **nominal(under_near=True, **back))
+    assert out.state == State.PROTECTIVE_STOP, "near field (tyres to truck side) is never exempt"
+
+
+@pytest.mark.req("SR-16")
+def test_sr16_beside_the_front_frame_while_reversing_stops_except_at_pile_or_docked_truck():
+    plc = SafetyPLC()
+    out = run(plc, 4, **nominal(speed_a=-1.0, speed_b=-1.0, front_side=True))
+    assert out.state == State.PROTECTIVE_STOP and Cause.FIELD_SIDE in out.cause
+    for zone in (dict(in_dig_zone=True), dict(in_dock_zone=True)):
+        plc = SafetyPLC()
+        out = run(plc, 4, **nominal(speed_a=-1.0, speed_b=-1.0, front_side=True, **zone))
+        assert out.state == State.RUN, zone

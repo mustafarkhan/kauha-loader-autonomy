@@ -82,6 +82,9 @@ class ScanResult:
     rear_warn: bool
     side_prot: bool
     side_contact: bool            # SR-12 contact band beside either frame (always evaluated)
+    front_side: bool              # SR-16 front-frame side fields, all sets (always evaluated)
+    under_near: bool              # SR-16 under-bucket fields (always evaluated)
+    under_far: bool
     points_front: np.ndarray      # (N,2) in front frame, for logging/visualisation
     points_rear: np.ndarray       # (N,2) in rear frame
 
@@ -89,7 +92,8 @@ class ScanResult:
 class SafetyScanners:
     def __init__(self, rng: np.random.Generator):
         self.rng = rng
-        self._prev = {"fp": False, "fw": False, "rp": False, "rw": False, "sp": False, "sc": False}
+        self._prev = {"fp": False, "fw": False, "rp": False, "rw": False, "sp": False, "sc": False, "un": False,
+                      "uf": False, "fs": False}
 
     @staticmethod
     def _adjacent_hits(mask: np.ndarray) -> bool:
@@ -141,14 +145,18 @@ class SafetyScanners:
         contact = any(eval_fields("front", [fs.side_contact, [(x, -y) for x, y in fs.side_contact]])) or \
             any(eval_fields("rear", [fs.side_contact_rear, [(x, -y) for x, y in fs.side_contact_rear]]))
         # Multiple sampling: a field counts as violated in two consecutive scans.
-        now = {"fp": front_p, "fw": front_w, "rp": rear_p, "rw": rear_w, "sp": side, "sc": contact}
+        un, uf = eval_fields("front", [fs.under_near, fs.under_far])
+        fsd = any(eval_fields("front", [fs.front_side, [(x, -y) for x, y in fs.front_side]]))
+        now = {"fp": front_p, "fw": front_w, "rp": rear_p, "rw": rear_w, "sp": side, "sc": contact, "un": un, "uf": uf,
+               "fs": fsd}
         out = {k: now[k] and self._prev[k] for k in now}
         self._prev = now
         pf = np.column_stack([np.concatenate([h[0][h[2]] for h in hits["front"]]),
                               np.concatenate([h[1][h[2]] for h in hits["front"]])])
         pr = np.column_stack([np.concatenate([h[0][h[2]] for h in hits["rear"]]),
                               np.concatenate([h[1][h[2]] for h in hits["rear"]])])
-        return ScanResult(out["fp"], out["fw"], out["rp"], out["rw"], out["sp"], out["sc"], pf, pr)
+        return ScanResult(out["fp"], out["fw"], out["rp"], out["rw"], out["sp"], out["sc"], out["fs"], out["un"],
+                          out["uf"], pf, pr)
 
 
 # ------------------------------------------------------------------- GNSS etc

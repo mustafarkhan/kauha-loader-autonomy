@@ -1,6 +1,30 @@
 [
  {
   "seq": 0,
+  "t": 446.6,
+  "kind": "stop",
+  "data": {
+   "state": "PROTECTIVE_STOP",
+   "cause": "FIELD_FRONT",
+   "field": "standstill",
+   "v": -0.001
+  },
+  "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+  "hash": "56bec106d1ccda9de4d24b7eab1ec5c1a28d020cd0f65ace6d5545ebdf0de448"
+ },
+ {
+  "seq": 1,
+  "t": 464.55,
+  "kind": "reset",
+  "data": {
+   "by": "auto",
+   "cleared": "FIELD_FRONT"
+  },
+  "prev": "56bec106d1ccda9de4d24b7eab1ec5c1a28d020cd0f65ace6d5545ebdf0de448",
+  "hash": "59326b53499afbd942d0f5ba7e0868eb8be62327ef42912aa3a4e8ca22742ea9"
+ },
+ {
+  "seq": 2,
   "t": 720.475,
   "kind": "stop",
   "data": {
@@ -8,258 +32,115 @@
    "cause": "REMOTE_LINK",
    "age": 0.525
   },
-  "prev": "0000000000000000000000000000000000000000000000000000000000000000",
-  "hash": "5b8dadf6704c119a9e0bb49b70229dd407a6d99ab0c8933bdc97d7854e12d885"
+  "prev": "59326b53499afbd942d0f5ba7e0868eb8be62327ef42912aa3a4e8ca22742ea9",
+  "hash": "a905f32e66d57719983479c073de79a1735dc748a991604f5d85f14479c459ca"
  },
  {
-  "seq": 1,
-  "t": 746.3,
+  "seq": 3,
+  "t": 753.4,
   "kind": "reset",
   "data": {
    "by": "supervisor",
    "cleared": "REMOTE_LINK"
   },
-  "prev": "5b8dadf6704c119a9e0bb49b70229dd407a6d99ab0c8933bdc97d7854e12d885",
-  "hash": "e2e45dde6cc982f73285c1fd882cadc7d49326542a342ebe2203f189cda2040b"
- },
- {
-  "seq": 2,
-  "t": 1155.4,
-  "kind": "stop",
-  "data": {
-   "state": "PROTECTIVE_STOP",
-   "cause": "FIELD_FRONT",
-   "field": "fwd_1.5_R1",
-   "v": 0.95
-  },
-  "prev": "e2e45dde6cc982f73285c1fd882cadc7d49326542a342ebe2203f189cda2040b",
-  "hash": "846cbf6aebbb3ebe70102a03688f9762ce70d3ae55b1e5b57971ba72b4e912ae"
- },
- {
-  "seq": 3,
-  "t": 1194.05,
-  "kind": "reset",
-  "data": {
-   "by": "supervisor",
-   "cleared": "FIELD_FRONT"
-  },
-  "prev": "846cbf6aebbb3ebe70102a03688f9762ce70d3ae55b1e5b57971ba72b4e912ae",
-  "hash": "97576c277228e442fc542ae173c3d48dee464c5bda54a9f90d9d898d383c398c"
+  "prev": "a905f32e66d57719983479c073de79a1735dc748a991604f5d85f14479c459ca",
+  "hash": "ab80991bdf7c4a6ea63f8320d2f48852fec81933181011ebf6cc763a57af7faf"
  },
  {
   "seq": 4,
-  "t": 1255.7,
-  "kind": "stop",
-  "data": {
-   "state": "PROTECTIVE_STOP",
-   "cause": "FIELD_FRONT",
-   "field": "fwd_1.5_S",
-   "v": 0.94
-  },
-  "prev": "97576c277228e442fc542ae173c3d48dee464c5bda54a9f90d9d898d383c398c",
-  "hash": "37c0d9b15a7085af372376c9447f34683c1eef0286cdbfc728aa45c6d8e15950"
- },
- {
-  "seq": 5,
-  "t": 1258.65,
-  "kind": "reset",
-  "data": {
-   "by": "supervisor",
-   "cleared": "FIELD_FRONT"
-  },
-  "prev": "37c0d9b15a7085af372376c9447f34683c1eef0286cdbfc728aa45c6d8e15950",
-  "hash": "0015f6d6fe31f582e03dbb81210ff509aeb69530ce4d3a39d22205b1a40eba32"
- },
- {
-  "seq": 6,
-  "t": 1476.85,
+  "t": 1189.8,
   "kind": "stop",
   "data": {
    "state": "PROTECTIVE_STOP",
    "cause": "FIELD_SIDE",
-   "field": "fwd_3.0_R1",
-   "v": 2.53
+   "field": "rev_2.5_R2",
+   "v": -2.359
   },
-  "prev": "0015f6d6fe31f582e03dbb81210ff509aeb69530ce4d3a39d22205b1a40eba32",
-  "hash": "dbfc61562ac2e6f87e02cea9c57833cf88f0a2fac0f204e8918796346d80a4be"
+  "prev": "ab80991bdf7c4a6ea63f8320d2f48852fec81933181011ebf6cc763a57af7faf",
+  "hash": "ead6588bd6f18eee363106c869592998be900acd6fd55e67aaed99f21ec60707"
  },
  {
-  "seq": 7,
-  "t": 1479.9,
+  "seq": 5,
+  "t": 1193.25,
   "kind": "reset",
   "data": {
    "by": "auto",
    "cleared": "FIELD_SIDE"
   },
-  "prev": "dbfc61562ac2e6f87e02cea9c57833cf88f0a2fac0f204e8918796346d80a4be",
-  "hash": "636c81859a84faca7ee247d87c65649c7c4862e10b0482f7c9db535bae5981ba"
+  "prev": "ead6588bd6f18eee363106c869592998be900acd6fd55e67aaed99f21ec60707",
+  "hash": "3421fd64a599765d51775e72187bf155a8b91a5d1bddf7bb099919de31bc6176"
+ },
+ {
+  "seq": 6,
+  "t": 1195.2,
+  "kind": "stop",
+  "data": {
+   "state": "PROTECTIVE_STOP",
+   "cause": "FIELD_SIDE",
+   "field": "front_side_reversing",
+   "v": -2.166
+  },
+  "prev": "3421fd64a599765d51775e72187bf155a8b91a5d1bddf7bb099919de31bc6176",
+  "hash": "9db15bf723d705e9f7b50b804224a3a01257dd5c51f2615225aafca6df5824ed"
+ },
+ {
+  "seq": 7,
+  "t": 1227.65,
+  "kind": "recovery",
+  "data": {
+   "fields": "FIELD_SIDE"
+  },
+  "prev": "9db15bf723d705e9f7b50b804224a3a01257dd5c51f2615225aafca6df5824ed",
+  "hash": "74f8095e3727ea98be1af06f5c00cff91f2ef615737d3c6a51f9cb7b8d33ab64"
  },
  {
   "seq": 8,
-  "t": 1506.9,
-  "kind": "stop",
+  "t": 1227.65,
+  "kind": "reset",
   "data": {
-   "state": "PROTECTIVE_STOP",
-   "cause": "FIELD_REAR",
-   "field": "rev_2.5_L2",
-   "v": -2.36
+   "by": "supervisor",
+   "cleared": "FIELD_SIDE"
   },
-  "prev": "636c81859a84faca7ee247d87c65649c7c4862e10b0482f7c9db535bae5981ba",
-  "hash": "522159e979690d0de8aafa761bc89f0e3b63f6ccc4311f4520e28fed36d7af9a"
+  "prev": "74f8095e3727ea98be1af06f5c00cff91f2ef615737d3c6a51f9cb7b8d33ab64",
+  "hash": "8a4b126a18e24365b8765480e84fb787c05cd17f8a472044e6b803fb75bab00d"
  },
  {
   "seq": 9,
-  "t": 1509.95,
-  "kind": "reset",
-  "data": {
-   "by": "auto",
-   "cleared": "FIELD_REAR"
-  },
-  "prev": "522159e979690d0de8aafa761bc89f0e3b63f6ccc4311f4520e28fed36d7af9a",
-  "hash": "99d1aa24979bb8a71e3a6088c3800a33230092a64bf26d3717d7d86779eac09d"
- },
- {
-  "seq": 10,
-  "t": 1581.7,
-  "kind": "stop",
-  "data": {
-   "state": "PROTECTIVE_STOP",
-   "cause": "FIELD_REAR",
-   "field": "rev_2.5_S",
-   "v": -2.45
-  },
-  "prev": "99d1aa24979bb8a71e3a6088c3800a33230092a64bf26d3717d7d86779eac09d",
-  "hash": "2ed2ca83199282010761e85dda6aeb1198da0f1c3d537f009599d4673667ec6d"
- },
- {
-  "seq": 11,
-  "t": 1584.75,
-  "kind": "reset",
-  "data": {
-   "by": "auto",
-   "cleared": "FIELD_REAR"
-  },
-  "prev": "2ed2ca83199282010761e85dda6aeb1198da0f1c3d537f009599d4673667ec6d",
-  "hash": "cfb7fa5f6a70a8fb2223a123e192625690c17689153d25d629628f5259f14ee2"
- },
- {
-  "seq": 12,
-  "t": 1711.35,
-  "kind": "stop",
-  "data": {
-   "state": "PROTECTIVE_STOP",
-   "cause": "FIELD_REAR",
-   "field": "rev_2.5_L1",
-   "v": -2.07
-  },
-  "prev": "cfb7fa5f6a70a8fb2223a123e192625690c17689153d25d629628f5259f14ee2",
-  "hash": "c986cd90f35be607c48a42a85cc72b1328e92e4b16a8b9394f9fcf73f73fdc82"
- },
- {
-  "seq": 13,
-  "t": 1714.4,
-  "kind": "reset",
-  "data": {
-   "by": "auto",
-   "cleared": "FIELD_REAR"
-  },
-  "prev": "c986cd90f35be607c48a42a85cc72b1328e92e4b16a8b9394f9fcf73f73fdc82",
-  "hash": "71b7d58a9fb8d8571fb4734085c72a4d99260311f67aabe90133a43753fd1927"
- },
- {
-  "seq": 14,
-  "t": 1739.0,
-  "kind": "stop",
-  "data": {
-   "state": "PROTECTIVE_STOP",
-   "cause": "FIELD_REAR",
-   "field": "rev_2.5_R2",
-   "v": -2.36
-  },
-  "prev": "71b7d58a9fb8d8571fb4734085c72a4d99260311f67aabe90133a43753fd1927",
-  "hash": "b32247ae10dbd4e5c0748c3a91e4806edfc6777731bb942a9dcb6792b3b0c265"
- },
- {
-  "seq": 15,
-  "t": 1742.05,
-  "kind": "reset",
-  "data": {
-   "by": "auto",
-   "cleared": "FIELD_REAR"
-  },
-  "prev": "b32247ae10dbd4e5c0748c3a91e4806edfc6777731bb942a9dcb6792b3b0c265",
-  "hash": "3c50e5ec4d3dce46fe04e55682ed80ff1e888878eee60945746c2c4364bb1816"
- },
- {
-  "seq": 16,
   "t": 2520.0,
   "kind": "stop",
   "data": {
    "state": "PROTECTIVE_STOP",
    "cause": "TRUCK_DOOR"
   },
-  "prev": "3c50e5ec4d3dce46fe04e55682ed80ff1e888878eee60945746c2c4364bb1816",
-  "hash": "63efd852dfc4b552bdd1d0dcf22c52761a8f4685ca1698c97d4b485e57e2a04d"
+  "prev": "8a4b126a18e24365b8765480e84fb787c05cd17f8a472044e6b803fb75bab00d",
+  "hash": "6cebdf47e707430d46d1083e365a5e0dc4096e720fef7cae83a6dd0ddae60a79"
  },
  {
-  "seq": 17,
-  "t": 2520.1,
+  "seq": 10,
+  "t": 2524.85,
   "kind": "stop",
   "data": {
    "state": "PROTECTIVE_STOP",
    "cause": "FIELD_FRONT",
-   "field": "fwd_1.5_S",
-   "v": 0.51
-  },
-  "prev": "63efd852dfc4b552bdd1d0dcf22c52761a8f4685ca1698c97d4b485e57e2a04d",
-  "hash": "620c7cd0c47eda425b45115186b7a0ad0894449fc968de959a292457e3dea2e9"
- },
- {
-  "seq": 18,
-  "t": 2530.7,
-  "kind": "stop",
-  "data": {
-   "state": "PROTECTIVE_STOP",
-   "cause": "FIELD_SIDE",
    "field": "standstill",
-   "v": 0.05
+   "v": -0.03
   },
-  "prev": "620c7cd0c47eda425b45115186b7a0ad0894449fc968de959a292457e3dea2e9",
-  "hash": "7714d370755b8aea0dc6d0129b365cb267dc762ebcca2a32e83e53de1507486a"
+  "prev": "6cebdf47e707430d46d1083e365a5e0dc4096e720fef7cae83a6dd0ddae60a79",
+  "hash": "9f631189c5a5b8ed0bff285b76796961c1374f0caa2a36227e7019390f635f1c"
  },
  {
-  "seq": 19,
-  "t": 2562.65,
-  "kind": "recovery",
-  "data": {
-   "fields": "FIELD_FRONT"
-  },
-  "prev": "7714d370755b8aea0dc6d0129b365cb267dc762ebcca2a32e83e53de1507486a",
-  "hash": "880b1b78ec4dcd73f516c82172b23ba053c6323a6cbc06456cb079e1b885c8a9"
- },
- {
-  "seq": 20,
-  "t": 2565.7,
-  "kind": "recovery",
-  "data": {
-   "fields": "FIELD_FRONT"
-  },
-  "prev": "880b1b78ec4dcd73f516c82172b23ba053c6323a6cbc06456cb079e1b885c8a9",
-  "hash": "7e8d19f7a8f1d9757e6a20b0e84882663bea5965801e16a3bd9c1b17d5e50cf8"
- },
- {
-  "seq": 21,
-  "t": 2565.7,
+  "seq": 11,
+  "t": 2562.95,
   "kind": "reset",
   "data": {
    "by": "supervisor",
-   "cleared": "FIELD_FRONT|FIELD_SIDE|TRUCK_DOOR"
+   "cleared": "FIELD_FRONT|TRUCK_DOOR"
   },
-  "prev": "7e8d19f7a8f1d9757e6a20b0e84882663bea5965801e16a3bd9c1b17d5e50cf8",
-  "hash": "3a5928692746364fac4e024b5cb0eae6118caf88443897f41e2dd17e20400900"
+  "prev": "9f631189c5a5b8ed0bff285b76796961c1374f0caa2a36227e7019390f635f1c",
+  "hash": "87df5e6d76866adb80a2767e96e5629889bf05ffc1942e1ea78d769abdf6c082"
  },
  {
-  "seq": 22,
+  "seq": 12,
   "t": 2880.2,
   "kind": "stop",
   "data": {
@@ -267,40 +148,40 @@
    "cause": "WATCHDOG",
    "age": 0.2
   },
-  "prev": "3a5928692746364fac4e024b5cb0eae6118caf88443897f41e2dd17e20400900",
-  "hash": "7e3b2f5aaed16ae87051f9d813ea32c9b1c033a400bb82f9de64a42c99356ef2"
+  "prev": "87df5e6d76866adb80a2767e96e5629889bf05ffc1942e1ea78d769abdf6c082",
+  "hash": "85670fa03f14eb602614cb25887e13cf747937252ba3f2e1f6b6f47faceb5a7e"
  },
  {
-  "seq": 23,
-  "t": 2895.6,
+  "seq": 13,
+  "t": 2891.75,
   "kind": "reset",
   "data": {
    "by": "supervisor",
    "cleared": "WATCHDOG"
   },
-  "prev": "7e3b2f5aaed16ae87051f9d813ea32c9b1c033a400bb82f9de64a42c99356ef2",
-  "hash": "db55213a85b2ac92ed12270f3257351c7b1dd899b48508b4f23203c13b4e478f"
+  "prev": "85670fa03f14eb602614cb25887e13cf747937252ba3f2e1f6b6f47faceb5a7e",
+  "hash": "277aad6e39bf3223da4531829f8efea180d806dc216ec355148f508df24e10cc"
  },
  {
-  "seq": 24,
+  "seq": 14,
   "t": 3240.0,
   "kind": "stop",
   "data": {
    "state": "EMERGENCY_STOP",
    "cause": "ESTOP_REMOTE"
   },
-  "prev": "db55213a85b2ac92ed12270f3257351c7b1dd899b48508b4f23203c13b4e478f",
-  "hash": "a1b53754d37b1874e46007e3df794b9b497816b8a6ff685eaa9ad9797e399f55"
+  "prev": "277aad6e39bf3223da4531829f8efea180d806dc216ec355148f508df24e10cc",
+  "hash": "35146d004adb19fa0ed9688afb0b287d39627ed66a37240517e47518defa19f7"
  },
  {
-  "seq": 25,
-  "t": 3250.1,
+  "seq": 15,
+  "t": 3258.3,
   "kind": "reset",
   "data": {
    "by": "supervisor",
    "cleared": "ESTOP_REMOTE"
   },
-  "prev": "a1b53754d37b1874e46007e3df794b9b497816b8a6ff685eaa9ad9797e399f55",
-  "hash": "a94d4dda4f1947a5502c130a2a854faea23d5c1502adcefc421afe2ca8c90d2b"
+  "prev": "35146d004adb19fa0ed9688afb0b287d39627ed66a37240517e47518defa19f7",
+  "hash": "eaad1a9cc299912fe137b8676a939a22ffe3e96ebc13fd3e61c64211c7785be7"
  }
 ]

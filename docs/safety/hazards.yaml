@@ -1,0 +1,81 @@
+# Hazards, the safety requirements allocated to them, and the assumptions the
+# argument rests on. Source of truth for the generated safety case
+# (python -m kauha.assurance.case). The prose version is safety_concept.md.
+
+scope: >
+  KAUHA retrofit kit on a 15.5 t articulated wheel loader, loading 20 t trucks
+  from stockpiles on a fenced aggregates yard, with a remote supervisor.
+  Evidence is from the digital twin, the multi-process SIL and formal proofs.
+
+hazards:
+  - id: H1
+    title: Person struck by the machine travelling forward
+    requirements: [SR-02, SR-03, SR-04, SR-08]
+    validation: [shift, adversary]
+  - id: H2
+    title: Person struck by the machine reversing
+    requirements: [SR-02, SR-04, SR-10]
+    validation: [shift, adversary]
+  - id: H3
+    title: Person beside the frames crushed at the articulation or brushed by the bucket
+    requirements: [SR-02, SR-12]
+    validation: [shift, adversary]
+  - id: H4
+    title: Person in the pile face during digging (front field muted)
+    requirements: [SR-10]
+    assumptions: [A1]
+    validation: [adversary-zones]
+  - id: H5
+    title: Person between the truck and the loader, or under the raised bucket
+    requirements: [SR-10, SR-14, SR-16]
+    assumptions: [A1]
+    validation: [shift]
+  - id: H6
+    title: Machine leaves the operating area
+    requirements: [SR-07]
+    validation: [shift]
+  - id: H7
+    title: Autonomy computer fails, hangs or sends stale commands
+    requirements: [SR-06, SR-13]
+    validation: [shift, sil]
+  - id: H8
+    title: Remote supervision lost
+    requirements: [SR-05, SR-01]
+    validation: [shift, sil]
+  - id: H9
+    title: Safety PLC itself fails
+    requirements: [SR-15]
+    validation: [sil]
+  - id: H10
+    title: Unexpected restart after a stop
+    requirements: [SR-09, SR-11, SR-01]
+    validation: [shift]
+  - id: H11
+    title: Person under the raised bucket or between the front tyres and the bucket (boom lowered or bucket dragged onto them)
+    requirements: [SR-16, SR-12]
+    validation: [shift, adversary]
+
+assumptions:
+  - id: A1
+    text: >
+      People on foot are kept out of the dig and dock zones by access control
+      (barriers, tags or light curtains at the zone entries). The truck driver
+      stays in the cab, or the cab-door switch reports otherwise (SR-14).
+  - id: A2
+    text: >
+      The safety scanners, speed sensors, e-stops and relays are certified parts
+      wired two-channel and report the truth within their stated response times.
+  - id: A3
+    text: >
+      The braking budget (reaction 0.47 s, 2.5 m/s² dry, 1.5 m/s² winter) holds on
+      the target machine. To be measured before field trials.
+
+open:   # goals that need work outside the twin; shown as undeveloped
+  - id: U1
+    text: Safety PLC logic re-implemented and verified in a certified PLC toolchain (ISO 13849-1/-2).
+  - id: U2
+    text: Hardware-in-the-loop bench passes HIL-01..10 on three consecutive days.
+  - id: U3
+    text: Brake and scanner response measured on the target machine, dry and on snow; field sets regenerated.
+  - id: U4
+    text: Full ISO 12100 risk assessment of machine and site; MPLr per ISO 19014.

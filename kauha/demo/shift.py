@@ -29,7 +29,7 @@ from kauha.can.codec import Codec
 from kauha.can.gateway import MachineGateway, VirtualBus
 from kauha.config import REPO_ROOT, load_machine
 from kauha.geometry import point_in_poly
-from kauha.safety.fields import Geometry
+from kauha.safety.fields import BOOM_RAISED_M, Geometry
 from kauha.safety.geofence import Geofence, SafetyPositioner
 from kauha.safety.plc import FIELD_CAUSES, Cause, Mode, SafetyInputs, SafetyParams, SafetyPLC, State
 from kauha.safety.stopping import StopBudget
@@ -43,10 +43,15 @@ from kauha.train.bucket_env import ScriptedOperator
 SIM_DT = 0.025
 
 
-def field_polygons(fs) -> list[tuple[str, list]]:
-    """(body, polygon) for every protective area of a field set, including the side fields."""
+def field_polygons(fs, under: bool = False) -> list[tuple[str, list]]:
+    """(body, polygon) for every protective area of a field set, including the side fields
+    (and, with under=True, the SR-16 under-bucket fields)."""
     out = [("front", fs.protective if fs.direction >= 0 else []),
            ("rear", fs.protective_for("rear") if fs.direction <= 0 else [])]
+    if under:
+        out += [("front", fs.under_near), ("front", fs.under_far)]
+    if fs.direction < 0 and fs.front_side:           # SR-16 front-side fields while reversing
+        out += [("front", fs.front_side), ("front", [(x, -y) for x, y in fs.front_side])]
     for body, side in (("front", fs.side), ("rear", fs.side_rear)):
         if side:
             out += [(body, side), (body, [(x, -y) for x, y in side])]
@@ -233,7 +238,7 @@ class ShiftSim:
         c, s = math.cos(bth), math.sin(bth)
         return dx * c + dy * s, -dx * s + dy * c
 
-    def _objects_in_protective(self, fs) -> list[str]:
+    def _objects_in_protective(self, fs, under: bool = False) -> list[str]:
         """Ground truth: which real objects are inside the active protective/side fields."""
         names = []
         objs = [(n, px, py) for n, px, py in self.site.people_at(self.t)]
@@ -250,7 +255,7 @@ class ShiftSim:
                 for a, b in zip(cs, cs[1:] + cs[:1]):
                     objs.append(("truck", a[0] + u * (b[0] - a[0]), a[1] + u * (b[1] - a[1])))
         for n, px, py in objs:
-            for body, poly in field_polygons(fs):
+            for body, poly in field_polygons(fs, under):
                 if not poly:
                     continue
                 lx, ly = self._to_body(body, px, py)
@@ -390,6 +395,9 @@ class ShiftSim:
             t=t, mode=mode, speed_a=speed_a, speed_b=speed_b, articulation=s.gamma,
             front_prot=sc.front_prot, front_warn=sc.front_warn, rear_prot=sc.rear_prot, rear_warn=sc.rear_warn,
             side_prot=sc.side_prot, side_contact=sc.side_contact, remote_hb_age=hb_age,
+            boom_raised=self.loader.bucket_bottom_height() > BOOM_RAISED_M, under_near=sc.under_near,
+            front_side=sc.front_side,
+            under_far=sc.under_far,
             remote_estop=bool(self.plc_hb.get("EStop", 0)) and hb_fresh,
             reset_req=bool(self.plc_hb.get("ResetReq", 0)) and hb_fresh,
             autonomy_cmd_age=cmd_age, dig_req=bool(self.plc_drive.get("DigFieldReq", 0)),
@@ -585,7 +593,8 @@ class ShiftSim:
     def _track_stops(self, out, fs) -> None:
         s = self.loader.state
         if out.state >= State.PROTECTIVE_STOP and self._prev_state < State.PROTECTIVE_STOP:
-            truth = self._objects_in_protective(self.plc.sets[self.plc.field_set]) \
+            truth = self._objects_in_protective(self.plc.sets[self.plc.field_set],
+                                                under=bool(out.cause & Cause.UNDER_BUCKET)) \
                 if out.cause & FIELD_CAUSES else []
             ev = {"t": round(self.t, 2), "cause": out.cause.name, "v": round(s.v, 2), "objects": truth,
                   "field": self.plc.sets[self.plc.field_set].name}

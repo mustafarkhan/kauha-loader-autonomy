@@ -71,6 +71,8 @@ def machine(w: Wiring, epoch: float, duration: float, log_path: str, person: dic
                                  sets[field_set], WALLS, circles)
         io.send({"front_prot": scan.front_prot, "front_warn": scan.front_warn, "rear_prot": scan.rear_prot,
                  "rear_warn": scan.rear_warn, "side_prot": scan.side_prot, "side_contact": scan.side_contact,
+                 "under_near": scan.under_near, "under_far": scan.under_far, "front_side": scan.front_side,
+                 "boom_raised": loader.bucket_bottom_height() > 1.0,
                  "speed_b": s.v,
                  "articulation": s.gamma, "t": t})
         cmd = gw.command(t)
@@ -127,6 +129,10 @@ def plc(w: Wiring, epoch: float, duration: float, log_path: str) -> None:
             front_prot=sensors.get("front_prot", True) or not io_ok, front_warn=sensors.get("front_warn", False),
             rear_prot=sensors.get("rear_prot", False), rear_warn=sensors.get("rear_warn", False),
             side_prot=sensors.get("side_prot", False), side_contact=sensors.get("side_contact", True) or not io_ok,
+            boom_raised=sensors.get("boom_raised", True) or not io_ok,
+            under_near=sensors.get("under_near", True) or not io_ok,
+            under_far=sensors.get("under_far", True) or not io_ok,
+            front_side=sensors.get("front_side", True) or not io_ok,
             remote_hb_age=hb_age,
             remote_estop=bool(hb.get("EStop", 0)) and hb_age < 0.5, reset_req=bool(hb.get("ResetReq", 0)),
             autonomy_cmd_age=cmd_age))

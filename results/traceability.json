@@ -60,6 +60,18 @@
    {
     "test": "tests/safety/test_plc.py::test_sr01_reset_refused_while_estop_held",
     "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[OUT-1]",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-01a]",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-01b]",
+    "outcome": "passed"
    }
   ],
   "all_passed": true
@@ -189,6 +201,22 @@
    {
     "test": "tests/sil/test_processes.py::test_person_in_path_stops_machine_across_processes",
     "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-02a]",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-02b]",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-02c]",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-02d]",
+    "outcome": "passed"
    }
   ],
   "all_passed": true
@@ -201,6 +229,10 @@
    },
    {
     "test": "tests/safety/test_plc.py::test_sr03_warning_ignored_inside_access_controlled_zones",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-03]",
     "outcome": "passed"
    }
   ],
@@ -225,6 +257,10 @@
     "outcome": "passed"
    },
    {
+    "test": "tests/safety/test_plc.py::test_found_by_proof_speed_above_the_top_band_is_never_unprotected",
+    "outcome": "passed"
+   },
+   {
     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_winter[1.0]",
     "outcome": "passed"
    },
@@ -234,6 +270,14 @@
    },
    {
     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_winter[2.6]",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-04a]",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-04b]",
     "outcome": "passed"
    }
   ],
@@ -252,6 +296,10 @@
    {
     "test": "tests/sil/test_processes.py::test_losing_the_remote_station_stops_the_machine",
     "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-05]",
+    "outcome": "passed"
    }
   ],
   "all_passed": true
@@ -269,6 +317,10 @@
    {
     "test": "tests/sil/test_processes.py::test_killing_the_autonomy_process_stops_the_machine",
     "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-06]",
+    "outcome": "passed"
    }
   ],
   "all_passed": true
@@ -282,6 +334,14 @@
    {
     "test": "tests/safety/test_plc.py::test_sr07_position_invalid_tolerated_briefly",
     "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-07a]",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-07b]",
+    "outcome": "passed"
    }
   ],
   "all_passed": true
@@ -291,6 +351,10 @@
    {
     "test": "tests/safety/test_plc.py::test_sr08_speed_sensor_discrepancy",
     "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-08]",
+    "outcome": "passed"
    }
   ],
   "all_passed": true
@@ -299,6 +363,10 @@
   "tests": [
    {
     "test": "tests/safety/test_plc.py::test_sr09_no_reset_while_moving",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-09]",
     "outcome": "passed"
    }
   ],
@@ -321,6 +389,18 @@
    {
     "test": "tests/safety/test_plc.py::test_sr10_muting_time_limited",
     "outcome": "passed"
+   },
+   {
+    "test": "tests/safety/test_plc.py::test_found_by_proof_muting_timeout_cannot_be_reset_while_muting_continues",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-10a]",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-10b]",
+    "outcome": "passed"
    }
   ],
   "all_passed": true
@@ -337,6 +417,10 @@
    },
    {
     "test": "tests/safety/test_plc.py::test_sr11_no_auto_restart_for_non_field_causes",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-11]",
     "outcome": "passed"
    }
   ],
@@ -359,6 +443,34 @@
    {
     "test": "tests/safety/test_plc.py::test_sr12_no_recovery_in_auto",
     "outcome": "passed"
+   },
+   {
+    "test": "tests/safety/test_plc.py::test_found_by_proof_reset_keeps_fields_already_in_recovery",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/safety/test_plc.py::test_found_by_proof_creep_limit_applies_from_the_first_recovery_cycle",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-12a]",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-12b]",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-12c]",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-12d]",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-12e]",
+    "outcome": "passed"
    }
   ],
   "all_passed": true
@@ -376,6 +488,10 @@
    {
     "test": "tests/scenario/test_shift_short.py::test_safety_log_intact",
     "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-13]",
+    "outcome": "passed"
    }
   ],
   "all_passed": true
@@ -389,6 +505,14 @@
    {
     "test": "tests/safety/test_plc.py::test_sr14_door_opening_while_docking_stops_and_clears",
     "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-14a]",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-14b]",
+    "outcome": "passed"
    }
   ],
   "all_passed": true
@@ -397,6 +521,39 @@
   "tests": [
    {
     "test": "tests/sil/test_processes.py::test_killing_the_safety_plc_drops_the_relays",
+    "outcome": "passed"
+   }
+  ],
+  "all_passed": true
+ },
+ "SR-16": {
+  "tests": [
+   {
+    "test": "tests/adversary/test_found_scenarios.py::test_person_under_the_raised_bucket_is_not_struck",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/safety/test_plc.py::test_sr16_person_under_raised_bucket_stops_travel_and_holds_the_boom",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/safety/test_plc.py::test_sr16_ignored_with_the_bucket_down_and_far_field_exempt_at_a_docked_truck",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/safety/test_plc.py::test_sr16_beside_the_front_frame_while_reversing_stops_except_at_pile_or_docked_truck",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-16a]",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-16c]",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/verify/test_proofs.py::test_property_proven_in_every_configuration[SR-16b]",
     "outcome": "passed"
    }
   ],

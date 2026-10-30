@@ -1,0 +1,4155 @@
+{
+ "summary": {
+  "root": "passed-open",
+  "goals": 47,
+  "solutions": 64,
+  "failed": [],
+  "missing": [],
+  "open": [
+   "U1",
+   "U2",
+   "U3",
+   "U4"
+  ],
+  "proofs": [
+   120,
+   120
+  ]
+ },
+ "nodes": {
+  "G0": {
+   "id": "G0",
+   "kind": "goal",
+   "text": "People on foot are not harmed by the KAUHA-equipped loader operating autonomously within its scope, given assumptions A1\u2013A3.",
+   "parent": null,
+   "status": "passed-open",
+   "evidence": [],
+   "children": [
+    "C0",
+    "C1",
+    "A1",
+    "A2",
+    "A3",
+    "S0"
+   ]
+  },
+  "C0": {
+   "id": "C0",
+   "kind": "context",
+   "text": "KAUHA retrofit kit on a 15.5 t articulated wheel loader, loading 20 t trucks from stockpiles on a fenced aggregates yard, with a remote supervisor. Evidence is from the digital twin, the multi-process SIL and formal proofs.",
+   "parent": "G0",
+   "status": null,
+   "evidence": [],
+   "children": []
+  },
+  "C1": {
+   "id": "C1",
+   "kind": "context",
+   "text": "Safety requirements SR-01\u2026SR-16 (docs/safety/requirements.md).",
+   "parent": "G0",
+   "status": null,
+   "evidence": [],
+   "children": []
+  },
+  "A1": {
+   "id": "A1",
+   "kind": "assumption",
+   "text": "People on foot are kept out of the dig and dock zones by access control (barriers, tags or light curtains at the zone entries). The truck driver stays in the cab, or the cab-door switch reports otherwise (SR-14).",
+   "parent": "G0",
+   "status": null,
+   "evidence": [],
+   "children": []
+  },
+  "A2": {
+   "id": "A2",
+   "kind": "assumption",
+   "text": "The safety scanners, speed sensors, e-stops and relays are certified parts wired two-channel and report the truth within their stated response times.",
+   "parent": "G0",
+   "status": null,
+   "evidence": [],
+   "children": []
+  },
+  "A3": {
+   "id": "A3",
+   "kind": "assumption",
+   "text": "The braking budget (reaction 0.47 s, 2.5 m/s\u00b2 dry, 1.5 m/s\u00b2 winter) holds on the target machine. To be measured before field trials.",
+   "parent": "G0",
+   "status": null,
+   "evidence": [],
+   "children": []
+  },
+  "S0": {
+   "id": "S0",
+   "kind": "strategy",
+   "text": "Argue over each identified hazard (docs/safety/hazards.yaml), then over the work that only hardware and certification can close.",
+   "parent": "G0",
+   "status": "passed-open",
+   "evidence": [],
+   "children": [
+    "H1",
+    "H2",
+    "H3",
+    "H4",
+    "H5",
+    "H6",
+    "H7",
+    "H8",
+    "H9",
+    "H10",
+    "H11",
+    "U1",
+    "U2",
+    "U3",
+    "U4"
+   ]
+  },
+  "H1": {
+   "id": "H1",
+   "kind": "goal",
+   "text": "H1: Person struck by the machine travelling forward is controlled.",
+   "parent": "S0",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H1.S"
+   ]
+  },
+  "H1.S": {
+   "id": "H1.S",
+   "kind": "strategy",
+   "text": "Argue that each allocated safety requirement is correctly implemented, then validate the integrated system against the hazard.",
+   "parent": "H1",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H1.S.SR-02",
+    "H1.S.SR-03",
+    "H1.S.SR-04",
+    "H1.S.SR-08",
+    "H1.V"
+   ]
+  },
+  "H1.S.SR-02": {
+   "id": "H1.S.SR-02",
+   "kind": "goal",
+   "text": "SR-02 is correctly implemented: An object in the protective field of the active direction (or the side fields while moving) shall cause a protective stop within one PLC cycle of the scanner output. Each field shall cover the swept path over the stopping distance at the top speed of its band, for every articulation angle in its sector.",
+   "parent": "H1.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H1.S.SR-02.proof",
+    "H1.S.SR-02.tests"
+   ],
+   "req": "SR-02"
+  },
+  "H1.S.SR-02.proof": {
+   "id": "H1.S.SR-02.proof",
+   "kind": "solution",
+   "text": "Formal proof: 4 properties \u00d7 4 configurations, 16/16 proven",
+   "parent": "H1.S.SR-02",
+   "status": "passed",
+   "evidence": [
+    {
+     "id": "SR-02a",
+     "text": "A violated front protective field of the selected set stops the machine in the same cycle, unless the front field is in supervised teleop recovery.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-02b",
+     "text": "Same for the rear protective field (reversing, or at standstill).",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-02c",
+     "text": "Same for the side fields while the machine moves.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-02d",
+     "text": "A scanner fault stops the machine.",
+     "proven": 4,
+     "configs": 4
+    }
+   ],
+   "children": [],
+   "source": "results/verification.json"
+  },
+  "H1.S.SR-02.tests": {
+   "id": "H1.S.SR-02.tests",
+   "kind": "solution",
+   "text": "Requirement-traced tests: 31/31 passed",
+   "parent": "H1.S.SR-02",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_protective_field_covers_stopping_distance[dry]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_protective_field_covers_stopping_distance[winter]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[1--0.69]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[1--0.3]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[1--0.12]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[1-0.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[1-0.12]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[1-0.3]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[1-0.69]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[-1--0.69]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[-1--0.3]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[-1--0.12]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[-1-0.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[-1-0.12]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[-1-0.3]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[-1-0.69]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_standstill_fields_start_at_each_body_contour",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr02_protective_field_stops_within_one_cycle[front_prot-1.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr02_protective_field_stops_within_one_cycle[rear_prot--1.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr02_protective_field_stops_within_one_cycle[side_prot-1.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr02_rear_field_ignored_when_driving_forward",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[0.5]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[1.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[1.5]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[2.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[2.5]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[3.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[-0.5]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[-1.5]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[-2.5]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/sil/test_processes.py::test_person_in_path_stops_machine_across_processes",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H1.S.SR-03": {
+   "id": "H1.S.SR-03",
+   "kind": "goal",
+   "text": "SR-03 is correctly implemented: An object in the warning field shall limit speed to 1.0 m/s without stopping. The limit holds for 2 s after the field clears. Warning fields are not evaluated inside the access-controlled dig and dock zones, where they would only ever see the stockpile or the truck.",
+   "parent": "H1.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H1.S.SR-03.proof",
+    "H1.S.SR-03.tests"
+   ],
+   "req": "SR-03"
+  },
+  "H1.S.SR-03.proof": {
+   "id": "H1.S.SR-03.proof",
+   "kind": "solution",
+   "text": "Formal proof: 1 property \u00d7 4 configurations, 4/4 proven",
+   "parent": "H1.S.SR-03",
+   "status": "passed",
+   "evidence": [
+    {
+     "id": "SR-03",
+     "text": "While the warning hold is active the speed limit is at most the warning speed.",
+     "proven": 4,
+     "configs": 4
+    }
+   ],
+   "children": [],
+   "source": "results/verification.json"
+  },
+  "H1.S.SR-03.tests": {
+   "id": "H1.S.SR-03.tests",
+   "kind": "solution",
+   "text": "Requirement-traced tests: 2/2 passed",
+   "parent": "H1.S.SR-03",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/safety/test_plc.py::test_sr03_warning_field_limits_speed_without_stopping",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr03_warning_ignored_inside_access_controlled_zones",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H1.S.SR-04": {
+   "id": "H1.S.SR-04",
+   "kind": "goal",
+   "text": "SR-04 is correctly implemented: Speed shall be monitored against the active limit. After a limit drops, the speed shall follow a 0.8 m/s\u00b2 ramp, starting after a 0.3 s reaction time. The autonomous speed limit shall not exceed the speed the protective field range can protect for the current braking budget (dry or winter), less the overspeed tolerance. While the brakes are released on a travel field set, the measured speed shall never exceed the speed that set's protective field can stop from.",
+   "parent": "H1.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H1.S.SR-04.proof",
+    "H1.S.SR-04.tests"
+   ],
+   "req": "SR-04"
+  },
+  "H1.S.SR-04.proof": {
+   "id": "H1.S.SR-04.proof",
+   "kind": "solution",
+   "text": "Formal proof: 2 properties \u00d7 4 configurations, 8/8 proven",
+   "parent": "H1.S.SR-04",
+   "status": "passed",
+   "evidence": [
+    {
+     "id": "SR-04a",
+     "text": "The commanded speed limit never exceeds the speed the scanners can protect.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-04b",
+     "text": "Whenever the brakes are released on a travel field set, the measured speed is within what that set's protective field can stop from.",
+     "proven": 4,
+     "configs": 4
+    }
+   ],
+   "children": [],
+   "source": "results/verification.json"
+  },
+  "H1.S.SR-04.tests": {
+   "id": "H1.S.SR-04.tests",
+   "kind": "solution",
+   "text": "Requirement-traced tests: 8/8 passed",
+   "parent": "H1.S.SR-04",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/safety/test_plc.py::test_sr04_overspeed_trips",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr04_deceleration_ramp_tolerated_after_limit_drop",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr04_too_slow_deceleration_trips",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr04_speed_cap_follows_scanner_range",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_found_by_proof_speed_above_the_top_band_is_never_unprotected",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_winter[1.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_winter[2.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_winter[2.6]",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H1.S.SR-08": {
+   "id": "H1.S.SR-08",
+   "kind": "goal",
+   "text": "SR-08 is correctly implemented: Disagreement between the two speed channels of more than 0.3 m/s for more than 0.2 s shall cause a stop.",
+   "parent": "H1.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H1.S.SR-08.proof",
+    "H1.S.SR-08.tests"
+   ],
+   "req": "SR-08"
+  },
+  "H1.S.SR-08.proof": {
+   "id": "H1.S.SR-08.proof",
+   "kind": "solution",
+   "text": "Formal proof: 1 property \u00d7 4 configurations, 4/4 proven",
+   "parent": "H1.S.SR-08",
+   "status": "passed",
+   "evidence": [
+    {
+     "id": "SR-08",
+     "text": "The two speed channels disagreeing by more than 0.3 m/s for more than 0.2 s stops the machine.",
+     "proven": 4,
+     "configs": 4
+    }
+   ],
+   "children": [],
+   "source": "results/verification.json"
+  },
+  "H1.S.SR-08.tests": {
+   "id": "H1.S.SR-08.tests",
+   "kind": "solution",
+   "text": "Requirement-traced tests: 1/1 passed",
+   "parent": "H1.S.SR-08",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/safety/test_plc.py::test_sr08_speed_sensor_discrepancy",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H1.V": {
+   "id": "H1.V",
+   "kind": "goal",
+   "text": "Integrated validation shows person struck by the machine travelling forward does not occur.",
+   "parent": "H1.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H1.V.shift",
+    "H1.V.adv"
+   ]
+  },
+  "H1.V.shift": {
+   "id": "H1.V.shift",
+   "kind": "solution",
+   "text": "15 simulated 60-min shifts (5 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
+   "parent": "H1.V",
+   "status": "passed",
+   "evidence": [
+    {
+     "config": "learned",
+     "seed": 1,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "learned",
+     "seed": 2,
+     "closest_m": 1.12,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "learned",
+     "seed": 3,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 1,
+     "closest_m": 1.4,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 2,
+     "closest_m": 1.12,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 3,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 1,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 2,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 3,
+     "closest_m": 1.47,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 1,
+     "closest_m": 1.36,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 2,
+     "closest_m": 0.73,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 3,
+     "closest_m": 1.15,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 1,
+     "closest_m": 1.4,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 2,
+     "closest_m": 0.76,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 3,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    }
+   ],
+   "children": [],
+   "source": "results/campaign.json"
+  },
+  "H1.V.adv": {
+   "id": "H1.V.adv",
+   "kind": "solution",
+   "text": "Adversarial search (rules-kept): 105 episodes, CMA-ES vs random; 0 contacts; worst clearance found 0.07 m (random search: 0.23 m)",
+   "parent": "H1.V",
+   "status": "passed",
+   "evidence": [
+    {
+     "method": "cma",
+     "clearance_m": 0.07,
+     "scenario": {
+      "t_appear": 104.66,
+      "start": [
+       31.44,
+       1.24
+      ],
+      "wp1": [
+       32.98,
+       14.93
+      ],
+      "pause_s": 3.11,
+      "wp2": [
+       31.49,
+       -2.36
+      ],
+      "speed": 1.91,
+      "dust": 0.0114,
+      "dust_t0": 59.4
+     }
+    },
+    {
+     "method": "random",
+     "clearance_m": 0.23,
+     "scenario": {
+      "t_appear": 29.08,
+      "start": [
+       39.76,
+       0.8
+      ],
+      "wp1": [
+       28.48,
+       3.83
+      ],
+      "pause_s": 24.42,
+      "wp2": [
+       11.88,
+       -1.17
+      ],
+      "speed": 0.65,
+      "dust": 0.0005,
+      "dust_t0": 18.1
+     }
+    },
+    {
+     "method": "cma",
+     "clearance_m": 1.18,
+     "scenario": {
+      "t_appear": 74.39,
+      "start": [
+       12.01,
+       -23.0
+      ],
+      "wp1": [
+       39.51,
+       11.01
+      ],
+      "pause_s": 12.13,
+      "wp2": [
+       20.64,
+       -17.54
+      ],
+      "speed": 1.39,
+      "dust": 0.0137,
+      "dust_t0": 42.8
+     }
+    },
+    {
+     "method": "cma",
+     "clearance_m": 1.4,
+     "scenario": {
+      "t_appear": 84.07,
+      "start": [
+       -2.35,
+       -16.63
+      ],
+      "wp1": [
+       12.41,
+       12.56
+      ],
+      "pause_s": 6.49,
+      "wp2": [
+       28.07,
+       -7.95
+      ],
+      "speed": 1.43,
+      "dust": 0.0124,
+      "dust_t0": 48.1
+     }
+    },
+    {
+     "method": "cma",
+     "clearance_m": 1.83,
+     "scenario": {
+      "t_appear": 90.2,
+      "start": [
+       12.87,
+       -11.18
+      ],
+      "wp1": [
+       15.58,
+       27.59
+      ],
+      "pause_s": 3.47,
+      "wp2": [
+       24.36,
+       -1.5
+      ],
+      "speed": 1.59,
+      "dust": 0.0195,
+      "dust_t0": 51.5
+     }
+    }
+   ],
+   "children": [],
+   "source": "results/adversary_rules-kept.json"
+  },
+  "H2": {
+   "id": "H2",
+   "kind": "goal",
+   "text": "H2: Person struck by the machine reversing is controlled.",
+   "parent": "S0",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H2.S"
+   ]
+  },
+  "H2.S": {
+   "id": "H2.S",
+   "kind": "strategy",
+   "text": "Argue that each allocated safety requirement is correctly implemented, then validate the integrated system against the hazard.",
+   "parent": "H2",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H2.S.SR-02",
+    "H2.S.SR-04",
+    "H2.S.SR-10",
+    "H2.V"
+   ]
+  },
+  "H2.S.SR-02": {
+   "id": "H2.S.SR-02",
+   "kind": "goal",
+   "text": "SR-02 is correctly implemented: An object in the protective field of the active direction (or the side fields while moving) shall cause a protective stop within one PLC cycle of the scanner output. Each field shall cover the swept path over the stopping distance at the top speed of its band, for every articulation angle in its sector.",
+   "parent": "H2.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H2.S.SR-02.proof",
+    "H2.S.SR-02.tests"
+   ],
+   "req": "SR-02"
+  },
+  "H2.S.SR-02.proof": {
+   "id": "H2.S.SR-02.proof",
+   "kind": "solution",
+   "text": "Formal proof: 4 properties \u00d7 4 configurations, 16/16 proven",
+   "parent": "H2.S.SR-02",
+   "status": "passed",
+   "evidence": [
+    {
+     "id": "SR-02a",
+     "text": "A violated front protective field of the selected set stops the machine in the same cycle, unless the front field is in supervised teleop recovery.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-02b",
+     "text": "Same for the rear protective field (reversing, or at standstill).",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-02c",
+     "text": "Same for the side fields while the machine moves.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-02d",
+     "text": "A scanner fault stops the machine.",
+     "proven": 4,
+     "configs": 4
+    }
+   ],
+   "children": [],
+   "source": "results/verification.json"
+  },
+  "H2.S.SR-02.tests": {
+   "id": "H2.S.SR-02.tests",
+   "kind": "solution",
+   "text": "Requirement-traced tests: 31/31 passed",
+   "parent": "H2.S.SR-02",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_protective_field_covers_stopping_distance[dry]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_protective_field_covers_stopping_distance[winter]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[1--0.69]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[1--0.3]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[1--0.12]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[1-0.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[1-0.12]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[1-0.3]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[1-0.69]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[-1--0.69]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[-1--0.3]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[-1--0.12]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[-1-0.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[-1-0.12]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[-1-0.3]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[-1-0.69]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_standstill_fields_start_at_each_body_contour",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr02_protective_field_stops_within_one_cycle[front_prot-1.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr02_protective_field_stops_within_one_cycle[rear_prot--1.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr02_protective_field_stops_within_one_cycle[side_prot-1.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr02_rear_field_ignored_when_driving_forward",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[0.5]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[1.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[1.5]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[2.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[2.5]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[3.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[-0.5]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[-1.5]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[-2.5]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/sil/test_processes.py::test_person_in_path_stops_machine_across_processes",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H2.S.SR-04": {
+   "id": "H2.S.SR-04",
+   "kind": "goal",
+   "text": "SR-04 is correctly implemented: Speed shall be monitored against the active limit. After a limit drops, the speed shall follow a 0.8 m/s\u00b2 ramp, starting after a 0.3 s reaction time. The autonomous speed limit shall not exceed the speed the protective field range can protect for the current braking budget (dry or winter), less the overspeed tolerance. While the brakes are released on a travel field set, the measured speed shall never exceed the speed that set's protective field can stop from.",
+   "parent": "H2.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H2.S.SR-04.proof",
+    "H2.S.SR-04.tests"
+   ],
+   "req": "SR-04"
+  },
+  "H2.S.SR-04.proof": {
+   "id": "H2.S.SR-04.proof",
+   "kind": "solution",
+   "text": "Formal proof: 2 properties \u00d7 4 configurations, 8/8 proven",
+   "parent": "H2.S.SR-04",
+   "status": "passed",
+   "evidence": [
+    {
+     "id": "SR-04a",
+     "text": "The commanded speed limit never exceeds the speed the scanners can protect.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-04b",
+     "text": "Whenever the brakes are released on a travel field set, the measured speed is within what that set's protective field can stop from.",
+     "proven": 4,
+     "configs": 4
+    }
+   ],
+   "children": [],
+   "source": "results/verification.json"
+  },
+  "H2.S.SR-04.tests": {
+   "id": "H2.S.SR-04.tests",
+   "kind": "solution",
+   "text": "Requirement-traced tests: 8/8 passed",
+   "parent": "H2.S.SR-04",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/safety/test_plc.py::test_sr04_overspeed_trips",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr04_deceleration_ramp_tolerated_after_limit_drop",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr04_too_slow_deceleration_trips",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr04_speed_cap_follows_scanner_range",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_found_by_proof_speed_above_the_top_band_is_never_unprotected",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_winter[1.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_winter[2.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_winter[2.6]",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H2.S.SR-10": {
+   "id": "H2.S.SR-10",
+   "kind": "goal",
+   "text": "SR-10 is correctly implemented: The dig (muted front) and dock (short front) field sets shall be granted only when the machine is inside the matching zone, at or below its speed cap (1.0 / 0.6 m/s), and not reversing. Muting shall be limited to 25 s, and a muting timeout shall block reset for as long as the dig request continues.",
+   "parent": "H2.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H2.S.SR-10.proof",
+    "H2.S.SR-10.tests"
+   ],
+   "req": "SR-10"
+  },
+  "H2.S.SR-10.proof": {
+   "id": "H2.S.SR-10.proof",
+   "kind": "solution",
+   "text": "Formal proof: 2 properties \u00d7 4 configurations, 8/8 proven",
+   "parent": "H2.S.SR-10",
+   "status": "passed",
+   "evidence": [
+    {
+     "id": "SR-10a",
+     "text": "The dig field set (front field muted) is only active when requested, inside the dig zone, with a valid position and at no more than the dig speed plus tolerance.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-10b",
+     "text": "Muting held for more than 25 s stops the machine.",
+     "proven": 4,
+     "configs": 4
+    }
+   ],
+   "children": [],
+   "source": "results/verification.json"
+  },
+  "H2.S.SR-10.tests": {
+   "id": "H2.S.SR-10.tests",
+   "kind": "solution",
+   "text": "Requirement-traced tests: 5/5 passed",
+   "parent": "H2.S.SR-10",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/safety/test_plc.py::test_sr10_dig_field_only_in_dig_zone",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr10_dig_field_refused_above_dig_speed",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr10_dig_field_not_used_when_reversing",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr10_muting_time_limited",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_found_by_proof_muting_timeout_cannot_be_reset_while_muting_continues",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H2.V": {
+   "id": "H2.V",
+   "kind": "goal",
+   "text": "Integrated validation shows person struck by the machine reversing does not occur.",
+   "parent": "H2.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H2.V.shift",
+    "H2.V.adv"
+   ]
+  },
+  "H2.V.shift": {
+   "id": "H2.V.shift",
+   "kind": "solution",
+   "text": "15 simulated 60-min shifts (5 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
+   "parent": "H2.V",
+   "status": "passed",
+   "evidence": [
+    {
+     "config": "learned",
+     "seed": 1,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "learned",
+     "seed": 2,
+     "closest_m": 1.12,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "learned",
+     "seed": 3,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 1,
+     "closest_m": 1.4,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 2,
+     "closest_m": 1.12,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 3,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 1,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 2,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 3,
+     "closest_m": 1.47,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 1,
+     "closest_m": 1.36,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 2,
+     "closest_m": 0.73,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 3,
+     "closest_m": 1.15,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 1,
+     "closest_m": 1.4,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 2,
+     "closest_m": 0.76,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 3,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    }
+   ],
+   "children": [],
+   "source": "results/campaign.json"
+  },
+  "H2.V.adv": {
+   "id": "H2.V.adv",
+   "kind": "solution",
+   "text": "Adversarial search (rules-kept): 105 episodes, CMA-ES vs random; 0 contacts; worst clearance found 0.07 m (random search: 0.23 m)",
+   "parent": "H2.V",
+   "status": "passed",
+   "evidence": [
+    {
+     "method": "cma",
+     "clearance_m": 0.07,
+     "scenario": {
+      "t_appear": 104.66,
+      "start": [
+       31.44,
+       1.24
+      ],
+      "wp1": [
+       32.98,
+       14.93
+      ],
+      "pause_s": 3.11,
+      "wp2": [
+       31.49,
+       -2.36
+      ],
+      "speed": 1.91,
+      "dust": 0.0114,
+      "dust_t0": 59.4
+     }
+    },
+    {
+     "method": "random",
+     "clearance_m": 0.23,
+     "scenario": {
+      "t_appear": 29.08,
+      "start": [
+       39.76,
+       0.8
+      ],
+      "wp1": [
+       28.48,
+       3.83
+      ],
+      "pause_s": 24.42,
+      "wp2": [
+       11.88,
+       -1.17
+      ],
+      "speed": 0.65,
+      "dust": 0.0005,
+      "dust_t0": 18.1
+     }
+    },
+    {
+     "method": "cma",
+     "clearance_m": 1.18,
+     "scenario": {
+      "t_appear": 74.39,
+      "start": [
+       12.01,
+       -23.0
+      ],
+      "wp1": [
+       39.51,
+       11.01
+      ],
+      "pause_s": 12.13,
+      "wp2": [
+       20.64,
+       -17.54
+      ],
+      "speed": 1.39,
+      "dust": 0.0137,
+      "dust_t0": 42.8
+     }
+    },
+    {
+     "method": "cma",
+     "clearance_m": 1.4,
+     "scenario": {
+      "t_appear": 84.07,
+      "start": [
+       -2.35,
+       -16.63
+      ],
+      "wp1": [
+       12.41,
+       12.56
+      ],
+      "pause_s": 6.49,
+      "wp2": [
+       28.07,
+       -7.95
+      ],
+      "speed": 1.43,
+      "dust": 0.0124,
+      "dust_t0": 48.1
+     }
+    },
+    {
+     "method": "cma",
+     "clearance_m": 1.83,
+     "scenario": {
+      "t_appear": 90.2,
+      "start": [
+       12.87,
+       -11.18
+      ],
+      "wp1": [
+       15.58,
+       27.59
+      ],
+      "pause_s": 3.47,
+      "wp2": [
+       24.36,
+       -1.5
+      ],
+      "speed": 1.59,
+      "dust": 0.0195,
+      "dust_t0": 51.5
+     }
+    }
+   ],
+   "children": [],
+   "source": "results/adversary_rules-kept.json"
+  },
+  "H3": {
+   "id": "H3",
+   "kind": "goal",
+   "text": "H3: Person beside the frames crushed at the articulation or brushed by the bucket is controlled.",
+   "parent": "S0",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H3.S"
+   ]
+  },
+  "H3.S": {
+   "id": "H3.S",
+   "kind": "strategy",
+   "text": "Argue that each allocated safety requirement is correctly implemented, then validate the integrated system against the hazard.",
+   "parent": "H3",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H3.S.SR-02",
+    "H3.S.SR-12",
+    "H3.V"
+   ]
+  },
+  "H3.S.SR-02": {
+   "id": "H3.S.SR-02",
+   "kind": "goal",
+   "text": "SR-02 is correctly implemented: An object in the protective field of the active direction (or the side fields while moving) shall cause a protective stop within one PLC cycle of the scanner output. Each field shall cover the swept path over the stopping distance at the top speed of its band, for every articulation angle in its sector.",
+   "parent": "H3.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H3.S.SR-02.proof",
+    "H3.S.SR-02.tests"
+   ],
+   "req": "SR-02"
+  },
+  "H3.S.SR-02.proof": {
+   "id": "H3.S.SR-02.proof",
+   "kind": "solution",
+   "text": "Formal proof: 4 properties \u00d7 4 configurations, 16/16 proven",
+   "parent": "H3.S.SR-02",
+   "status": "passed",
+   "evidence": [
+    {
+     "id": "SR-02a",
+     "text": "A violated front protective field of the selected set stops the machine in the same cycle, unless the front field is in supervised teleop recovery.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-02b",
+     "text": "Same for the rear protective field (reversing, or at standstill).",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-02c",
+     "text": "Same for the side fields while the machine moves.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-02d",
+     "text": "A scanner fault stops the machine.",
+     "proven": 4,
+     "configs": 4
+    }
+   ],
+   "children": [],
+   "source": "results/verification.json"
+  },
+  "H3.S.SR-02.tests": {
+   "id": "H3.S.SR-02.tests",
+   "kind": "solution",
+   "text": "Requirement-traced tests: 31/31 passed",
+   "parent": "H3.S.SR-02",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_protective_field_covers_stopping_distance[dry]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_protective_field_covers_stopping_distance[winter]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[1--0.69]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[1--0.3]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[1--0.12]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[1-0.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[1-0.12]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[1-0.3]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[1-0.69]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[-1--0.69]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[-1--0.3]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[-1--0.12]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[-1-0.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[-1-0.12]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[-1-0.3]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_field_covers_swept_path_for_any_articulation[-1-0.69]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_standstill_fields_start_at_each_body_contour",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr02_protective_field_stops_within_one_cycle[front_prot-1.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr02_protective_field_stops_within_one_cycle[rear_prot--1.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr02_protective_field_stops_within_one_cycle[side_prot-1.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr02_rear_field_ignored_when_driving_forward",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[0.5]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[1.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[1.5]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[2.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[2.5]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[3.0]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[-0.5]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[-1.5]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_person_intrusion.py::test_stops_before_person_dry[-2.5]",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/sil/test_processes.py::test_person_in_path_stops_machine_across_processes",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H3.S.SR-12": {
+   "id": "H3.S.SR-12",
+   "kind": "goal",
+   "text": "SR-12 is correctly implemented: In TELEOP, a supervisor reset with an occupied protective field shall enter recovery, adding that field to any already in recovery. The speed limit is 0.5 m/s (0.3 m/s for the side fields) from the first recovery cycle, motion toward the occupied field trips again, and boom/bucket motion is disabled until the field clears. Recovery from a side-field stop is refused, and recovery motion stops, while the 0.35 m contact band beside either frame is occupied: beside the frame no direction of travel moves away from a person, because the bucket is wider than the front frame. Inside the access-controlled dig zone, and the dock zone while the truck's cab door is closed, the band does not block recovery (the object there is the pile flank or the truck).",
+   "parent": "H3.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H3.S.SR-12.proof",
+    "H3.S.SR-12.tests"
+   ],
+   "req": "SR-12"
+  },
+  "H3.S.SR-12.proof": {
+   "id": "H3.S.SR-12.proof",
+   "kind": "solution",
+   "text": "Formal proof: 5 properties \u00d7 4 configurations, 20/20 proven",
+   "parent": "H3.S.SR-12",
+   "status": "passed",
+   "evidence": [
+    {
+     "id": "SR-12a",
+     "text": "The implement (boom, bucket) is never enabled during recovery.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-12b",
+     "text": "During recovery from a front stop, moving forward stops the machine; from a rear stop, reversing stops it.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-12c",
+     "text": "During recovery from a side stop, an occupied contact band stops the machine (outside the access-controlled zones).",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-12d",
+     "text": "Recovery exists only in TELEOP.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-12e",
+     "text": "While recovering with the brakes released, the speed limit is creep speed (0.5 m/s, 0.3 m/s for a side stop).",
+     "proven": 4,
+     "configs": 4
+    }
+   ],
+   "children": [],
+   "source": "results/verification.json"
+  },
+  "H3.S.SR-12.tests": {
+   "id": "H3.S.SR-12.tests",
+   "kind": "solution",
+   "text": "Requirement-traced tests: 6/6 passed",
+   "parent": "H3.S.SR-12",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/safety/test_plc.py::test_sr12_recovery_allows_backing_away_only",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr12_side_recovery_refused_while_someone_is_right_beside_the_frame",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr12_contact_band_does_not_block_recovery_in_access_controlled_zones",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr12_no_recovery_in_auto",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_found_by_proof_reset_keeps_fields_already_in_recovery",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_found_by_proof_creep_limit_applies_from_the_first_recovery_cycle",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H3.V": {
+   "id": "H3.V",
+   "kind": "goal",
+   "text": "Integrated validation shows person beside the frames crushed at the articulation or brushed by the bucket does not occur.",
+   "parent": "H3.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H3.V.shift",
+    "H3.V.adv"
+   ]
+  },
+  "H3.V.shift": {
+   "id": "H3.V.shift",
+   "kind": "solution",
+   "text": "15 simulated 60-min shifts (5 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
+   "parent": "H3.V",
+   "status": "passed",
+   "evidence": [
+    {
+     "config": "learned",
+     "seed": 1,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "learned",
+     "seed": 2,
+     "closest_m": 1.12,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "learned",
+     "seed": 3,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 1,
+     "closest_m": 1.4,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 2,
+     "closest_m": 1.12,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 3,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 1,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 2,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 3,
+     "closest_m": 1.47,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 1,
+     "closest_m": 1.36,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 2,
+     "closest_m": 0.73,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 3,
+     "closest_m": 1.15,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 1,
+     "closest_m": 1.4,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 2,
+     "closest_m": 0.76,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 3,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    }
+   ],
+   "children": [],
+   "source": "results/campaign.json"
+  },
+  "H3.V.adv": {
+   "id": "H3.V.adv",
+   "kind": "solution",
+   "text": "Adversarial search (rules-kept): 105 episodes, CMA-ES vs random; 0 contacts; worst clearance found 0.07 m (random search: 0.23 m)",
+   "parent": "H3.V",
+   "status": "passed",
+   "evidence": [
+    {
+     "method": "cma",
+     "clearance_m": 0.07,
+     "scenario": {
+      "t_appear": 104.66,
+      "start": [
+       31.44,
+       1.24
+      ],
+      "wp1": [
+       32.98,
+       14.93
+      ],
+      "pause_s": 3.11,
+      "wp2": [
+       31.49,
+       -2.36
+      ],
+      "speed": 1.91,
+      "dust": 0.0114,
+      "dust_t0": 59.4
+     }
+    },
+    {
+     "method": "random",
+     "clearance_m": 0.23,
+     "scenario": {
+      "t_appear": 29.08,
+      "start": [
+       39.76,
+       0.8
+      ],
+      "wp1": [
+       28.48,
+       3.83
+      ],
+      "pause_s": 24.42,
+      "wp2": [
+       11.88,
+       -1.17
+      ],
+      "speed": 0.65,
+      "dust": 0.0005,
+      "dust_t0": 18.1
+     }
+    },
+    {
+     "method": "cma",
+     "clearance_m": 1.18,
+     "scenario": {
+      "t_appear": 74.39,
+      "start": [
+       12.01,
+       -23.0
+      ],
+      "wp1": [
+       39.51,
+       11.01
+      ],
+      "pause_s": 12.13,
+      "wp2": [
+       20.64,
+       -17.54
+      ],
+      "speed": 1.39,
+      "dust": 0.0137,
+      "dust_t0": 42.8
+     }
+    },
+    {
+     "method": "cma",
+     "clearance_m": 1.4,
+     "scenario": {
+      "t_appear": 84.07,
+      "start": [
+       -2.35,
+       -16.63
+      ],
+      "wp1": [
+       12.41,
+       12.56
+      ],
+      "pause_s": 6.49,
+      "wp2": [
+       28.07,
+       -7.95
+      ],
+      "speed": 1.43,
+      "dust": 0.0124,
+      "dust_t0": 48.1
+     }
+    },
+    {
+     "method": "cma",
+     "clearance_m": 1.83,
+     "scenario": {
+      "t_appear": 90.2,
+      "start": [
+       12.87,
+       -11.18
+      ],
+      "wp1": [
+       15.58,
+       27.59
+      ],
+      "pause_s": 3.47,
+      "wp2": [
+       24.36,
+       -1.5
+      ],
+      "speed": 1.59,
+      "dust": 0.0195,
+      "dust_t0": 51.5
+     }
+    }
+   ],
+   "children": [],
+   "source": "results/adversary_rules-kept.json"
+  },
+  "H4": {
+   "id": "H4",
+   "kind": "goal",
+   "text": "H4: Person in the pile face during digging (front field muted) is controlled.",
+   "parent": "S0",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H4.A1",
+    "H4.S"
+   ]
+  },
+  "H4.A1": {
+   "id": "H4.A1",
+   "kind": "assumption",
+   "text": "Relies on A1.",
+   "parent": "H4",
+   "status": null,
+   "evidence": [],
+   "children": [],
+   "ref": "A1"
+  },
+  "H4.S": {
+   "id": "H4.S",
+   "kind": "strategy",
+   "text": "Argue that each allocated safety requirement is correctly implemented, then validate the integrated system against the hazard.",
+   "parent": "H4",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H4.S.SR-10",
+    "H4.V"
+   ]
+  },
+  "H4.S.SR-10": {
+   "id": "H4.S.SR-10",
+   "kind": "goal",
+   "text": "SR-10 is correctly implemented: The dig (muted front) and dock (short front) field sets shall be granted only when the machine is inside the matching zone, at or below its speed cap (1.0 / 0.6 m/s), and not reversing. Muting shall be limited to 25 s, and a muting timeout shall block reset for as long as the dig request continues.",
+   "parent": "H4.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H4.S.SR-10.proof",
+    "H4.S.SR-10.tests"
+   ],
+   "req": "SR-10"
+  },
+  "H4.S.SR-10.proof": {
+   "id": "H4.S.SR-10.proof",
+   "kind": "solution",
+   "text": "Formal proof: 2 properties \u00d7 4 configurations, 8/8 proven",
+   "parent": "H4.S.SR-10",
+   "status": "passed",
+   "evidence": [
+    {
+     "id": "SR-10a",
+     "text": "The dig field set (front field muted) is only active when requested, inside the dig zone, with a valid position and at no more than the dig speed plus tolerance.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-10b",
+     "text": "Muting held for more than 25 s stops the machine.",
+     "proven": 4,
+     "configs": 4
+    }
+   ],
+   "children": [],
+   "source": "results/verification.json"
+  },
+  "H4.S.SR-10.tests": {
+   "id": "H4.S.SR-10.tests",
+   "kind": "solution",
+   "text": "Requirement-traced tests: 5/5 passed",
+   "parent": "H4.S.SR-10",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/safety/test_plc.py::test_sr10_dig_field_only_in_dig_zone",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr10_dig_field_refused_above_dig_speed",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr10_dig_field_not_used_when_reversing",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr10_muting_time_limited",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_found_by_proof_muting_timeout_cannot_be_reset_while_muting_continues",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H4.V": {
+   "id": "H4.V",
+   "kind": "goal",
+   "text": "Integrated validation shows person in the pile face during digging (front field muted) does not occur.",
+   "parent": "H4.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H4.V.adv-zones"
+   ]
+  },
+  "H4.V.adv-zones": {
+   "id": "H4.V.adv-zones",
+   "kind": "solution",
+   "text": "Adversarial search (rules-broken): 73 episodes, CMA-ES vs random; 1 contacts; worst clearance found -0.21 m (random search: 0.09 m). Measures what zone access control (A1) carries; not a pass/fail criterion.",
+   "parent": "H4.V",
+   "status": "info",
+   "evidence": [
+    {
+     "method": "cma",
+     "clearance_m": -0.21,
+     "scenario": {
+      "t_appear": 23.68,
+      "start": [
+       57.57,
+       15.23
+      ],
+      "wp1": [
+       43.5,
+       15.22
+      ],
+      "pause_s": 8.85,
+      "wp2": [
+       29.81,
+       -17.84
+      ],
+      "speed": 1.13,
+      "dust": 0.0064,
+      "dust_t0": 15.2
+     }
+    },
+    {
+     "method": "cma",
+     "clearance_m": 0.07,
+     "scenario": {
+      "t_appear": 31.76,
+      "start": [
+       38.31,
+       -2.37
+      ],
+      "wp1": [
+       53.83,
+       11.03
+      ],
+      "pause_s": 2.89,
+      "wp2": [
+       24.64,
+       -11.43
+      ],
+      "speed": 1.04,
+      "dust": 0.0096,
+      "dust_t0": 19.6
+     }
+    },
+    {
+     "method": "cma",
+     "clearance_m": 0.08,
+     "scenario": {
+      "t_appear": 13.6,
+      "start": [
+       26.57,
+       -28.91
+      ],
+      "wp1": [
+       59.21,
+       28.79
+      ],
+      "pause_s": 2.24,
+      "wp2": [
+       12.55,
+       -28.81
+      ],
+      "speed": 1.27,
+      "dust": 0.0,
+      "dust_t0": 9.7
+     }
+    },
+    {
+     "method": "cma",
+     "clearance_m": 0.08,
+     "scenario": {
+      "t_appear": 36.22,
+      "start": [
+       27.12,
+       -29.24
+      ],
+      "wp1": [
+       58.56,
+       28.35
+      ],
+      "pause_s": 3.48,
+      "wp2": [
+       21.5,
+       -25.89
+      ],
+      "speed": 1.99,
+      "dust": 0.0,
+      "dust_t0": 22.0
+     }
+    },
+    {
+     "method": "random",
+     "clearance_m": 0.09,
+     "scenario": {
+      "t_appear": 69.52,
+      "start": [
+       57.3,
+       12.59
+      ],
+      "wp1": [
+       22.65,
+       -4.1
+      ],
+      "pause_s": 11.03,
+      "wp2": [
+       4.01,
+       -18.81
+      ],
+      "speed": 0.93,
+      "dust": 0.0,
+      "dust_t0": 40.2
+     }
+    }
+   ],
+   "children": [],
+   "source": "results/adversary_rules-broken.json"
+  },
+  "H5": {
+   "id": "H5",
+   "kind": "goal",
+   "text": "H5: Person between the truck and the loader, or under the raised bucket is controlled.",
+   "parent": "S0",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H5.A1",
+    "H5.S"
+   ]
+  },
+  "H5.A1": {
+   "id": "H5.A1",
+   "kind": "assumption",
+   "text": "Relies on A1.",
+   "parent": "H5",
+   "status": null,
+   "evidence": [],
+   "children": [],
+   "ref": "A1"
+  },
+  "H5.S": {
+   "id": "H5.S",
+   "kind": "strategy",
+   "text": "Argue that each allocated safety requirement is correctly implemented, then validate the integrated system against the hazard.",
+   "parent": "H5",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H5.S.SR-10",
+    "H5.S.SR-14",
+    "H5.S.SR-16",
+    "H5.V"
+   ]
+  },
+  "H5.S.SR-10": {
+   "id": "H5.S.SR-10",
+   "kind": "goal",
+   "text": "SR-10 is correctly implemented: The dig (muted front) and dock (short front) field sets shall be granted only when the machine is inside the matching zone, at or below its speed cap (1.0 / 0.6 m/s), and not reversing. Muting shall be limited to 25 s, and a muting timeout shall block reset for as long as the dig request continues.",
+   "parent": "H5.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H5.S.SR-10.proof",
+    "H5.S.SR-10.tests"
+   ],
+   "req": "SR-10"
+  },
+  "H5.S.SR-10.proof": {
+   "id": "H5.S.SR-10.proof",
+   "kind": "solution",
+   "text": "Formal proof: 2 properties \u00d7 4 configurations, 8/8 proven",
+   "parent": "H5.S.SR-10",
+   "status": "passed",
+   "evidence": [
+    {
+     "id": "SR-10a",
+     "text": "The dig field set (front field muted) is only active when requested, inside the dig zone, with a valid position and at no more than the dig speed plus tolerance.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-10b",
+     "text": "Muting held for more than 25 s stops the machine.",
+     "proven": 4,
+     "configs": 4
+    }
+   ],
+   "children": [],
+   "source": "results/verification.json"
+  },
+  "H5.S.SR-10.tests": {
+   "id": "H5.S.SR-10.tests",
+   "kind": "solution",
+   "text": "Requirement-traced tests: 5/5 passed",
+   "parent": "H5.S.SR-10",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/safety/test_plc.py::test_sr10_dig_field_only_in_dig_zone",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr10_dig_field_refused_above_dig_speed",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr10_dig_field_not_used_when_reversing",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr10_muting_time_limited",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_found_by_proof_muting_timeout_cannot_be_reset_while_muting_continues",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H5.S.SR-14": {
+   "id": "H5.S.SR-14",
+   "kind": "goal",
+   "text": "SR-14 is correctly implemented: While the cab door of the truck in the bay is open, the dock field set shall not be granted; if the door opens while docking, the machine shall make a protective stop that clears 3 s after the door closes.",
+   "parent": "H5.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H5.S.SR-14.proof",
+    "H5.S.SR-14.tests"
+   ],
+   "req": "SR-14"
+  },
+  "H5.S.SR-14.proof": {
+   "id": "H5.S.SR-14.proof",
+   "kind": "solution",
+   "text": "Formal proof: 2 properties \u00d7 4 configurations, 8/8 proven",
+   "parent": "H5.S.SR-14",
+   "status": "passed",
+   "evidence": [
+    {
+     "id": "SR-14a",
+     "text": "The dock field set is never active while the truck's cab door is open.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-14b",
+     "text": "The cab door opening while docking in the dock zone stops the machine.",
+     "proven": 4,
+     "configs": 4
+    }
+   ],
+   "children": [],
+   "source": "results/verification.json"
+  },
+  "H5.S.SR-14.tests": {
+   "id": "H5.S.SR-14.tests",
+   "kind": "solution",
+   "text": "Requirement-traced tests: 2/2 passed",
+   "parent": "H5.S.SR-14",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/safety/test_plc.py::test_sr14_dock_refused_while_truck_door_open",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr14_door_opening_while_docking_stops_and_clears",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H5.S.SR-16": {
+   "id": "H5.S.SR-16",
+   "kind": "goal",
+   "text": "SR-16 is correctly implemented: Outside the dig zone, a person between the front tyres and the bucket (2.0\u20132.8 m ahead of the front axle, any boom position), under the raised bucket (2.8\u20135.1 m, bucket bottom above 1.0 m; not beside a docked truck), or beside the front frame while reversing (not beside a docked truck) shall cause a protective stop that holds the boom. Teleop recovery may only back away.",
+   "parent": "H5.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H5.S.SR-16.proof",
+    "H5.S.SR-16.tests"
+   ],
+   "req": "SR-16"
+  },
+  "H5.S.SR-16.proof": {
+   "id": "H5.S.SR-16.proof",
+   "kind": "solution",
+   "text": "Formal proof: 3 properties \u00d7 4 configurations, 12/12 proven",
+   "parent": "H5.S.SR-16",
+   "status": "passed",
+   "evidence": [
+    {
+     "id": "SR-16a",
+     "text": "Outside the dig zone, anyone between the front tyres and the bucket (near field, any boom position) or under the raised bucket (far field, except beside a docked truck) stops travel and holds the boom, unless backing away in recovery.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-16c",
+     "text": "While reversing, anyone beside the front frame stops the machine (outside the dig zone and a docked truck), unless backing away from a side stop in recovery.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-16b",
+     "text": "During recovery from an under-bucket stop, moving forward stops the machine, and the boom stays held.",
+     "proven": 4,
+     "configs": 4
+    }
+   ],
+   "children": [],
+   "source": "results/verification.json"
+  },
+  "H5.S.SR-16.tests": {
+   "id": "H5.S.SR-16.tests",
+   "kind": "solution",
+   "text": "Requirement-traced tests: 4/4 passed",
+   "parent": "H5.S.SR-16",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/adversary/test_found_scenarios.py::test_person_under_the_raised_bucket_is_not_struck",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr16_person_under_raised_bucket_stops_travel_and_holds_the_boom",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr16_ignored_with_the_bucket_down_and_far_field_exempt_at_a_docked_truck",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr16_beside_the_front_frame_while_reversing_stops_except_at_pile_or_docked_truck",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H5.V": {
+   "id": "H5.V",
+   "kind": "goal",
+   "text": "Integrated validation shows person between the truck and the loader, or under the raised bucket does not occur.",
+   "parent": "H5.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H5.V.shift"
+   ]
+  },
+  "H5.V.shift": {
+   "id": "H5.V.shift",
+   "kind": "solution",
+   "text": "15 simulated 60-min shifts (5 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
+   "parent": "H5.V",
+   "status": "passed",
+   "evidence": [
+    {
+     "config": "learned",
+     "seed": 1,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "learned",
+     "seed": 2,
+     "closest_m": 1.12,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "learned",
+     "seed": 3,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 1,
+     "closest_m": 1.4,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 2,
+     "closest_m": 1.12,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 3,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 1,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 2,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 3,
+     "closest_m": 1.47,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 1,
+     "closest_m": 1.36,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 2,
+     "closest_m": 0.73,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 3,
+     "closest_m": 1.15,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 1,
+     "closest_m": 1.4,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 2,
+     "closest_m": 0.76,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 3,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    }
+   ],
+   "children": [],
+   "source": "results/campaign.json"
+  },
+  "H6": {
+   "id": "H6",
+   "kind": "goal",
+   "text": "H6: Machine leaves the operating area is controlled.",
+   "parent": "S0",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H6.S"
+   ]
+  },
+  "H6.S": {
+   "id": "H6.S",
+   "kind": "strategy",
+   "text": "Argue that each allocated safety requirement is correctly implemented, then validate the integrated system against the hazard.",
+   "parent": "H6",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H6.S.SR-07",
+    "H6.V"
+   ]
+  },
+  "H6.S.SR-07": {
+   "id": "H6.S.SR-07",
+   "kind": "goal",
+   "text": "SR-07 is correctly implemented: In AUTO the machine shall stay inside the operating area. The check accounts for the safety position's uncertainty bound. An invalid position for more than 2 s shall cause a stop.",
+   "parent": "H6.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H6.S.SR-07.proof",
+    "H6.S.SR-07.tests"
+   ],
+   "req": "SR-07"
+  },
+  "H6.S.SR-07.proof": {
+   "id": "H6.S.SR-07.proof",
+   "kind": "solution",
+   "text": "Formal proof: 2 properties \u00d7 4 configurations, 8/8 proven",
+   "parent": "H6.S.SR-07",
+   "status": "passed",
+   "evidence": [
+    {
+     "id": "SR-07a",
+     "text": "In AUTO with a valid safety position outside the operating area, the machine stops.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-07b",
+     "text": "In AUTO, a safety position invalid for more than 2 s stops the machine.",
+     "proven": 4,
+     "configs": 4
+    }
+   ],
+   "children": [],
+   "source": "results/verification.json"
+  },
+  "H6.S.SR-07.tests": {
+   "id": "H6.S.SR-07.tests",
+   "kind": "solution",
+   "text": "Requirement-traced tests: 2/2 passed",
+   "parent": "H6.S.SR-07",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/safety/test_plc.py::test_sr07_geofence",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr07_position_invalid_tolerated_briefly",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H6.V": {
+   "id": "H6.V",
+   "kind": "goal",
+   "text": "Integrated validation shows machine leaves the operating area does not occur.",
+   "parent": "H6.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H6.V.shift"
+   ]
+  },
+  "H6.V.shift": {
+   "id": "H6.V.shift",
+   "kind": "solution",
+   "text": "15 simulated 60-min shifts (5 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
+   "parent": "H6.V",
+   "status": "passed",
+   "evidence": [
+    {
+     "config": "learned",
+     "seed": 1,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "learned",
+     "seed": 2,
+     "closest_m": 1.12,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "learned",
+     "seed": 3,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 1,
+     "closest_m": 1.4,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 2,
+     "closest_m": 1.12,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 3,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 1,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 2,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 3,
+     "closest_m": 1.47,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 1,
+     "closest_m": 1.36,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 2,
+     "closest_m": 0.73,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 3,
+     "closest_m": 1.15,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 1,
+     "closest_m": 1.4,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 2,
+     "closest_m": 0.76,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 3,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    }
+   ],
+   "children": [],
+   "source": "results/campaign.json"
+  },
+  "H7": {
+   "id": "H7",
+   "kind": "goal",
+   "text": "H7: Autonomy computer fails, hangs or sends stale commands is controlled.",
+   "parent": "S0",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H7.S"
+   ]
+  },
+  "H7.S": {
+   "id": "H7.S",
+   "kind": "strategy",
+   "text": "Argue that each allocated safety requirement is correctly implemented, then validate the integrated system against the hazard.",
+   "parent": "H7",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H7.S.SR-06",
+    "H7.S.SR-13",
+    "H7.V"
+   ]
+  },
+  "H7.S.SR-06": {
+   "id": "H7.S.SR-06",
+   "kind": "goal",
+   "text": "SR-06 is correctly implemented: Loss of autonomy commands for more than 200 ms in AUTO or TELEOP shall cause a protective stop (watchdog).",
+   "parent": "H7.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H7.S.SR-06.proof",
+    "H7.S.SR-06.tests"
+   ],
+   "req": "SR-06"
+  },
+  "H7.S.SR-06.proof": {
+   "id": "H7.S.SR-06.proof",
+   "kind": "solution",
+   "text": "Formal proof: 1 property \u00d7 4 configurations, 4/4 proven",
+   "parent": "H7.S.SR-06",
+   "status": "passed",
+   "evidence": [
+    {
+     "id": "SR-06",
+     "text": "A stale autonomy command (> 0.2 s) in AUTO or TELEOP stops the machine.",
+     "proven": 4,
+     "configs": 4
+    }
+   ],
+   "children": [],
+   "source": "results/verification.json"
+  },
+  "H7.S.SR-06.tests": {
+   "id": "H7.S.SR-06.tests",
+   "kind": "solution",
+   "text": "Requirement-traced tests: 3/3 passed",
+   "parent": "H7.S.SR-06",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/safety/test_plc.py::test_sr06_autonomy_watchdog",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr06_watchdog_not_applied_in_idle",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/sil/test_processes.py::test_killing_the_autonomy_process_stops_the_machine",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H7.S.SR-13": {
+   "id": "H7.S.SR-13",
+   "kind": "goal",
+   "text": "SR-13 is correctly implemented: Every stop, reset and recovery shall be recorded in a tamper-evident log.",
+   "parent": "H7.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H7.S.SR-13.proof",
+    "H7.S.SR-13.tests"
+   ],
+   "req": "SR-13"
+  },
+  "H7.S.SR-13.proof": {
+   "id": "H7.S.SR-13.proof",
+   "kind": "solution",
+   "text": "Formal proof: 1 property \u00d7 4 configurations, 4/4 proven",
+   "parent": "H7.S.SR-13",
+   "status": "passed",
+   "evidence": [
+    {
+     "id": "SR-13",
+     "text": "Every transition into a stop and every reset is written to the safety log.",
+     "proven": 4,
+     "configs": 4
+    }
+   ],
+   "children": [],
+   "source": "results/verification.json"
+  },
+  "H7.S.SR-13.tests": {
+   "id": "H7.S.SR-13.tests",
+   "kind": "solution",
+   "text": "Requirement-traced tests: 3/3 passed",
+   "parent": "H7.S.SR-13",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/safety/test_fields_and_log.py::test_log_detects_tampering",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr13_every_stop_and_reset_is_logged",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/scenario/test_shift_short.py::test_safety_log_intact",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H7.V": {
+   "id": "H7.V",
+   "kind": "goal",
+   "text": "Integrated validation shows autonomy computer fails, hangs or sends stale commands does not occur.",
+   "parent": "H7.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H7.V.shift",
+    "H7.V.sil"
+   ]
+  },
+  "H7.V.shift": {
+   "id": "H7.V.shift",
+   "kind": "solution",
+   "text": "15 simulated 60-min shifts (5 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
+   "parent": "H7.V",
+   "status": "passed",
+   "evidence": [
+    {
+     "config": "learned",
+     "seed": 1,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "learned",
+     "seed": 2,
+     "closest_m": 1.12,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "learned",
+     "seed": 3,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 1,
+     "closest_m": 1.4,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 2,
+     "closest_m": 1.12,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 3,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 1,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 2,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 3,
+     "closest_m": 1.47,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 1,
+     "closest_m": 1.36,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 2,
+     "closest_m": 0.73,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 3,
+     "closest_m": 1.15,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 1,
+     "closest_m": 1.4,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 2,
+     "closest_m": 0.76,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 3,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    }
+   ],
+   "children": [],
+   "source": "results/campaign.json"
+  },
+  "H7.V.sil": {
+   "id": "H7.V.sil",
+   "kind": "solution",
+   "text": "Multi-process SIL fault injection (process kills): 4/4 passed",
+   "parent": "H7.V",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/sil/test_processes.py::test_person_in_path_stops_machine_across_processes",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/sil/test_processes.py::test_losing_the_remote_station_stops_the_machine",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/sil/test_processes.py::test_killing_the_autonomy_process_stops_the_machine",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/sil/test_processes.py::test_killing_the_safety_plc_drops_the_relays",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H8": {
+   "id": "H8",
+   "kind": "goal",
+   "text": "H8: Remote supervision lost is controlled.",
+   "parent": "S0",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H8.S"
+   ]
+  },
+  "H8.S": {
+   "id": "H8.S",
+   "kind": "strategy",
+   "text": "Argue that each allocated safety requirement is correctly implemented, then validate the integrated system against the hazard.",
+   "parent": "H8",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H8.S.SR-05",
+    "H8.S.SR-01",
+    "H8.V"
+   ]
+  },
+  "H8.S.SR-05": {
+   "id": "H8.S.SR-05",
+   "kind": "goal",
+   "text": "SR-05 is correctly implemented: Loss of the remote supervision heartbeat for more than 500 ms in AUTO or TELEOP shall cause a protective stop. Reset needs a supervisor.",
+   "parent": "H8.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H8.S.SR-05.proof",
+    "H8.S.SR-05.tests"
+   ],
+   "req": "SR-05"
+  },
+  "H8.S.SR-05.proof": {
+   "id": "H8.S.SR-05.proof",
+   "kind": "solution",
+   "text": "Formal proof: 1 property \u00d7 4 configurations, 4/4 proven",
+   "parent": "H8.S.SR-05",
+   "status": "passed",
+   "evidence": [
+    {
+     "id": "SR-05",
+     "text": "Loss of the remote supervision heartbeat (> 0.5 s) in AUTO or TELEOP stops the machine.",
+     "proven": 4,
+     "configs": 4
+    }
+   ],
+   "children": [],
+   "source": "results/verification.json"
+  },
+  "H8.S.SR-05.tests": {
+   "id": "H8.S.SR-05.tests",
+   "kind": "solution",
+   "text": "Requirement-traced tests: 3/3 passed",
+   "parent": "H8.S.SR-05",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/safety/test_plc.py::test_sr05_remote_link_loss_stops",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr05_link_stop_needs_supervisor_reset",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/sil/test_processes.py::test_losing_the_remote_station_stops_the_machine",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H8.S.SR-01": {
+   "id": "H8.S.SR-01",
+   "kind": "goal",
+   "text": "SR-01 is correctly implemented: A machine or remote e-stop shall bring the machine to an emergency stop and latch it. Reset needs the e-stop released, a supervisor reset and standstill.",
+   "parent": "H8.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H8.S.SR-01.proof",
+    "H8.S.SR-01.tests"
+   ],
+   "req": "SR-01"
+  },
+  "H8.S.SR-01.proof": {
+   "id": "H8.S.SR-01.proof",
+   "kind": "solution",
+   "text": "Formal proof: 3 properties \u00d7 4 configurations, 12/12 proven",
+   "parent": "H8.S.SR-01",
+   "status": "passed",
+   "evidence": [
+    {
+     "id": "OUT-1",
+     "text": "A stopped state always applies the brakes, cuts the implement and zeroes the speed limit.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-01a",
+     "text": "A pressed e-stop (machine or remote) gives an emergency stop in the same cycle.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-01b",
+     "text": "An emergency stop is never cleared without a new supervisor reset (no automatic restart).",
+     "proven": 4,
+     "configs": 4
+    }
+   ],
+   "children": [],
+   "source": "results/verification.json"
+  },
+  "H8.S.SR-01.tests": {
+   "id": "H8.S.SR-01.tests",
+   "kind": "solution",
+   "text": "Requirement-traced tests: 3/3 passed",
+   "parent": "H8.S.SR-01",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/safety/test_plc.py::test_sr01_machine_estop_latches_until_reset",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr01_remote_estop",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr01_reset_refused_while_estop_held",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H8.V": {
+   "id": "H8.V",
+   "kind": "goal",
+   "text": "Integrated validation shows remote supervision lost does not occur.",
+   "parent": "H8.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H8.V.shift",
+    "H8.V.sil"
+   ]
+  },
+  "H8.V.shift": {
+   "id": "H8.V.shift",
+   "kind": "solution",
+   "text": "15 simulated 60-min shifts (5 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
+   "parent": "H8.V",
+   "status": "passed",
+   "evidence": [
+    {
+     "config": "learned",
+     "seed": 1,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "learned",
+     "seed": 2,
+     "closest_m": 1.12,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "learned",
+     "seed": 3,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 1,
+     "closest_m": 1.4,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 2,
+     "closest_m": 1.12,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 3,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 1,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 2,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 3,
+     "closest_m": 1.47,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 1,
+     "closest_m": 1.36,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 2,
+     "closest_m": 0.73,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 3,
+     "closest_m": 1.15,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 1,
+     "closest_m": 1.4,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 2,
+     "closest_m": 0.76,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 3,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    }
+   ],
+   "children": [],
+   "source": "results/campaign.json"
+  },
+  "H8.V.sil": {
+   "id": "H8.V.sil",
+   "kind": "solution",
+   "text": "Multi-process SIL fault injection (process kills): 4/4 passed",
+   "parent": "H8.V",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/sil/test_processes.py::test_person_in_path_stops_machine_across_processes",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/sil/test_processes.py::test_losing_the_remote_station_stops_the_machine",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/sil/test_processes.py::test_killing_the_autonomy_process_stops_the_machine",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/sil/test_processes.py::test_killing_the_safety_plc_drops_the_relays",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H9": {
+   "id": "H9",
+   "kind": "goal",
+   "text": "H9: Safety PLC itself fails is controlled.",
+   "parent": "S0",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H9.S"
+   ]
+  },
+  "H9.S": {
+   "id": "H9.S",
+   "kind": "strategy",
+   "text": "Argue that each allocated safety requirement is correctly implemented, then validate the integrated system against the hazard.",
+   "parent": "H9",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H9.S.SR-15",
+    "H9.V"
+   ]
+  },
+  "H9.S.SR-15": {
+   "id": "H9.S.SR-15",
+   "kind": "goal",
+   "text": "SR-15 is correctly implemented: Loss of the safety PLC's relay refresh (PLC failure, cable cut) shall de-energise the brake/neutral relays and the pilot cut-off within 100 ms.",
+   "parent": "H9.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H9.S.SR-15.tests"
+   ],
+   "req": "SR-15"
+  },
+  "H9.S.SR-15.tests": {
+   "id": "H9.S.SR-15.tests",
+   "kind": "solution",
+   "text": "Requirement-traced tests: 1/1 passed",
+   "parent": "H9.S.SR-15",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/sil/test_processes.py::test_killing_the_safety_plc_drops_the_relays",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H9.V": {
+   "id": "H9.V",
+   "kind": "goal",
+   "text": "Integrated validation shows safety plc itself fails does not occur.",
+   "parent": "H9.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H9.V.sil"
+   ]
+  },
+  "H9.V.sil": {
+   "id": "H9.V.sil",
+   "kind": "solution",
+   "text": "Multi-process SIL fault injection (process kills): 4/4 passed",
+   "parent": "H9.V",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/sil/test_processes.py::test_person_in_path_stops_machine_across_processes",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/sil/test_processes.py::test_losing_the_remote_station_stops_the_machine",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/sil/test_processes.py::test_killing_the_autonomy_process_stops_the_machine",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/sil/test_processes.py::test_killing_the_safety_plc_drops_the_relays",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H10": {
+   "id": "H10",
+   "kind": "goal",
+   "text": "H10: Unexpected restart after a stop is controlled.",
+   "parent": "S0",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H10.S"
+   ]
+  },
+  "H10.S": {
+   "id": "H10.S",
+   "kind": "strategy",
+   "text": "Argue that each allocated safety requirement is correctly implemented, then validate the integrated system against the hazard.",
+   "parent": "H10",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H10.S.SR-09",
+    "H10.S.SR-11",
+    "H10.S.SR-01",
+    "H10.V"
+   ]
+  },
+  "H10.S.SR-09": {
+   "id": "H10.S.SR-09",
+   "kind": "goal",
+   "text": "SR-09 is correctly implemented: No reset shall be accepted unless the machine is at standstill, and no cause latched in a cycle shall be reset in that same cycle.",
+   "parent": "H10.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H10.S.SR-09.proof",
+    "H10.S.SR-09.tests"
+   ],
+   "req": "SR-09"
+  },
+  "H10.S.SR-09.proof": {
+   "id": "H10.S.SR-09.proof",
+   "kind": "solution",
+   "text": "Formal proof: 1 property \u00d7 4 configurations, 4/4 proven",
+   "parent": "H10.S.SR-09",
+   "status": "passed",
+   "evidence": [
+    {
+     "id": "SR-09",
+     "text": "A stop is only ever cleared at standstill.",
+     "proven": 4,
+     "configs": 4
+    }
+   ],
+   "children": [],
+   "source": "results/verification.json"
+  },
+  "H10.S.SR-09.tests": {
+   "id": "H10.S.SR-09.tests",
+   "kind": "solution",
+   "text": "Requirement-traced tests: 1/1 passed",
+   "parent": "H10.S.SR-09",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/safety/test_plc.py::test_sr09_no_reset_while_moving",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H10.S.SR-11": {
+   "id": "H10.S.SR-11",
+   "kind": "goal",
+   "text": "SR-11 is correctly implemented: After a field-caused stop, automatic restart is allowed only if the site risk assessment permits it. It needs all fields clear for 3 s and no other latched cause.",
+   "parent": "H10.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H10.S.SR-11.proof",
+    "H10.S.SR-11.tests"
+   ],
+   "req": "SR-11"
+  },
+  "H10.S.SR-11.proof": {
+   "id": "H10.S.SR-11.proof",
+   "kind": "solution",
+   "text": "Formal proof: 1 property \u00d7 4 configurations, 4/4 proven",
+   "parent": "H10.S.SR-11",
+   "status": "passed",
+   "evidence": [
+    {
+     "id": "SR-11",
+     "text": "Without a supervisor reset, only self-clearing causes (fields, truck door) restart automatically.",
+     "proven": 4,
+     "configs": 4
+    }
+   ],
+   "children": [],
+   "source": "results/verification.json"
+  },
+  "H10.S.SR-11.tests": {
+   "id": "H10.S.SR-11.tests",
+   "kind": "solution",
+   "text": "Requirement-traced tests: 3/3 passed",
+   "parent": "H10.S.SR-11",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/safety/test_plc.py::test_sr11_auto_restart_after_field_clears",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr11_no_auto_restart_when_disabled",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr11_no_auto_restart_for_non_field_causes",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H10.S.SR-01": {
+   "id": "H10.S.SR-01",
+   "kind": "goal",
+   "text": "SR-01 is correctly implemented: A machine or remote e-stop shall bring the machine to an emergency stop and latch it. Reset needs the e-stop released, a supervisor reset and standstill.",
+   "parent": "H10.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H10.S.SR-01.proof",
+    "H10.S.SR-01.tests"
+   ],
+   "req": "SR-01"
+  },
+  "H10.S.SR-01.proof": {
+   "id": "H10.S.SR-01.proof",
+   "kind": "solution",
+   "text": "Formal proof: 3 properties \u00d7 4 configurations, 12/12 proven",
+   "parent": "H10.S.SR-01",
+   "status": "passed",
+   "evidence": [
+    {
+     "id": "OUT-1",
+     "text": "A stopped state always applies the brakes, cuts the implement and zeroes the speed limit.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-01a",
+     "text": "A pressed e-stop (machine or remote) gives an emergency stop in the same cycle.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-01b",
+     "text": "An emergency stop is never cleared without a new supervisor reset (no automatic restart).",
+     "proven": 4,
+     "configs": 4
+    }
+   ],
+   "children": [],
+   "source": "results/verification.json"
+  },
+  "H10.S.SR-01.tests": {
+   "id": "H10.S.SR-01.tests",
+   "kind": "solution",
+   "text": "Requirement-traced tests: 3/3 passed",
+   "parent": "H10.S.SR-01",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/safety/test_plc.py::test_sr01_machine_estop_latches_until_reset",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr01_remote_estop",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr01_reset_refused_while_estop_held",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H10.V": {
+   "id": "H10.V",
+   "kind": "goal",
+   "text": "Integrated validation shows unexpected restart after a stop does not occur.",
+   "parent": "H10.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H10.V.shift"
+   ]
+  },
+  "H10.V.shift": {
+   "id": "H10.V.shift",
+   "kind": "solution",
+   "text": "15 simulated 60-min shifts (5 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
+   "parent": "H10.V",
+   "status": "passed",
+   "evidence": [
+    {
+     "config": "learned",
+     "seed": 1,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "learned",
+     "seed": 2,
+     "closest_m": 1.12,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "learned",
+     "seed": 3,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 1,
+     "closest_m": 1.4,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 2,
+     "closest_m": 1.12,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 3,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 1,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 2,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 3,
+     "closest_m": 1.47,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 1,
+     "closest_m": 1.36,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 2,
+     "closest_m": 0.73,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 3,
+     "closest_m": 1.15,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 1,
+     "closest_m": 1.4,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 2,
+     "closest_m": 0.76,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 3,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    }
+   ],
+   "children": [],
+   "source": "results/campaign.json"
+  },
+  "H11": {
+   "id": "H11",
+   "kind": "goal",
+   "text": "H11: Person under the raised bucket or between the front tyres and the bucket (boom lowered or bucket dragged onto them) is controlled.",
+   "parent": "S0",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H11.S"
+   ]
+  },
+  "H11.S": {
+   "id": "H11.S",
+   "kind": "strategy",
+   "text": "Argue that each allocated safety requirement is correctly implemented, then validate the integrated system against the hazard.",
+   "parent": "H11",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H11.S.SR-16",
+    "H11.S.SR-12",
+    "H11.V"
+   ]
+  },
+  "H11.S.SR-16": {
+   "id": "H11.S.SR-16",
+   "kind": "goal",
+   "text": "SR-16 is correctly implemented: Outside the dig zone, a person between the front tyres and the bucket (2.0\u20132.8 m ahead of the front axle, any boom position), under the raised bucket (2.8\u20135.1 m, bucket bottom above 1.0 m; not beside a docked truck), or beside the front frame while reversing (not beside a docked truck) shall cause a protective stop that holds the boom. Teleop recovery may only back away.",
+   "parent": "H11.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H11.S.SR-16.proof",
+    "H11.S.SR-16.tests"
+   ],
+   "req": "SR-16"
+  },
+  "H11.S.SR-16.proof": {
+   "id": "H11.S.SR-16.proof",
+   "kind": "solution",
+   "text": "Formal proof: 3 properties \u00d7 4 configurations, 12/12 proven",
+   "parent": "H11.S.SR-16",
+   "status": "passed",
+   "evidence": [
+    {
+     "id": "SR-16a",
+     "text": "Outside the dig zone, anyone between the front tyres and the bucket (near field, any boom position) or under the raised bucket (far field, except beside a docked truck) stops travel and holds the boom, unless backing away in recovery.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-16c",
+     "text": "While reversing, anyone beside the front frame stops the machine (outside the dig zone and a docked truck), unless backing away from a side stop in recovery.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-16b",
+     "text": "During recovery from an under-bucket stop, moving forward stops the machine, and the boom stays held.",
+     "proven": 4,
+     "configs": 4
+    }
+   ],
+   "children": [],
+   "source": "results/verification.json"
+  },
+  "H11.S.SR-16.tests": {
+   "id": "H11.S.SR-16.tests",
+   "kind": "solution",
+   "text": "Requirement-traced tests: 4/4 passed",
+   "parent": "H11.S.SR-16",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/adversary/test_found_scenarios.py::test_person_under_the_raised_bucket_is_not_struck",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr16_person_under_raised_bucket_stops_travel_and_holds_the_boom",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr16_ignored_with_the_bucket_down_and_far_field_exempt_at_a_docked_truck",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr16_beside_the_front_frame_while_reversing_stops_except_at_pile_or_docked_truck",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H11.S.SR-12": {
+   "id": "H11.S.SR-12",
+   "kind": "goal",
+   "text": "SR-12 is correctly implemented: In TELEOP, a supervisor reset with an occupied protective field shall enter recovery, adding that field to any already in recovery. The speed limit is 0.5 m/s (0.3 m/s for the side fields) from the first recovery cycle, motion toward the occupied field trips again, and boom/bucket motion is disabled until the field clears. Recovery from a side-field stop is refused, and recovery motion stops, while the 0.35 m contact band beside either frame is occupied: beside the frame no direction of travel moves away from a person, because the bucket is wider than the front frame. Inside the access-controlled dig zone, and the dock zone while the truck's cab door is closed, the band does not block recovery (the object there is the pile flank or the truck).",
+   "parent": "H11.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H11.S.SR-12.proof",
+    "H11.S.SR-12.tests"
+   ],
+   "req": "SR-12"
+  },
+  "H11.S.SR-12.proof": {
+   "id": "H11.S.SR-12.proof",
+   "kind": "solution",
+   "text": "Formal proof: 5 properties \u00d7 4 configurations, 20/20 proven",
+   "parent": "H11.S.SR-12",
+   "status": "passed",
+   "evidence": [
+    {
+     "id": "SR-12a",
+     "text": "The implement (boom, bucket) is never enabled during recovery.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-12b",
+     "text": "During recovery from a front stop, moving forward stops the machine; from a rear stop, reversing stops it.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-12c",
+     "text": "During recovery from a side stop, an occupied contact band stops the machine (outside the access-controlled zones).",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-12d",
+     "text": "Recovery exists only in TELEOP.",
+     "proven": 4,
+     "configs": 4
+    },
+    {
+     "id": "SR-12e",
+     "text": "While recovering with the brakes released, the speed limit is creep speed (0.5 m/s, 0.3 m/s for a side stop).",
+     "proven": 4,
+     "configs": 4
+    }
+   ],
+   "children": [],
+   "source": "results/verification.json"
+  },
+  "H11.S.SR-12.tests": {
+   "id": "H11.S.SR-12.tests",
+   "kind": "solution",
+   "text": "Requirement-traced tests: 6/6 passed",
+   "parent": "H11.S.SR-12",
+   "status": "passed",
+   "evidence": [
+    {
+     "test": "tests/safety/test_plc.py::test_sr12_recovery_allows_backing_away_only",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr12_side_recovery_refused_while_someone_is_right_beside_the_frame",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr12_contact_band_does_not_block_recovery_in_access_controlled_zones",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr12_no_recovery_in_auto",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_found_by_proof_reset_keeps_fields_already_in_recovery",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_found_by_proof_creep_limit_applies_from_the_first_recovery_cycle",
+     "outcome": "passed"
+    }
+   ],
+   "children": [],
+   "source": "results/traceability.json"
+  },
+  "H11.V": {
+   "id": "H11.V",
+   "kind": "goal",
+   "text": "Integrated validation shows person under the raised bucket or between the front tyres and the bucket (boom lowered or bucket dragged onto them) does not occur.",
+   "parent": "H11.S",
+   "status": "passed",
+   "evidence": [],
+   "children": [
+    "H11.V.shift",
+    "H11.V.adv"
+   ]
+  },
+  "H11.V.shift": {
+   "id": "H11.V.shift",
+   "kind": "solution",
+   "text": "15 simulated 60-min shifts (5 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
+   "parent": "H11.V",
+   "status": "passed",
+   "evidence": [
+    {
+     "config": "learned",
+     "seed": 1,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "learned",
+     "seed": 2,
+     "closest_m": 1.12,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "learned",
+     "seed": 3,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 1,
+     "closest_m": 1.4,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 2,
+     "closest_m": 1.12,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "scripted",
+     "seed": 3,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 1,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 2,
+     "closest_m": 1.42,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "winter",
+     "seed": 3,
+     "closest_m": 1.47,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 1,
+     "closest_m": 1.36,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 2,
+     "closest_m": 0.73,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "guard_on",
+     "seed": 3,
+     "closest_m": 1.15,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 1,
+     "closest_m": 1.4,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 2,
+     "closest_m": 0.76,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "careless",
+     "seed": 3,
+     "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    }
+   ],
+   "children": [],
+   "source": "results/campaign.json"
+  },
+  "H11.V.adv": {
+   "id": "H11.V.adv",
+   "kind": "solution",
+   "text": "Adversarial search (rules-kept): 105 episodes, CMA-ES vs random; 0 contacts; worst clearance found 0.07 m (random search: 0.23 m)",
+   "parent": "H11.V",
+   "status": "passed",
+   "evidence": [
+    {
+     "method": "cma",
+     "clearance_m": 0.07,
+     "scenario": {
+      "t_appear": 104.66,
+      "start": [
+       31.44,
+       1.24
+      ],
+      "wp1": [
+       32.98,
+       14.93
+      ],
+      "pause_s": 3.11,
+      "wp2": [
+       31.49,
+       -2.36
+      ],
+      "speed": 1.91,
+      "dust": 0.0114,
+      "dust_t0": 59.4
+     }
+    },
+    {
+     "method": "random",
+     "clearance_m": 0.23,
+     "scenario": {
+      "t_appear": 29.08,
+      "start": [
+       39.76,
+       0.8
+      ],
+      "wp1": [
+       28.48,
+       3.83
+      ],
+      "pause_s": 24.42,
+      "wp2": [
+       11.88,
+       -1.17
+      ],
+      "speed": 0.65,
+      "dust": 0.0005,
+      "dust_t0": 18.1
+     }
+    },
+    {
+     "method": "cma",
+     "clearance_m": 1.18,
+     "scenario": {
+      "t_appear": 74.39,
+      "start": [
+       12.01,
+       -23.0
+      ],
+      "wp1": [
+       39.51,
+       11.01
+      ],
+      "pause_s": 12.13,
+      "wp2": [
+       20.64,
+       -17.54
+      ],
+      "speed": 1.39,
+      "dust": 0.0137,
+      "dust_t0": 42.8
+     }
+    },
+    {
+     "method": "cma",
+     "clearance_m": 1.4,
+     "scenario": {
+      "t_appear": 84.07,
+      "start": [
+       -2.35,
+       -16.63
+      ],
+      "wp1": [
+       12.41,
+       12.56
+      ],
+      "pause_s": 6.49,
+      "wp2": [
+       28.07,
+       -7.95
+      ],
+      "speed": 1.43,
+      "dust": 0.0124,
+      "dust_t0": 48.1
+     }
+    },
+    {
+     "method": "cma",
+     "clearance_m": 1.83,
+     "scenario": {
+      "t_appear": 90.2,
+      "start": [
+       12.87,
+       -11.18
+      ],
+      "wp1": [
+       15.58,
+       27.59
+      ],
+      "pause_s": 3.47,
+      "wp2": [
+       24.36,
+       -1.5
+      ],
+      "speed": 1.59,
+      "dust": 0.0195,
+      "dust_t0": 51.5
+     }
+    }
+   ],
+   "children": [],
+   "source": "results/adversary_rules-kept.json"
+  },
+  "U1": {
+   "id": "U1",
+   "kind": "undeveloped",
+   "text": "Safety PLC logic re-implemented and verified in a certified PLC toolchain (ISO 13849-1/-2).",
+   "parent": "S0",
+   "status": "open",
+   "evidence": [],
+   "children": []
+  },
+  "U2": {
+   "id": "U2",
+   "kind": "undeveloped",
+   "text": "Hardware-in-the-loop bench passes HIL-01..10 on three consecutive days.",
+   "parent": "S0",
+   "status": "open",
+   "evidence": [],
+   "children": []
+  },
+  "U3": {
+   "id": "U3",
+   "kind": "undeveloped",
+   "text": "Brake and scanner response measured on the target machine, dry and on snow; field sets regenerated.",
+   "parent": "S0",
+   "status": "open",
+   "evidence": [],
+   "children": []
+  },
+  "U4": {
+   "id": "U4",
+   "kind": "undeveloped",
+   "text": "Full ISO 12100 risk assessment of machine and site; MPLr per ISO 19014.",
+   "parent": "S0",
+   "status": "open",
+   "evidence": [],
+   "children": []
+  }
+ }
+}

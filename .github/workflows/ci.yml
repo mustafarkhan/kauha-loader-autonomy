@@ -8,7 +8,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -30,13 +30,21 @@ jobs:
           python - <<'PY'
           import json, sys
           m = json.load(open("results/traceability.json"))
-          need = [f"SR-{i:02d}" for i in range(1, 16)] + ["AR-01", "AR-02", "AR-03", "AR-04"]
+          need = [f"SR-{i:02d}" for i in range(1, 17)] + ["AR-01", "AR-02", "AR-03", "AR-04"]
           missing = [r for r in need if r not in m or not m[r]["all_passed"]]
           print("requirements covered:", len(m))
           sys.exit(f"uncovered or failing: {missing}" if missing else 0)
           PY
+      - name: Prove the safety PLC properties
+        run: python -m kauha.verify.prove
+      - name: Safety case holds on the evidence
+        run: python -m kauha.assurance.case --check
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: traceability
-          path: results/traceability.json
+          name: assurance-evidence
+          path: |
+            results/traceability.json
+            results/verification.json
+            results/safety_case.json
+            docs/results/safety_case.html
