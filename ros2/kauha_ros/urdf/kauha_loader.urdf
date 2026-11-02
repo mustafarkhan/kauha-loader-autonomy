@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!--
+  KAUHA reference loader (15.5 t articulated wheel loader), for TF and visualisation.
+  base_link = front axle centre on the ground, x forward, z up (the twin's pose reference).
+  Joint conventions (published by kauha_ros/twin_bridge on /joint_states):
+    articulation  rear frame yaw relative to the front frame; position = articulation angle gamma
+                  (axis -z, so the rear heading is theta - gamma as in the twin)
+    boom          boom pitch above horizontal (axis -y: positive raises)
+    bucket        bucket pitch relative to the boom (visual mapping of the twin's bucket state)
+  Safety scanner frames match kauha/sim/sensors.py (rear mounts converted from the rear frame's
+  backward-facing coordinates). LaserScan angle 0 is the scanner link's +x axis.
+-->
+<robot name="kauha_loader">
+  <material name="machine"><color rgba="0.88 0.63 0.0 1"/></material>
+  <material name="dark"><color rgba="0.23 0.17 0.0 1"/></material>
+  <material name="tyre"><color rgba="0.16 0.17 0.16 1"/></material>
+  <material name="glass"><color rgba="0.7 0.8 0.85 0.6"/></material>
+
+  <link name="base_link"/>
+
+  <link name="front_frame">
+    <visual><origin xyz="-0.35 0 1.0"/><geometry><box size="2.9 1.2 0.75"/></geometry><material name="machine"/></visual>
+  </link>
+  <joint name="front_frame_fixed" type="fixed"><parent link="base_link"/><child link="front_frame"/></joint>
+
+  <link name="front_wheel_left"><visual><origin rpy="1.5708 0 0"/><geometry><cylinder radius="0.78" length="0.6"/></geometry><material name="tyre"/></visual></link>
+  <link name="front_wheel_right"><visual><origin rpy="1.5708 0 0"/><geometry><cylinder radius="0.78" length="0.6"/></geometry><material name="tyre"/></visual></link>
+  <joint name="front_wheel_left_fixed" type="fixed"><parent link="base_link"/><child link="front_wheel_left"/><origin xyz="0 1.05 0.78"/></joint>
+  <joint name="front_wheel_right_fixed" type="fixed"><parent link="base_link"/><child link="front_wheel_right"/><origin xyz="0 -1.05 0.78"/></joint>
+
+  <!-- articulation joint 1.6 m behind the front axle -->
+  <link name="articulation_link"><visual><origin xyz="0 0 1.0"/><geometry><cylinder radius="0.25" length="0.9"/></geometry><material name="dark"/></visual></link>
+  <joint name="articulation" type="revolute">
+    <parent link="base_link"/><child link="articulation_link"/>
+    <origin xyz="-1.6 0 0"/><axis xyz="0 0 -1"/>
+    <limit lower="-0.698" upper="0.698" effort="1e6" velocity="0.35"/>
+  </joint>
+
+  <!-- rear frame origin = rear axle centre, 1.6 m behind the joint, x forward -->
+  <link name="rear_axle">
+    <visual><origin xyz="-0.75 0 1.6"/><geometry><box size="2.1 1.45 1.0"/></geometry><material name="machine"/></visual>
+    <visual><origin xyz="-1.95 0 1.25"/><geometry><box size="0.45 2.2 1.15"/></geometry><material name="machine"/></visual>
+    <visual><origin xyz="0.9 0 2.38"/><geometry><box size="1.2 1.4 1.35"/></geometry><material name="glass"/></visual>
+    <visual><origin xyz="0.9 0 3.12"/><geometry><box size="1.35 1.55 0.12"/></geometry><material name="machine"/></visual>
+  </link>
+  <joint name="rear_frame_fixed" type="fixed"><parent link="articulation_link"/><child link="rear_axle"/><origin xyz="-1.6 0 0"/></joint>
+  <link name="rear_wheel_left"><visual><origin rpy="1.5708 0 0"/><geometry><cylinder radius="0.78" length="0.6"/></geometry><material name="tyre"/></visual></link>
+  <link name="rear_wheel_right"><visual><origin rpy="1.5708 0 0"/><geometry><cylinder radius="0.78" length="0.6"/></geometry><material name="tyre"/></visual></link>
+  <joint name="rear_wheel_left_fixed" type="fixed"><parent link="rear_axle"/><child link="rear_wheel_left"/><origin xyz="0 1.05 0.78"/></joint>
+  <joint name="rear_wheel_right_fixed" type="fixed"><parent link="rear_axle"/><child link="rear_wheel_right"/><origin xyz="0 -1.05 0.78"/></joint>
+
+  <!-- boom and bucket -->
+  <link name="boom">
+    <visual><origin xyz="1.475 0.75 0"/><geometry><box size="2.95 0.2 0.28"/></geometry><material name="machine"/></visual>
+    <visual><origin xyz="1.475 -0.75 0"/><geometry><box size="2.95 0.2 0.28"/></geometry><material name="machine"/></visual>
+  </link>
+  <joint name="boom" type="revolute">
+    <parent link="base_link"/><child link="boom"/>
+    <origin xyz="0.9 0 1.95"/><axis xyz="0 -1 0"/>
+    <limit lower="-0.62" upper="0.95" effort="1e6" velocity="0.27"/>
+  </joint>
+  <link name="bucket">
+    <visual><origin xyz="-0.05 0 -0.45"/><geometry><box size="0.08 2.7 1.0"/></geometry><material name="dark"/></visual>
+    <visual><origin xyz="0.6 0 -0.95"/><geometry><box size="1.3 2.7 0.08"/></geometry><material name="dark"/></visual>
+  </link>
+  <joint name="bucket" type="revolute">
+    <parent link="boom"/><child link="bucket"/>
+    <origin xyz="2.95 0 0"/><axis xyz="0 -1 0"/>
+    <limit lower="-2.0" upper="2.0" effort="1e6" velocity="0.55"/>
+  </joint>
+
+  <!-- safety scanners (outdoorScan3, 275 deg) -->
+  <link name="front_left_scanner"/>
+  <joint name="front_left_scanner_fixed" type="fixed"><parent link="base_link"/><child link="front_left_scanner"/><origin xyz="2.0 1.35 0.5" rpy="0 0 0.785398163"/></joint>
+  <link name="front_right_scanner"/>
+  <joint name="front_right_scanner_fixed" type="fixed"><parent link="base_link"/><child link="front_right_scanner"/><origin xyz="2.0 -1.35 0.5" rpy="0 0 -0.785398163"/></joint>
+  <link name="rear_left_scanner"/>
+  <joint name="rear_left_scanner_fixed" type="fixed"><parent link="rear_axle"/><child link="rear_left_scanner"/><origin xyz="-1.7 1.2 0.5" rpy="0 0 2.356194490"/></joint>
+  <link name="rear_right_scanner"/>
+  <joint name="rear_right_scanner_fixed" type="fixed"><parent link="rear_axle"/><child link="rear_right_scanner"/><origin xyz="-1.7 -1.2 0.5" rpy="0 0 -2.356194490"/></joint>
+</robot>

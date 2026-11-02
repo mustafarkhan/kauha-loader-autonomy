@@ -22,7 +22,8 @@ from kauha.config import REPO_ROOT
 CONFIGS = {"learned": ["--controller", "learned"], "scripted": ["--controller", "scripted"],
            "winter": ["--controller", "learned", "--winter"],
            "guard_on": ["--controller", "learned", "--guard"],
-           "careless": ["--controller", "scripted", "--careless"]}
+           "careless": ["--controller", "scripted", "--careless"],
+           "carry": ["--controller", "learned", "--task", "carry"]}
 NUMERIC = ("tonnes", "tonnes_per_hour", "cycles", "trucks", "cycle_time_median_s", "clean_cycle_time_median_s",
            "dig_time_mean_s", "fill_factor_mean", "truck_wait_s", "interventions_per_hour", "protective_stops",
            "false_stops", "min_person_distance_moving_m", "person_field_entries_while_moving",

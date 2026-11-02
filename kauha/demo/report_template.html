@@ -364,7 +364,7 @@ for (const [label, t] of jumps) { if (t > T_END) continue; const b = document.cr
 
 // ---------- KPI table (campaign: mean and range over seeds)
 const C = DATA.campaign, cols = Object.keys(C);
-const COLNAME = { learned: "Learned bucket", scripted: "Rule-based bucket", winter: "Learned, winter braking", guard_on: "Learned, field guard on", careless: "Rule-based, careless walkers (0.3 m)" };
+const COLNAME = { learned: "Learned bucket", scripted: "Rule-based bucket", winter: "Learned, winter braking", guard_on: "Learned, field guard on", careless: "Rule-based, careless walkers (0.3 m)", carry: "Learned, load-and-carry to hopper" };
 const nSeeds = C[cols[0]].seeds.length;
 const cell = (c, key, fmt) => { const s = C[c].summary[key]; return `${fmt(s.mean)} <span class="range">${fmt(s.min)}–${fmt(s.max)}</span>`; };
 const f0 = v => v.toFixed(0), f1 = v => v.toFixed(1), f2 = v => v.toFixed(2), cm = v => (v * 100).toFixed(1);

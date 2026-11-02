@@ -54,6 +54,10 @@ class FieldSet:
     # it and the front tyres (found by the adversarial search).
     front_side: Polygon = field(default_factory=lambda: front_side_field())
     under_near: Polygon = field(default_factory=lambda: under_bucket("near"))
+    # Gap between the near field and the lowered bucket's back edge (found by the
+    # carry adversarial search: a person standing there was out of every field
+    # while the boom was low, and the machine restarted and reversed onto them).
+    under_mid: Polygon = field(default_factory=lambda: under_bucket("mid"))
     under_far: Polygon = field(default_factory=lambda: under_bucket("far"))
     # Standstill only: the rear frame has its own contour, so it gets its own fields.
     rear_protective: Polygon | None = None
@@ -75,6 +79,8 @@ class Geometry:
     rear_half_width: float = 1.3     # rear frame (2.55 m wide) plus a little
     scanner_x: float = 2.0           # front scanners on the front-frame fenders
     dock_field_end_x: float = 2.8    # truck side must stay beyond this when docked
+    gap_field_end_x: float = 3.35    # the bucket's back edge at scan height is at least 3.57 m
+                                     # ahead on level ground (bucket bottom not below the ground)
     dig_side_end_x: float = 1.0      # DIG side fields cover the cab/articulation area only;
                                      # further forward the pile flanks beside the bucket
                                      # would trip them on every pass
@@ -92,7 +98,8 @@ def front_side_field(g: "Geometry | None" = None) -> Polygon:
 
 def under_bucket(part: str, g: "Geometry | None" = None) -> Polygon:
     g = g or Geometry()
-    x0, x1 = (g.scanner_x, g.dock_field_end_x) if part == "near" else (g.dock_field_end_x, g.front_contour_x)
+    x0, x1 = {"near": (g.scanner_x, g.dock_field_end_x), "mid": (g.dock_field_end_x, g.gap_field_end_x),
+              "far": (g.dock_field_end_x, g.front_contour_x)}[part]
     hw = g.half_width
     return [(x0, -hw), (x1, -hw), (x1, hw), (x0, hw)]
 

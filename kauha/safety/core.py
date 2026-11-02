@@ -231,8 +231,11 @@ def step(O, P, T: FieldTable, s: Memory, i):
     # zone the pile fills both while the bucket lifts out of the face; beside a
     # docked truck (driver in the cab) the truck fills the far field.
     exempt = O.Or(i.in_dig_zone, O.And(i.in_dock_zone, O.Not(i.truck_door_open)))
+    # The mid field (2.8-3.35 m) reaches up to the lowered bucket's back edge at any
+    # boom position, beyond where a docked truck's side may be (found by the
+    # adversarial search on the carry site).
     under = O.And(O.Not(i.in_dig_zone),
-                  O.Or(i.under_near, O.And(i.boom_raised, i.under_far, O.Not(exempt))))
+                  O.Or(i.under_near, O.And(O.Not(exempt), O.Or(i.under_mid, O.And(i.boom_raised, i.under_far)))))
     rec = O.If(O.And(at_rest, O.Not(under)), O.clear(rec, UNDER_BUCKET), rec)
     # Beside the frame no direction is "away": the bucket is wider than the front
     # frame and slides past a person standing there either way. Inside the

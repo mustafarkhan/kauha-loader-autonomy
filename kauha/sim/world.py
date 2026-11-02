@@ -78,6 +78,9 @@ class Truck:
     buckets: int = 0
     arrived_t: float = 0.0
     serial: int = 1
+    kind: str = "truck"          # "truck": loaded to capacity, then leaves; "hopper": fixed, drains to a feeder
+    feeder_t_h: float = 0.0      # hopper only: rate the feeder draws material out
+    spill_t: float = 0.0         # hopper only: material dumped into a full hopper
 
     def corners(self) -> Polygon:
         c, s = math.cos(self.heading), math.sin(self.heading)
@@ -141,10 +144,16 @@ class Site:
     trucks_completed: int = 0
     tonnes_loaded: float = 0.0
     _truck_gone_at: float | None = None
+    _t_prev: float | None = None
 
     # ------------------------------------------------------------- dynamics
     def update(self, t: float) -> None:
         tr = self.truck
+        if tr.kind == "hopper":
+            if self._t_prev is not None:
+                tr.payload_t = max(0.0, tr.payload_t - tr.feeder_t_h / 3600.0 * (t - self._t_prev))
+            self._t_prev = t
+            return
         if not tr.present and self._truck_gone_at is not None and t - self._truck_gone_at >= self.swap_time_s:
             tr.present, tr.payload_t, tr.buckets, tr.arrived_t = True, 0.0, 0, t
             tr.serial += 1
@@ -155,6 +164,8 @@ class Site:
         if not tr.present:
             return 0.0
         accepted = min(tonnes, tr.capacity_t * 1.05 - tr.payload_t)
+        if tr.kind == "hopper":
+            tr.spill_t += tonnes - accepted
         tr.payload_t += accepted
         tr.buckets += 1
         self.tonnes_loaded += accepted
@@ -162,6 +173,8 @@ class Site:
 
     def dispatch_truck_if_full(self, t: float, next_bucket_t: float) -> bool:
         tr = self.truck
+        if tr.kind == "hopper":
+            return False                      # a hopper never leaves
         if tr.present and tr.payload_t + 0.7 * next_bucket_t > tr.capacity_t:
             tr.present = False
             self._truck_gone_at = t
@@ -204,8 +217,9 @@ def load_site(cfg: MachineConfig, path: str | Path = DEFAULT_SITE_FILE) -> Site:
         slots = [Slot(p["y_min"] + (i + 0.5) * p["slot_width"], p["slot_width"], p["toe_x"]) for i in range(n)]
         piles[p["name"]] = Stockpile(p["name"], cfg.materials[p["material"]], slots, p["height"],
                                      p["toe_x"] + p["depth"])
-    tb = d["truck_bay"]
-    truck = Truck(tb["center"][0], tb["center"][1], tb["heading"], tb["length"], tb["width"], tb["capacity_t"])
+    tb = d["truck_bay"] if "truck_bay" in d else d["hopper"]
+    truck = Truck(tb["center"][0], tb["center"][1], tb["heading"], tb["length"], tb["width"], tb["capacity_t"],
+                  kind="truck" if "truck_bay" in d else "hopper", feeder_t_h=tb.get("feeder_t_h", 0.0))
     walls = [(a[0], a[1], b[0], b[1]) for a, b in d["site"]["walls"]]
     return Site(
         name=d["site"]["name"],
@@ -213,7 +227,7 @@ def load_site(cfg: MachineConfig, path: str | Path = DEFAULT_SITE_FILE) -> Site:
         walls=walls, piles=piles,
         dig_zones={k: [tuple(p) for p in v] for k, v in d["dig_zones"].items()},
         dock_zone=[tuple(p) for p in tb["dock_zone"]],
-        truck=truck, dock_offset=tb["dock_offset"], swap_time_s=tb["swap_time_s"],
+        truck=truck, dock_offset=tb["dock_offset"], swap_time_s=tb.get("swap_time_s", 0.0),
         landmarks=[tuple(p) for p in d["landmarks"]],
         start_pose=tuple(d["start_pose"]),
     )

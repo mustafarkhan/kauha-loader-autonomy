@@ -95,7 +95,7 @@ Z3 = Z3Ops()
 INPUT_BOOLS = ("front_prot", "front_warn", "rear_prot", "rear_warn", "side_prot", "side_contact", "scanners_ok",
                "remote_estop", "reset_req", "machine_estop", "dig_req", "dock_req", "in_operating_area",
                "in_dig_zone", "in_dock_zone", "truck_door_open", "position_valid", "boom_raised", "under_near",
-               "under_far", "front_side")
+               "under_far", "under_mid", "front_side")
 INPUT_REALS = ("t", "speed_a", "speed_b", "articulation", "remote_hb_age", "autonomy_cmd_age")
 
 

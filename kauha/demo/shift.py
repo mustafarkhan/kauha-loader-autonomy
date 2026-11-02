@@ -49,7 +49,7 @@ def field_polygons(fs, under: bool = False) -> list[tuple[str, list]]:
     out = [("front", fs.protective if fs.direction >= 0 else []),
            ("rear", fs.protective_for("rear") if fs.direction <= 0 else [])]
     if under:
-        out += [("front", fs.under_near), ("front", fs.under_far)]
+        out += [("front", fs.under_near), ("front", fs.under_mid), ("front", fs.under_far)]
     if fs.direction < 0 and fs.front_side:           # SR-16 front-side fields while reversing
         out += [("front", fs.front_side), ("front", [(x, -y) for x, y in fs.front_side])]
     for body, side in (("front", fs.side), ("rear", fs.side_rear)):
@@ -57,6 +57,8 @@ def field_polygons(fs, under: bool = False) -> list[tuple[str, list]]:
             out += [(body, side), (body, [(x, -y) for x, y in side])]
     return out
 RECORD_EVERY = 8          # 5 Hz replay frames
+SITE_FILES = {"truck": REPO_ROOT / "hardware" / "config" / "site_demo.yaml",
+              "carry": REPO_ROOT / "hardware" / "config" / "site_carry.yaml"}
 WALK_AROUND_AFTER_S = 15.0
 
 
@@ -135,16 +137,20 @@ class Kpis:
 class ShiftSim:
     def __init__(self, controller: str = "learned", minutes: float = 60.0, seed: int = 1,
                  winter: bool = False, policy_path: Path | None = None, guard: bool = False,
-                 careless: bool = False):
+                 careless: bool = False, task: str = "truck"):
         self.rng = np.random.default_rng(seed)
+        self.task = task                         # "truck" loading (phase 3) or load-and-"carry" to a hopper (phase 2)
         # Pedestrian clearance (m): (from a moving machine, from a stopped one). The
         # default assumes site-trained people keep about a metre away; "careless"
         # walkers come within 0.3 m and only hold back from a moving machine at 1 m.
         self.yield_m = (1.0, 0.3) if careless else (1.5, 1.0)
         self.cfg = load_machine()
-        self.site = load_site(self.cfg)          # ground truth
-        site_map = load_site(self.cfg)           # the autonomy's survey map
+        site_file = SITE_FILES[task]
+        self.site = load_site(self.cfg, site_file)          # ground truth
+        site_map = load_site(self.cfg, site_file)           # the autonomy's survey map
         people, events, schedule, obstacles = demo_scenario(minutes)
+        if task == "carry":                      # a hopper has no cab and no driver
+            people = [p for p in people if p.name != "driver"]
         self.site.people, self.site.events = people, events
         self.obstacles = obstacles
         self.minutes = minutes
@@ -397,7 +403,7 @@ class ShiftSim:
             side_prot=sc.side_prot, side_contact=sc.side_contact, remote_hb_age=hb_age,
             boom_raised=self.loader.bucket_bottom_height() > BOOM_RAISED_M, under_near=sc.under_near,
             front_side=sc.front_side,
-            under_far=sc.under_far,
+            under_far=sc.under_far, under_mid=sc.under_mid,
             remote_estop=bool(self.plc_hb.get("EStop", 0)) and hb_fresh,
             reset_req=bool(self.plc_hb.get("ResetReq", 0)) and hb_fresh,
             autonomy_cmd_age=cmd_age, dig_req=bool(self.plc_drive.get("DigFieldReq", 0)),
@@ -728,10 +734,12 @@ def main() -> None:
     ap.add_argument("--winter", action="store_true")
     ap.add_argument("--guard", action="store_true", help="enable field-aware speed limiting (AR-04)")
     ap.add_argument("--careless", action="store_true", help="pedestrians come within 0.3 m (stress case)")
+    ap.add_argument("--task", choices=("truck", "carry"), default="truck",
+                    help="truck loading (phase 3) or load-and-carry to a hopper (phase 2)")
     ap.add_argument("--out", type=Path, default=Path("results/shift"))
     args = ap.parse_args()
     sim = ShiftSim(args.controller, args.minutes, args.seed, args.winter, guard=args.guard,
-                   careless=args.careless)
+                   careless=args.careless, task=args.task)
     k = sim.run()
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out / "kpis.json").write_text(json.dumps(asdict(k), indent=1))
@@ -744,6 +752,7 @@ def main() -> None:
                           "material": p.material.name} for n, p in sim.site.piles.items()},
             "dig_zones": sim.site.dig_zones, "dock_zone": sim.site.dock_zone,
             "truck": [sim.site.truck.cx, sim.site.truck.cy, sim.site.truck.length, sim.site.truck.width],
+            "target_kind": sim.site.truck.kind, "target_capacity_t": sim.site.truck.capacity_t,
             "landmarks": sim.site.landmarks},
         "fields": {fid: {"name": f.name, "dir": f.direction, "prot": f.protective, "warn": f.warning,
                          "rprot": f.protective_for("rear"), "rwarn": f.warning_for("rear"), "rside": f.side_rear,

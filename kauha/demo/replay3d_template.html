@@ -63,7 +63,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
   <header>
     <div>
       <div class="eyebrow">KAUHA · digital twin · simulated 60-minute shift · 3D</div>
-      <h1>Autonomous wheel loader, loading trucks</h1>
+      <h1 id="title">Autonomous wheel loader, loading trucks</h1>
       <p class="lede">The full stack in the loop: autonomy computer, CAN with end-to-end checks, drive-by-wire gateway and an
       independent safety PLC whose active protective (red) and warning (orange) fields are drawn on the ground as the
       scanners see them. Drag to orbit, scroll to zoom. Simulation, not field data.</p>
@@ -89,7 +89,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
         <dt>Safety limit</dt><dd id="limit">—</dd>
         <dt>Field set</dt><dd id="fset">—</dd>
         <dt>Bucket load</dt><dd id="load">—</dd>
-        <dt>Truck</dt><dd id="truck">—</dd>
+        <dt id="truck-label">Truck</dt><dd id="truck">—</dd>
       </dl>
       <div class="chips"><span class="chip" id="c-dust">DUST</span><span class="chip" id="c-gnss">GNSS OUT</span><span class="chip" id="c-link">LINK LOST</span></div>
       <div class="note" id="eventnote"></div>
@@ -145,7 +145,7 @@ function panel(f) {
   $("limit").textContent = f.st >= 2 ? "0.00 m/s" : f.lim.toFixed(2) + " m/s";
   $("fset").textContent = FIELDS[f.fs] ? FIELDS[f.fs].name : f.fs;
   $("load").textContent = f.load.toFixed(2) + " m³";
-  $("truck").textContent = f.tr[0] ? `#${f.tr[2]} · ${f.tr[1].toFixed(1)} t` : "swapping";
+  $("truck").textContent = S.target_kind === "hopper" ? `hopper · ${f.tr[1].toFixed(1)} t` : f.tr[0] ? `#${f.tr[2]} · ${f.tr[1].toFixed(1)} t` : "swapping";
   $("c-dust").classList.toggle("on", !!f.dust); $("c-gnss").classList.toggle("on", !f.gnss); $("c-link").classList.toggle("on", !f.link);
   const ev = DATA.stops.filter(e => e.t <= f.t && f.t - e.t < 25).pop();
   $("eventnote").textContent = ev ? `Stop at ${fmtT(ev.t)}: ${ev.cause.toLowerCase().replace(/_/g, " ")}${ev.objects && ev.objects.length ? " (" + ev.objects.join(", ").replace(/_/g, " ") + ")" : ""}` : "";
@@ -243,13 +243,23 @@ function init3d() {
   const [tcx, tcy, tl, tw] = S.truck;
   const truck = new THREE.Group(); truck.position.copy(W(tcx, tcy));
   const box = (w, h, d, m, x, y, z) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; return o; };
-  truck.add(box(tl, .5, tw, mat.dark, 0, .9, 0));
-  truck.add(box(2.0, 2.2, tw, mat.truck, tl / 2 - 1.0, 2.25, 0));
-  truck.add(box(tl - 2.4, .12, tw, mat.bed, -1.2, 1.25, 0));
-  for (const z of [-1, 1]) truck.add(box(tl - 2.4, 1.2, .1, mat.bed, -1.2, 1.85, z * (tw / 2 - .05)));
-  truck.add(box(.1, 1.2, tw, mat.bed, -tl / 2 + .05, 1.85, 0));
-  for (const x of [-3.2, -1.8, 3.2]) for (const z of [-1, 1]) { const wh = new THREE.Mesh(new THREE.CylinderGeometry(.55, .55, .4, 16), mat.tyre); wh.rotation.x = Math.PI / 2; wh.position.set(x, .55, z * (tw / 2 - .2)); truck.add(wh); }
-  const payload = box(tl - 2.6, 1, tw - .3, mat.pileA, -1.2, 1.3, 0); truck.add(payload);
+  const HOPPER = S.target_kind === "hopper", CAP = S.target_capacity_t || 20;
+  let payload;
+  if (HOPPER) {
+    // receiving hopper: concrete walls 2.4 m high around the opening, feeder below
+    for (const z of [-1, 1]) truck.add(box(tl, 2.4, .3, mat.concrete, 0, 1.2, z * (tw / 2)));
+    for (const x of [-1, 1]) truck.add(box(.3, 2.4, tw, mat.concrete, x * (tl / 2), 1.2, 0));
+    truck.add(box(tl + 3, .4, .9, mat.dark, 1.5, .2, 0));
+    payload = box(tl - .4, 1, tw - .4, mat.pileA, 0, .5, 0); truck.add(payload);
+  } else {
+    truck.add(box(tl, .5, tw, mat.dark, 0, .9, 0));
+    truck.add(box(2.0, 2.2, tw, mat.truck, tl / 2 - 1.0, 2.25, 0));
+    truck.add(box(tl - 2.4, .12, tw, mat.bed, -1.2, 1.25, 0));
+    for (const z of [-1, 1]) truck.add(box(tl - 2.4, 1.2, .1, mat.bed, -1.2, 1.85, z * (tw / 2 - .05)));
+    truck.add(box(.1, 1.2, tw, mat.bed, -tl / 2 + .05, 1.85, 0));
+    for (const x of [-3.2, -1.8, 3.2]) for (const z of [-1, 1]) { const wh = new THREE.Mesh(new THREE.CylinderGeometry(.55, .55, .4, 16), mat.tyre); wh.rotation.x = Math.PI / 2; wh.position.set(x, .55, z * (tw / 2 - .2)); truck.add(wh); }
+    payload = box(tl - 2.6, 1, tw - .3, mat.pileA, -1.2, 1.3, 0); truck.add(payload);
+  }
   scene.add(truck);
 
   // loader: front frame (front axle origin) and rear frame (rear axle origin), x forward in both
@@ -329,7 +339,8 @@ function init3d() {
     boom.rotation.z = lerp(a.boom, b.boom, u);
     bucket.rotation.z = -boom.rotation.z + 0.6 * lerp(a.bkt, b.bkt, u);
     const ld = Math.min(1, a.load / 3); heap.visible = ld > .03; heap.scale.y = Math.max(.05, ld); heap.position.y = -.92 + .3 * heap.scale.y;
-    truck.visible = !!a.tr[0]; const pf = Math.min(1, a.tr[1] / 20); payload.visible = pf > .01; payload.scale.y = Math.max(.02, pf * 1.5); payload.position.y = 1.3 + .5 * payload.scale.y;
+    truck.visible = !!a.tr[0]; const pf = Math.min(1, a.tr[1] / CAP); payload.visible = pf > .01;
+    payload.scale.y = Math.max(.02, pf * (HOPPER ? 2.2 : 1.5)); payload.position.y = (HOPPER ? .1 : 1.3) + .5 * payload.scale.y;
     setFields(a.fs, a.st >= 2); setPeople(a.ppl); setBlocks(a.obs || []); updatePiles(t);
     scene.fog.near = a.dust ? 12 : 90; scene.fog.far = a.dust ? 60 : 220;
     pose = { x, y, th };
@@ -365,6 +376,11 @@ function toggle(on) { playing = on; $("play").textContent = on ? "Pause" : "Play
 $("play").addEventListener("click", () => toggle(!playing));
 $("scrub").addEventListener("input", e => show(e.target.value / 1000 * T_END));
 $("marks").addEventListener("click", e => { const r = e.target.getBoundingClientRect(); show((e.clientX - r.left) / r.width * T_END); });
-for (const [label, t] of JUMPS) { if (t > T_END) continue; const b = document.createElement("button"); b.type = "button"; b.textContent = `${fmtT(t)} ${label}`; b.addEventListener("click", () => show(t)); $("jumps").appendChild(b); }
+if (S.target_kind === "hopper") {
+  $("title").textContent = "Autonomous wheel loader, load-and-carry to a hopper";
+  $("truck-label").textContent = "Hopper";
+  document.title = "KAUHA 3D Load-and-Carry";
+}
+for (const [label, t] of JUMPS) { if (t > T_END || (S.target_kind === "hopper" && label === "Driver leaves cab")) continue; const b = document.createElement("button"); b.type = "button"; b.textContent = `${fmtT(t)} ${label}`; b.addEventListener("click", () => show(t)); $("jumps").appendChild(b); }
 drawMarks(); init3d(); show(T);
 </script>

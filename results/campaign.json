@@ -64,7 +64,7 @@
     "gateway_timeouts": 2,
     "log_chain_ok": true,
     "log_records": 15,
-    "wall_time_s": 246.1
+    "wall_time_s": 322.3
    },
    {
     "sim_minutes": 60.0,
@@ -126,7 +126,7 @@
     "gateway_timeouts": 2,
     "log_chain_ok": true,
     "log_records": 19,
-    "wall_time_s": 245.8
+    "wall_time_s": 319.2
    },
    {
     "sim_minutes": 60.0,
@@ -185,7 +185,7 @@
     "gateway_timeouts": 2,
     "log_chain_ok": true,
     "log_records": 21,
-    "wall_time_s": 251.7
+    "wall_time_s": 311.1
    }
   ],
   "summary": {
@@ -379,7 +379,7 @@
     "gateway_timeouts": 2,
     "log_chain_ok": true,
     "log_records": 19,
-    "wall_time_s": 246.6
+    "wall_time_s": 312.1
    },
    {
     "sim_minutes": 60.0,
@@ -439,7 +439,7 @@
     "gateway_timeouts": 2,
     "log_chain_ok": true,
     "log_records": 20,
-    "wall_time_s": 245.5
+    "wall_time_s": 301.9
    },
    {
     "sim_minutes": 60.0,
@@ -497,7 +497,7 @@
     "gateway_timeouts": 2,
     "log_chain_ok": true,
     "log_records": 18,
-    "wall_time_s": 253.0
+    "wall_time_s": 304.6
    }
   ],
   "summary": {
@@ -689,7 +689,7 @@
     "gateway_timeouts": 2,
     "log_chain_ok": true,
     "log_records": 17,
-    "wall_time_s": 244.4
+    "wall_time_s": 316.5
    },
    {
     "sim_minutes": 60.0,
@@ -748,7 +748,7 @@
     "gateway_timeouts": 2,
     "log_chain_ok": true,
     "log_records": 23,
-    "wall_time_s": 247.7
+    "wall_time_s": 333.6
    },
    {
     "sim_minutes": 60.0,
@@ -805,7 +805,7 @@
     "gateway_timeouts": 2,
     "log_chain_ok": true,
     "log_records": 11,
-    "wall_time_s": 244.0
+    "wall_time_s": 303.3
    }
   ],
   "summary": {
@@ -995,7 +995,7 @@
     "gateway_timeouts": 2,
     "log_chain_ok": true,
     "log_records": 27,
-    "wall_time_s": 294.4
+    "wall_time_s": 358.8
    },
    {
     "sim_minutes": 60.0,
@@ -1056,7 +1056,7 @@
     "gateway_timeouts": 2,
     "log_chain_ok": true,
     "log_records": 16,
-    "wall_time_s": 300.1
+    "wall_time_s": 366.5
    },
    {
     "sim_minutes": 60.0,
@@ -1115,7 +1115,7 @@
     "gateway_timeouts": 2,
     "log_chain_ok": true,
     "log_records": 19,
-    "wall_time_s": 306.2
+    "wall_time_s": 366.7
    }
   ],
   "summary": {
@@ -1307,7 +1307,7 @@
     "gateway_timeouts": 2,
     "log_chain_ok": true,
     "log_records": 19,
-    "wall_time_s": 237.4
+    "wall_time_s": 294.9
    },
    {
     "sim_minutes": 60.0,
@@ -1366,7 +1366,7 @@
     "gateway_timeouts": 2,
     "log_chain_ok": true,
     "log_records": 32,
-    "wall_time_s": 242.4
+    "wall_time_s": 313.7
    },
    {
     "sim_minutes": 60.0,
@@ -1424,7 +1424,7 @@
     "gateway_timeouts": 2,
     "log_chain_ok": true,
     "log_records": 18,
-    "wall_time_s": 240.4
+    "wall_time_s": 307.5
    }
   ],
   "summary": {
@@ -1549,6 +1549,318 @@
   "fill_by_pile": {
    "A": 1.0206666666666664,
    "B": 0.8323333333333333
+  },
+  "log_chain_ok": true
+ },
+ "carry": {
+  "seeds": [
+   1,
+   2,
+   3
+  ],
+  "runs": [
+   {
+    "sim_minutes": 60.0,
+    "controller": "learned",
+    "cycles": 40,
+    "tonnes": 185.4,
+    "trucks": 0,
+    "buckets_per_truck": 40.0,
+    "tonnes_per_hour": 185.4,
+    "cycles_per_hour": 40.0,
+    "cycle_time_median_s": 83.5,
+    "cycle_time_p90_s": 99.7,
+    "clean_cycle_time_median_s": 83.1,
+    "dig_time_mean_s": 9.57,
+    "fill_factor_mean": 0.915,
+    "fill_factor_by_pile": {
+     "A": 1.023,
+     "B": 0.813
+    },
+    "truck_wait_s": 0.0,
+    "interventions": 6,
+    "interventions_per_hour": 6.0,
+    "interventions_by_reason": {
+     "remote_link": 1,
+     "blocked_path": 2,
+     "phase_timeout_goto_pile": 1,
+     "watchdog": 1,
+     "estop_remote": 1
+    },
+    "protective_stops": 6,
+    "stops_by_cause": {
+     "REMOTE_LINK": 1,
+     "FIELD_FRONT": 1,
+     "FIELD_REAR": 1,
+     "FIELD_SIDE": 1,
+     "WATCHDOG": 1,
+     "ESTOP_REMOTE": 1
+    },
+    "false_stops": 1,
+    "false_stops_per_hour": 1.0,
+    "person_stop_response_s": [],
+    "min_person_distance_m": 2.0,
+    "min_person_distance_moving_m": 2.0,
+    "person_field_entries_while_moving": 0,
+    "person_under_raised_bucket_moving_s": 0.0,
+    "loc_rms_m": 0.025,
+    "loc_rms_gnss_outage_m": 0.027,
+    "loc_max_m": 0.112,
+    "loc_filter_resets": 7,
+    "teleop_latency_p50_ms": 101.1,
+    "teleop_latency_p95_ms": 127.8,
+    "teleop_budget_ms": 150.0,
+    "fuel_l": 14.43,
+    "fuel_l_per_t": 0.078,
+    "spill_t": 0.0,
+    "e2e_errors": 0,
+    "gateway_timeouts": 2,
+    "log_chain_ok": true,
+    "log_records": 14,
+    "wall_time_s": 319.6
+   },
+   {
+    "sim_minutes": 60.0,
+    "controller": "learned",
+    "cycles": 41,
+    "tonnes": 184.7,
+    "trucks": 0,
+    "buckets_per_truck": 41.0,
+    "tonnes_per_hour": 184.7,
+    "cycles_per_hour": 41.0,
+    "cycle_time_median_s": 83.9,
+    "cycle_time_p90_s": 92.4,
+    "clean_cycle_time_median_s": 83.2,
+    "dig_time_mean_s": 9.61,
+    "fill_factor_mean": 0.894,
+    "fill_factor_by_pile": {
+     "A": 0.978,
+     "B": 0.813
+    },
+    "truck_wait_s": 0.0,
+    "interventions": 5,
+    "interventions_per_hour": 5.0,
+    "interventions_by_reason": {
+     "remote_link": 1,
+     "blocked_path": 1,
+     "phase_timeout_goto_pile": 1,
+     "watchdog": 1,
+     "estop_remote": 1
+    },
+    "protective_stops": 7,
+    "stops_by_cause": {
+     "REMOTE_LINK": 1,
+     "FIELD_FRONT": 1,
+     "FIELD_SIDE": 1,
+     "FIELD_REAR": 2,
+     "WATCHDOG": 1,
+     "ESTOP_REMOTE": 1
+    },
+    "false_stops": 2,
+    "false_stops_per_hour": 2.0,
+    "person_stop_response_s": [],
+    "min_person_distance_m": 2.69,
+    "min_person_distance_moving_m": 2.69,
+    "person_field_entries_while_moving": 0,
+    "person_under_raised_bucket_moving_s": 0.0,
+    "loc_rms_m": 0.025,
+    "loc_rms_gnss_outage_m": 0.027,
+    "loc_max_m": 0.153,
+    "loc_filter_resets": 12,
+    "teleop_latency_p50_ms": 101.6,
+    "teleop_latency_p95_ms": 130.1,
+    "teleop_budget_ms": 150.0,
+    "fuel_l": 14.35,
+    "fuel_l_per_t": 0.078,
+    "spill_t": 0.0,
+    "e2e_errors": 0,
+    "gateway_timeouts": 2,
+    "log_chain_ok": true,
+    "log_records": 15,
+    "wall_time_s": 311.8
+   },
+   {
+    "sim_minutes": 60.0,
+    "controller": "learned",
+    "cycles": 41,
+    "tonnes": 189.4,
+    "trucks": 0,
+    "buckets_per_truck": 41.0,
+    "tonnes_per_hour": 189.4,
+    "cycles_per_hour": 41.0,
+    "cycle_time_median_s": 84.0,
+    "cycle_time_p90_s": 91.4,
+    "clean_cycle_time_median_s": 83.1,
+    "dig_time_mean_s": 9.59,
+    "fill_factor_mean": 0.896,
+    "fill_factor_by_pile": {
+     "A": 0.979,
+     "B": 0.813
+    },
+    "truck_wait_s": 0.0,
+    "interventions": 5,
+    "interventions_per_hour": 5.0,
+    "interventions_by_reason": {
+     "remote_link": 1,
+     "blocked_path": 1,
+     "phase_timeout_goto_pile": 1,
+     "watchdog": 1,
+     "estop_remote": 1
+    },
+    "protective_stops": 7,
+    "stops_by_cause": {
+     "REMOTE_LINK": 1,
+     "FIELD_FRONT": 1,
+     "FIELD_SIDE": 2,
+     "FIELD_REAR": 1,
+     "WATCHDOG": 1,
+     "ESTOP_REMOTE": 1
+    },
+    "false_stops": 2,
+    "false_stops_per_hour": 2.0,
+    "person_stop_response_s": [],
+    "min_person_distance_m": 2.36,
+    "min_person_distance_moving_m": 2.36,
+    "person_field_entries_while_moving": 0,
+    "person_under_raised_bucket_moving_s": 0.0,
+    "loc_rms_m": 0.025,
+    "loc_rms_gnss_outage_m": 0.029,
+    "loc_max_m": 0.098,
+    "loc_filter_resets": 12,
+    "teleop_latency_p50_ms": 100.8,
+    "teleop_latency_p95_ms": 129.2,
+    "teleop_budget_ms": 150.0,
+    "fuel_l": 14.52,
+    "fuel_l_per_t": 0.077,
+    "spill_t": 0.0,
+    "e2e_errors": 0,
+    "gateway_timeouts": 2,
+    "log_chain_ok": true,
+    "log_records": 15,
+    "wall_time_s": 320.7
+   }
+  ],
+  "summary": {
+   "tonnes": {
+    "mean": 186.5,
+    "min": 184.7,
+    "max": 189.4
+   },
+   "tonnes_per_hour": {
+    "mean": 186.5,
+    "min": 184.7,
+    "max": 189.4
+   },
+   "cycles": {
+    "mean": 40.666666666666664,
+    "min": 40.0,
+    "max": 41.0
+   },
+   "trucks": {
+    "mean": 0.0,
+    "min": 0.0,
+    "max": 0.0
+   },
+   "cycle_time_median_s": {
+    "mean": 83.8,
+    "min": 83.5,
+    "max": 84.0
+   },
+   "clean_cycle_time_median_s": {
+    "mean": 83.13333333333334,
+    "min": 83.1,
+    "max": 83.2
+   },
+   "dig_time_mean_s": {
+    "mean": 9.59,
+    "min": 9.57,
+    "max": 9.61
+   },
+   "fill_factor_mean": {
+    "mean": 0.9016666666666667,
+    "min": 0.894,
+    "max": 0.915
+   },
+   "truck_wait_s": {
+    "mean": 0.0,
+    "min": 0.0,
+    "max": 0.0
+   },
+   "interventions_per_hour": {
+    "mean": 5.333333333333333,
+    "min": 5.0,
+    "max": 6.0
+   },
+   "protective_stops": {
+    "mean": 6.666666666666667,
+    "min": 6.0,
+    "max": 7.0
+   },
+   "false_stops": {
+    "mean": 1.6666666666666667,
+    "min": 1.0,
+    "max": 2.0
+   },
+   "min_person_distance_moving_m": {
+    "mean": 2.3499999999999996,
+    "min": 2.0,
+    "max": 2.69
+   },
+   "person_field_entries_while_moving": {
+    "mean": 0.0,
+    "min": 0.0,
+    "max": 0.0
+   },
+   "person_under_raised_bucket_moving_s": {
+    "mean": 0.0,
+    "min": 0.0,
+    "max": 0.0
+   },
+   "loc_rms_m": {
+    "mean": 0.025000000000000005,
+    "min": 0.025,
+    "max": 0.025
+   },
+   "loc_rms_gnss_outage_m": {
+    "mean": 0.02766666666666667,
+    "min": 0.027,
+    "max": 0.029
+   },
+   "teleop_latency_p95_ms": {
+    "mean": 129.03333333333333,
+    "min": 127.8,
+    "max": 130.1
+   },
+   "fuel_l_per_t": {
+    "mean": 0.07766666666666666,
+    "min": 0.077,
+    "max": 0.078
+   },
+   "e2e_errors": {
+    "mean": 0.0,
+    "min": 0.0,
+    "max": 0.0
+   }
+  },
+  "interventions_by_reason_total": {
+   "remote_link": 3,
+   "blocked_path": 4,
+   "phase_timeout_goto_pile": 3,
+   "watchdog": 3,
+   "estop_remote": 3
+  },
+  "stops_by_cause_total": {
+   "REMOTE_LINK": 3,
+   "FIELD_FRONT": 3,
+   "FIELD_REAR": 4,
+   "FIELD_SIDE": 4,
+   "WATCHDOG": 3,
+   "ESTOP_REMOTE": 3
+  },
+  "person_stop_response_s": [],
+  "fill_by_pile": {
+   "A": 0.9933333333333333,
+   "B": 0.8130000000000001
   },
   "log_chain_ok": true
  }

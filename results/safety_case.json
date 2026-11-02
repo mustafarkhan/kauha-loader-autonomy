@@ -2,7 +2,7 @@
  "summary": {
   "root": "passed-open",
   "goals": 47,
-  "solutions": 64,
+  "solutions": 67,
   "failed": [],
   "missing": [],
   "open": [
@@ -494,13 +494,14 @@
    "evidence": [],
    "children": [
     "H1.V.shift",
-    "H1.V.adv"
+    "H1.V.adv",
+    "H1.V.adv-carry"
    ]
   },
   "H1.V.shift": {
    "id": "H1.V.shift",
    "kind": "solution",
-   "text": "15 simulated 60-min shifts (5 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
+   "text": "18 simulated 60-min shifts (6 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
    "parent": "H1.V",
    "status": "passed",
    "evidence": [
@@ -608,6 +609,27 @@
      "closest_m": 1.41,
      "field_entries": 0,
      "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 1,
+     "closest_m": 2.0,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 2,
+     "closest_m": 2.69,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 3,
+     "closest_m": 2.36,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
     }
    ],
    "children": [],
@@ -616,7 +638,7 @@
   "H1.V.adv": {
    "id": "H1.V.adv",
    "kind": "solution",
-   "text": "Adversarial search (rules-kept): 105 episodes, CMA-ES vs random; 0 contacts; worst clearance found 0.07 m (random search: 0.23 m)",
+   "text": "Adversarial search (rules-kept): 80 episodes, CMA-ES vs random; 0 contacts; worst clearance found 0.07 m (random search: 0.23 m)",
    "parent": "H1.V",
    "status": "passed",
    "evidence": [
@@ -733,6 +755,132 @@
       "speed": 1.59,
       "dust": 0.0195,
       "dust_t0": 51.5
+     }
+    }
+   ],
+   "children": [],
+   "source": "results/adversary_rules-kept.json"
+  },
+  "H1.V.adv-carry": {
+   "id": "H1.V.adv-carry",
+   "kind": "solution",
+   "text": "Adversarial search (load-and-carry site, rules-kept): 58 episodes, CMA-ES vs random; 0 contacts; worst clearance found 0.09 m (random search: 0.09 m)",
+   "parent": "H1.V",
+   "status": "passed",
+   "evidence": [
+    {
+     "method": "random",
+     "clearance_m": 0.09,
+     "scenario": {
+      "t_appear": 34.9,
+      "start": [
+       38.07,
+       17.33
+      ],
+      "wp1": [
+       15.5,
+       -14.01
+      ],
+      "pause_s": 24.73,
+      "wp2": [
+       50.45,
+       -23.39
+      ],
+      "speed": 1.71,
+      "dust": 0.0133,
+      "dust_t0": 21.3
+     }
+    },
+    {
+     "method": "cma",
+     "clearance_m": 0.09,
+     "scenario": {
+      "t_appear": 98.67,
+      "start": [
+       44.41,
+       23.08
+      ],
+      "wp1": [
+       28.77,
+       9.51
+      ],
+      "pause_s": 12.88,
+      "wp2": [
+       46.11,
+       -28.68
+      ],
+      "speed": 1.71,
+      "dust": 0.0,
+      "dust_t0": 56.1
+     }
+    },
+    {
+     "method": "random",
+     "clearance_m": 0.43,
+     "scenario": {
+      "t_appear": 29.08,
+      "start": [
+       39.76,
+       0.8
+      ],
+      "wp1": [
+       28.48,
+       3.83
+      ],
+      "pause_s": 24.42,
+      "wp2": [
+       11.88,
+       -1.17
+      ],
+      "speed": 0.65,
+      "dust": 0.0005,
+      "dust_t0": 18.1
+     }
+    },
+    {
+     "method": "cma",
+     "clearance_m": 0.95,
+     "scenario": {
+      "t_appear": 95.89,
+      "start": [
+       55.21,
+       22.71
+      ],
+      "wp1": [
+       24.78,
+       6.74
+      ],
+      "pause_s": 4.19,
+      "wp2": [
+       24.08,
+       -1.97
+      ],
+      "speed": 1.17,
+      "dust": 0.0068,
+      "dust_t0": 54.6
+     }
+    },
+    {
+     "method": "cma",
+     "clearance_m": 1.09,
+     "scenario": {
+      "t_appear": 109.41,
+      "start": [
+       51.94,
+       26.04
+      ],
+      "wp1": [
+       33.49,
+       7.18
+      ],
+      "pause_s": 4.04,
+      "wp2": [
+       9.71,
+       5.83
+      ],
+      "speed": 1.31,
+      "dust": 0.0008,
+      "dust_t0": 62.0
      }
     }
    ],
@@ -1102,13 +1250,14 @@
    "evidence": [],
    "children": [
     "H2.V.shift",
-    "H2.V.adv"
+    "H2.V.adv",
+    "H2.V.adv-carry"
    ]
   },
   "H2.V.shift": {
    "id": "H2.V.shift",
    "kind": "solution",
-   "text": "15 simulated 60-min shifts (5 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
+   "text": "18 simulated 60-min shifts (6 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
    "parent": "H2.V",
    "status": "passed",
    "evidence": [
@@ -1216,6 +1365,27 @@
      "closest_m": 1.41,
      "field_entries": 0,
      "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 1,
+     "closest_m": 2.0,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 2,
+     "closest_m": 2.69,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 3,
+     "closest_m": 2.36,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
     }
    ],
    "children": [],
@@ -1224,7 +1394,7 @@
   "H2.V.adv": {
    "id": "H2.V.adv",
    "kind": "solution",
-   "text": "Adversarial search (rules-kept): 105 episodes, CMA-ES vs random; 0 contacts; worst clearance found 0.07 m (random search: 0.23 m)",
+   "text": "Adversarial search (rules-kept): 80 episodes, CMA-ES vs random; 0 contacts; worst clearance found 0.07 m (random search: 0.23 m)",
    "parent": "H2.V",
    "status": "passed",
    "evidence": [
@@ -1341,6 +1511,132 @@
       "speed": 1.59,
       "dust": 0.0195,
       "dust_t0": 51.5
+     }
+    }
+   ],
+   "children": [],
+   "source": "results/adversary_rules-kept.json"
+  },
+  "H2.V.adv-carry": {
+   "id": "H2.V.adv-carry",
+   "kind": "solution",
+   "text": "Adversarial search (load-and-carry site, rules-kept): 58 episodes, CMA-ES vs random; 0 contacts; worst clearance found 0.09 m (random search: 0.09 m)",
+   "parent": "H2.V",
+   "status": "passed",
+   "evidence": [
+    {
+     "method": "random",
+     "clearance_m": 0.09,
+     "scenario": {
+      "t_appear": 34.9,
+      "start": [
+       38.07,
+       17.33
+      ],
+      "wp1": [
+       15.5,
+       -14.01
+      ],
+      "pause_s": 24.73,
+      "wp2": [
+       50.45,
+       -23.39
+      ],
+      "speed": 1.71,
+      "dust": 0.0133,
+      "dust_t0": 21.3
+     }
+    },
+    {
+     "method": "cma",
+     "clearance_m": 0.09,
+     "scenario": {
+      "t_appear": 98.67,
+      "start": [
+       44.41,
+       23.08
+      ],
+      "wp1": [
+       28.77,
+       9.51
+      ],
+      "pause_s": 12.88,
+      "wp2": [
+       46.11,
+       -28.68
+      ],
+      "speed": 1.71,
+      "dust": 0.0,
+      "dust_t0": 56.1
+     }
+    },
+    {
+     "method": "random",
+     "clearance_m": 0.43,
+     "scenario": {
+      "t_appear": 29.08,
+      "start": [
+       39.76,
+       0.8
+      ],
+      "wp1": [
+       28.48,
+       3.83
+      ],
+      "pause_s": 24.42,
+      "wp2": [
+       11.88,
+       -1.17
+      ],
+      "speed": 0.65,
+      "dust": 0.0005,
+      "dust_t0": 18.1
+     }
+    },
+    {
+     "method": "cma",
+     "clearance_m": 0.95,
+     "scenario": {
+      "t_appear": 95.89,
+      "start": [
+       55.21,
+       22.71
+      ],
+      "wp1": [
+       24.78,
+       6.74
+      ],
+      "pause_s": 4.19,
+      "wp2": [
+       24.08,
+       -1.97
+      ],
+      "speed": 1.17,
+      "dust": 0.0068,
+      "dust_t0": 54.6
+     }
+    },
+    {
+     "method": "cma",
+     "clearance_m": 1.09,
+     "scenario": {
+      "t_appear": 109.41,
+      "start": [
+       51.94,
+       26.04
+      ],
+      "wp1": [
+       33.49,
+       7.18
+      ],
+      "pause_s": 4.04,
+      "wp2": [
+       9.71,
+       5.83
+      ],
+      "speed": 1.31,
+      "dust": 0.0008,
+      "dust_t0": 62.0
      }
     }
    ],
@@ -1658,7 +1954,7 @@
   "H3.V.shift": {
    "id": "H3.V.shift",
    "kind": "solution",
-   "text": "15 simulated 60-min shifts (5 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
+   "text": "18 simulated 60-min shifts (6 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
    "parent": "H3.V",
    "status": "passed",
    "evidence": [
@@ -1766,6 +2062,27 @@
      "closest_m": 1.41,
      "field_entries": 0,
      "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 1,
+     "closest_m": 2.0,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 2,
+     "closest_m": 2.69,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 3,
+     "closest_m": 2.36,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
     }
    ],
    "children": [],
@@ -1774,7 +2091,7 @@
   "H3.V.adv": {
    "id": "H3.V.adv",
    "kind": "solution",
-   "text": "Adversarial search (rules-kept): 105 episodes, CMA-ES vs random; 0 contacts; worst clearance found 0.07 m (random search: 0.23 m)",
+   "text": "Adversarial search (rules-kept): 80 episodes, CMA-ES vs random; 0 contacts; worst clearance found 0.07 m (random search: 0.23 m)",
    "parent": "H3.V",
    "status": "passed",
    "evidence": [
@@ -2012,7 +2329,7 @@
   "H4.V.adv-zones": {
    "id": "H4.V.adv-zones",
    "kind": "solution",
-   "text": "Adversarial search (rules-broken): 73 episodes, CMA-ES vs random; 1 contacts; worst clearance found -0.21 m (random search: 0.09 m). Measures what zone access control (A1) carries; not a pass/fail criterion.",
+   "text": "Adversarial search (rules-broken): 94 episodes, CMA-ES vs random; 1 contacts; worst clearance found -0.21 m (random search: 0.09 m). Measures what zone access control (A1) carries; not a pass/fail criterion.",
    "parent": "H4.V",
    "status": "info",
    "evidence": [
@@ -2296,7 +2613,7 @@
   "H5.S.SR-16": {
    "id": "H5.S.SR-16",
    "kind": "goal",
-   "text": "SR-16 is correctly implemented: Outside the dig zone, a person between the front tyres and the bucket (2.0\u20132.8 m ahead of the front axle, any boom position), under the raised bucket (2.8\u20135.1 m, bucket bottom above 1.0 m; not beside a docked truck), or beside the front frame while reversing (not beside a docked truck) shall cause a protective stop that holds the boom. Teleop recovery may only back away.",
+   "text": "SR-16 is correctly implemented: Outside the dig zone, a person between the front tyres and the bucket (2.0\u20132.8 m ahead of the front axle, any boom position; 2.8\u20133.35 m, any boom position, not beside a docked truck), under the raised bucket (2.8\u20135.1 m, bucket bottom above 1.0 m; not beside a docked truck), or beside the front frame while reversing (not beside a docked truck) shall cause a protective stop that holds the boom. Teleop recovery may only back away.",
    "parent": "H5.S",
    "status": "passed",
    "evidence": [],
@@ -2315,7 +2632,7 @@
    "evidence": [
     {
      "id": "SR-16a",
-     "text": "Outside the dig zone, anyone between the front tyres and the bucket (near field, any boom position) or under the raised bucket (far field, except beside a docked truck) stops travel and holds the boom, unless backing away in recovery.",
+     "text": "Outside the dig zone, anyone between the front tyres and the bucket (near field at any boom position; mid field at any boom position, except beside a docked truck) or under the raised bucket (far field, except beside a docked truck) stops travel and holds the boom, unless backing away in recovery.",
      "proven": 4,
      "configs": 4
     },
@@ -2338,7 +2655,7 @@
   "H5.S.SR-16.tests": {
    "id": "H5.S.SR-16.tests",
    "kind": "solution",
-   "text": "Requirement-traced tests: 4/4 passed",
+   "text": "Requirement-traced tests: 6/6 passed",
    "parent": "H5.S.SR-16",
    "status": "passed",
    "evidence": [
@@ -2347,11 +2664,19 @@
      "outcome": "passed"
     },
     {
+     "test": "tests/adversary/test_found_scenarios.py::test_person_between_the_tyres_and_the_lowered_bucket_is_not_struck",
+     "outcome": "passed"
+    },
+    {
      "test": "tests/safety/test_plc.py::test_sr16_person_under_raised_bucket_stops_travel_and_holds_the_boom",
      "outcome": "passed"
     },
     {
      "test": "tests/safety/test_plc.py::test_sr16_ignored_with_the_bucket_down_and_far_field_exempt_at_a_docked_truck",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr16_gap_field_stops_at_any_boom_position_except_beside_a_docked_truck",
      "outcome": "passed"
     },
     {
@@ -2376,7 +2701,7 @@
   "H5.V.shift": {
    "id": "H5.V.shift",
    "kind": "solution",
-   "text": "15 simulated 60-min shifts (5 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
+   "text": "18 simulated 60-min shifts (6 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
    "parent": "H5.V",
    "status": "passed",
    "evidence": [
@@ -2484,6 +2809,27 @@
      "closest_m": 1.41,
      "field_entries": 0,
      "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 1,
+     "closest_m": 2.0,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 2,
+     "closest_m": 2.69,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 3,
+     "closest_m": 2.36,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
     }
    ],
    "children": [],
@@ -2581,7 +2927,7 @@
   "H6.V.shift": {
    "id": "H6.V.shift",
    "kind": "solution",
-   "text": "15 simulated 60-min shifts (5 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
+   "text": "18 simulated 60-min shifts (6 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
    "parent": "H6.V",
    "status": "passed",
    "evidence": [
@@ -2687,6 +3033,27 @@
      "config": "careless",
      "seed": 3,
      "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 1,
+     "closest_m": 2.0,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 2,
+     "closest_m": 2.69,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 3,
+     "closest_m": 2.36,
      "field_entries": 0,
      "under_bucket_s": 0.0
     }
@@ -2839,7 +3206,7 @@
   "H7.V.shift": {
    "id": "H7.V.shift",
    "kind": "solution",
-   "text": "15 simulated 60-min shifts (5 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
+   "text": "18 simulated 60-min shifts (6 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
    "parent": "H7.V",
    "status": "passed",
    "evidence": [
@@ -2945,6 +3312,27 @@
      "config": "careless",
      "seed": 3,
      "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 1,
+     "closest_m": 2.0,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 2,
+     "closest_m": 2.69,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 3,
+     "closest_m": 2.36,
      "field_entries": 0,
      "under_bucket_s": 0.0
     }
@@ -3136,7 +3524,7 @@
   "H8.V.shift": {
    "id": "H8.V.shift",
    "kind": "solution",
-   "text": "15 simulated 60-min shifts (5 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
+   "text": "18 simulated 60-min shifts (6 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
    "parent": "H8.V",
    "status": "passed",
    "evidence": [
@@ -3242,6 +3630,27 @@
      "config": "careless",
      "seed": 3,
      "closest_m": 1.41,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 1,
+     "closest_m": 2.0,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 2,
+     "closest_m": 2.69,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 3,
+     "closest_m": 2.36,
      "field_entries": 0,
      "under_bucket_s": 0.0
     }
@@ -3566,7 +3975,7 @@
   "H10.V.shift": {
    "id": "H10.V.shift",
    "kind": "solution",
-   "text": "15 simulated 60-min shifts (5 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
+   "text": "18 simulated 60-min shifts (6 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
    "parent": "H10.V",
    "status": "passed",
    "evidence": [
@@ -3674,6 +4083,27 @@
      "closest_m": 1.41,
      "field_entries": 0,
      "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 1,
+     "closest_m": 2.0,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 2,
+     "closest_m": 2.69,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 3,
+     "closest_m": 2.36,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
     }
    ],
    "children": [],
@@ -3706,7 +4136,7 @@
   "H11.S.SR-16": {
    "id": "H11.S.SR-16",
    "kind": "goal",
-   "text": "SR-16 is correctly implemented: Outside the dig zone, a person between the front tyres and the bucket (2.0\u20132.8 m ahead of the front axle, any boom position), under the raised bucket (2.8\u20135.1 m, bucket bottom above 1.0 m; not beside a docked truck), or beside the front frame while reversing (not beside a docked truck) shall cause a protective stop that holds the boom. Teleop recovery may only back away.",
+   "text": "SR-16 is correctly implemented: Outside the dig zone, a person between the front tyres and the bucket (2.0\u20132.8 m ahead of the front axle, any boom position; 2.8\u20133.35 m, any boom position, not beside a docked truck), under the raised bucket (2.8\u20135.1 m, bucket bottom above 1.0 m; not beside a docked truck), or beside the front frame while reversing (not beside a docked truck) shall cause a protective stop that holds the boom. Teleop recovery may only back away.",
    "parent": "H11.S",
    "status": "passed",
    "evidence": [],
@@ -3725,7 +4155,7 @@
    "evidence": [
     {
      "id": "SR-16a",
-     "text": "Outside the dig zone, anyone between the front tyres and the bucket (near field, any boom position) or under the raised bucket (far field, except beside a docked truck) stops travel and holds the boom, unless backing away in recovery.",
+     "text": "Outside the dig zone, anyone between the front tyres and the bucket (near field at any boom position; mid field at any boom position, except beside a docked truck) or under the raised bucket (far field, except beside a docked truck) stops travel and holds the boom, unless backing away in recovery.",
      "proven": 4,
      "configs": 4
     },
@@ -3748,7 +4178,7 @@
   "H11.S.SR-16.tests": {
    "id": "H11.S.SR-16.tests",
    "kind": "solution",
-   "text": "Requirement-traced tests: 4/4 passed",
+   "text": "Requirement-traced tests: 6/6 passed",
    "parent": "H11.S.SR-16",
    "status": "passed",
    "evidence": [
@@ -3757,11 +4187,19 @@
      "outcome": "passed"
     },
     {
+     "test": "tests/adversary/test_found_scenarios.py::test_person_between_the_tyres_and_the_lowered_bucket_is_not_struck",
+     "outcome": "passed"
+    },
+    {
      "test": "tests/safety/test_plc.py::test_sr16_person_under_raised_bucket_stops_travel_and_holds_the_boom",
      "outcome": "passed"
     },
     {
      "test": "tests/safety/test_plc.py::test_sr16_ignored_with_the_bucket_down_and_far_field_exempt_at_a_docked_truck",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_plc.py::test_sr16_gap_field_stops_at_any_boom_position_except_beside_a_docked_truck",
      "outcome": "passed"
     },
     {
@@ -3870,13 +4308,14 @@
    "evidence": [],
    "children": [
     "H11.V.shift",
-    "H11.V.adv"
+    "H11.V.adv",
+    "H11.V.adv-carry"
    ]
   },
   "H11.V.shift": {
    "id": "H11.V.shift",
    "kind": "solution",
-   "text": "15 simulated 60-min shifts (5 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
+   "text": "18 simulated 60-min shifts (6 configurations): 0 contacts with the moving machine, 0 protective-field entries while moving, 0.0 s under a raised bucket; closest approach 0.73 m",
    "parent": "H11.V",
    "status": "passed",
    "evidence": [
@@ -3984,6 +4423,27 @@
      "closest_m": 1.41,
      "field_entries": 0,
      "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 1,
+     "closest_m": 2.0,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 2,
+     "closest_m": 2.69,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
+    },
+    {
+     "config": "carry",
+     "seed": 3,
+     "closest_m": 2.36,
+     "field_entries": 0,
+     "under_bucket_s": 0.0
     }
    ],
    "children": [],
@@ -3992,7 +4452,7 @@
   "H11.V.adv": {
    "id": "H11.V.adv",
    "kind": "solution",
-   "text": "Adversarial search (rules-kept): 105 episodes, CMA-ES vs random; 0 contacts; worst clearance found 0.07 m (random search: 0.23 m)",
+   "text": "Adversarial search (rules-kept): 80 episodes, CMA-ES vs random; 0 contacts; worst clearance found 0.07 m (random search: 0.23 m)",
    "parent": "H11.V",
    "status": "passed",
    "evidence": [
@@ -4109,6 +4569,132 @@
       "speed": 1.59,
       "dust": 0.0195,
       "dust_t0": 51.5
+     }
+    }
+   ],
+   "children": [],
+   "source": "results/adversary_rules-kept.json"
+  },
+  "H11.V.adv-carry": {
+   "id": "H11.V.adv-carry",
+   "kind": "solution",
+   "text": "Adversarial search (load-and-carry site, rules-kept): 58 episodes, CMA-ES vs random; 0 contacts; worst clearance found 0.09 m (random search: 0.09 m)",
+   "parent": "H11.V",
+   "status": "passed",
+   "evidence": [
+    {
+     "method": "random",
+     "clearance_m": 0.09,
+     "scenario": {
+      "t_appear": 34.9,
+      "start": [
+       38.07,
+       17.33
+      ],
+      "wp1": [
+       15.5,
+       -14.01
+      ],
+      "pause_s": 24.73,
+      "wp2": [
+       50.45,
+       -23.39
+      ],
+      "speed": 1.71,
+      "dust": 0.0133,
+      "dust_t0": 21.3
+     }
+    },
+    {
+     "method": "cma",
+     "clearance_m": 0.09,
+     "scenario": {
+      "t_appear": 98.67,
+      "start": [
+       44.41,
+       23.08
+      ],
+      "wp1": [
+       28.77,
+       9.51
+      ],
+      "pause_s": 12.88,
+      "wp2": [
+       46.11,
+       -28.68
+      ],
+      "speed": 1.71,
+      "dust": 0.0,
+      "dust_t0": 56.1
+     }
+    },
+    {
+     "method": "random",
+     "clearance_m": 0.43,
+     "scenario": {
+      "t_appear": 29.08,
+      "start": [
+       39.76,
+       0.8
+      ],
+      "wp1": [
+       28.48,
+       3.83
+      ],
+      "pause_s": 24.42,
+      "wp2": [
+       11.88,
+       -1.17
+      ],
+      "speed": 0.65,
+      "dust": 0.0005,
+      "dust_t0": 18.1
+     }
+    },
+    {
+     "method": "cma",
+     "clearance_m": 0.95,
+     "scenario": {
+      "t_appear": 95.89,
+      "start": [
+       55.21,
+       22.71
+      ],
+      "wp1": [
+       24.78,
+       6.74
+      ],
+      "pause_s": 4.19,
+      "wp2": [
+       24.08,
+       -1.97
+      ],
+      "speed": 1.17,
+      "dust": 0.0068,
+      "dust_t0": 54.6
+     }
+    },
+    {
+     "method": "cma",
+     "clearance_m": 1.09,
+     "scenario": {
+      "t_appear": 109.41,
+      "start": [
+       51.94,
+       26.04
+      ],
+      "wp1": [
+       33.49,
+       7.18
+      ],
+      "pause_s": 4.04,
+      "wp2": [
+       9.71,
+       5.83
+      ],
+      "speed": 1.31,
+      "dust": 0.0008,
+      "dust_t0": 62.0
      }
     }
    ],

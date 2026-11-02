@@ -86,6 +86,7 @@ def build() -> dict:
     camp = _load(RESULTS / "campaign.json")
     adv_k = _load(RESULTS / "adversary_rules-kept.json")
     adv_b = _load(RESULTS / "adversary_rules-broken.json")
+    adv_c = _load(RESULTS / "adversary_rules-kept_carry.json")
 
     c = Case()
     c.add("G0", "goal", "People on foot are not harmed by the KAUHA-equipped loader operating autonomously "
@@ -155,12 +156,13 @@ def build() -> dict:
               source="results/campaign.json")
 
     def adversary_evidence(parent: str, rep: dict | None, residual: bool) -> None:
-        tag = "adv-zones" if residual else "adv"
+        tag = "adv-zones" if residual else ("adv-carry" if rep and rep.get("task") == "carry" else "adv")
         if not rep:
             c.add(f"{parent}.{tag}", "solution", "Adversarial search: results missing", parent, "missing")
             return
         bc, br = rep["best_cma"], rep["best_random"]
-        text = (f"Adversarial search ({rep['mode']}): {rep['valid_episodes']} episodes, CMA-ES vs random; "
+        where = "load-and-carry site, " if rep.get("task") == "carry" else ""
+        text = (f"Adversarial search ({where}{rep['mode']}): {rep['valid_episodes']} episodes, CMA-ES vs random; "
                 f"{rep['contacts']} contacts; worst clearance found {bc['min_clearance_moving_m']:.2f} m "
                 f"(random search: {br['min_clearance_moving_m']:.2f} m)")
         if residual:
@@ -199,6 +201,12 @@ def build() -> dict:
                 shift_evidence(v)
             elif kind == "adversary":
                 adversary_evidence(v, adv_k, residual=False)
+            elif kind == "adversary-carry":
+                if adv_c:
+                    adversary_evidence(v, adv_c, residual=False)
+                else:
+                    c.add(f"{v}.adv-carry", "solution", "Adversarial search (load-and-carry): results missing", v,
+                          "missing")
             elif kind == "adversary-zones":
                 adversary_evidence(v, adv_b, residual=True)
             elif kind == "sil":

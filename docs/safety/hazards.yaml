@@ -11,11 +11,11 @@ hazards:
   - id: H1
     title: Person struck by the machine travelling forward
     requirements: [SR-02, SR-03, SR-04, SR-08]
-    validation: [shift, adversary]
+    validation: [shift, adversary, adversary-carry]
   - id: H2
     title: Person struck by the machine reversing
     requirements: [SR-02, SR-04, SR-10]
-    validation: [shift, adversary]
+    validation: [shift, adversary, adversary-carry]
   - id: H3
     title: Person beside the frames crushed at the articulation or brushed by the bucket
     requirements: [SR-02, SR-12]
@@ -53,7 +53,7 @@ hazards:
   - id: H11
     title: Person under the raised bucket or between the front tyres and the bucket (boom lowered or bucket dragged onto them)
     requirements: [SR-16, SR-12]
-    validation: [shift, adversary]
+    validation: [shift, adversary, adversary-carry]
 
 assumptions:
   - id: A1

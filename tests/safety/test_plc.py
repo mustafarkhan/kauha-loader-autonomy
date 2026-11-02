@@ -401,6 +401,18 @@ def test_sr16_ignored_with_the_bucket_down_and_far_field_exempt_at_a_docked_truc
 
 
 @pytest.mark.req("SR-16")
+def test_sr16_gap_field_stops_at_any_boom_position_except_beside_a_docked_truck():
+    """The mid field ends short of the lowered bucket's back edge, so it is watched with the boom down."""
+    plc = SafetyPLC()
+    out = run(plc, 4, **nominal(boom_raised=False, under_mid=True))
+    assert out.state == State.PROTECTIVE_STOP and Cause.UNDER_BUCKET in out.cause and not out.implement_enable
+    for zone in (dict(in_dig_zone=True), dict(in_dock_zone=True)):
+        plc = SafetyPLC()
+        out = run(plc, 4, **nominal(speed_a=-0.5, speed_b=-0.5, under_mid=True, **zone))
+        assert out.state == State.RUN, zone
+
+
+@pytest.mark.req("SR-16")
 def test_sr16_beside_the_front_frame_while_reversing_stops_except_at_pile_or_docked_truck():
     plc = SafetyPLC()
     out = run(plc, 4, **nominal(speed_a=-1.0, speed_b=-1.0, front_side=True))

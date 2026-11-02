@@ -1,7 +1,7 @@
 # KAUHA: autonomy retrofit for articulated wheel loaders
 
 KAUHA turns a 14–18 t articulated wheel loader into a supervised autonomous
-truck loader. The retrofit kit adds sensors, a drive-by-wire gateway, an
+loader: truck loading, and load-and-carry from a stockpile to a fixed hopper. The retrofit kit adds sensors, a drive-by-wire gateway, an
 autonomy computer and an independent safety channel. One remote supervisor
 watches several machines and steps in by teleoperation when a machine asks
 for help.
@@ -22,6 +22,8 @@ physical machine is involved:
 | Formal verification | The safety PLC's step function is written once and run two ways: on floats in the machine, on z3 terms for proof. 30 requirement properties proved for every input and every reachable state, in four configurations, in CI | `kauha/safety/core.py`, `kauha/verify`, `docs/safety/verification.md` |
 | Adversarial testing | CMA-ES searches pedestrian routes, timing and dust to minimise clearance to the moving machine, with the site rules kept or broken; found scenarios become regression tests | `kauha/adversary`, `tests/adversary` |
 | Safety case | GSN assurance argument generated from the hazard list and the evidence (proofs, traced tests, shifts, search, SIL); CI fails if any claim loses its evidence | `kauha/assurance`, `docs/safety/hazards.yaml`, `docs/results/safety_case.html` |
+| ROS 2 (Jazzy) | `kauha_ros` package: the twin as ROS 2 topics (TF, URDF, LaserScan per safety scanner, odometry, diagnostics, field markers), rosbag2 MCAP recording, and a CAN bridge so ROS autonomy drives the SIL machine while the safety PLC stays on CAN | `ros2/` |
+| Load-and-carry | Hopper over a feeder, carry route, hopper dumping, KPIs against truck loading (`--task carry`) | `hardware/config/site_carry.yaml`, `docs/results/README.md` §4 |
 | Demonstration | 60-minute shift with people, link loss, an obstacle, dust, a GNSS outage, a material change, a computer freeze and a remote e-stop; KPIs, 2D and 3D replay | `kauha/demo`, `docs/results` |
 
 ## Quick start
@@ -33,8 +35,11 @@ pytest -m slow                     # real-time multi-process SIL, ~1 min
 python -m kauha.verify.prove       # prove the safety PLC properties (~30 s)
 python -m kauha.assurance.case --check
 python -m kauha.demo.shift --controller learned --minutes 60 --out results/shift_learned
-pip install -e ".[adversary]" && python -m kauha.adversary.search --mode rules-kept --budget 200
+python -m kauha.demo.shift --controller learned --minutes 60 --task carry --out results/shift_carry
+pip install -e ".[adversary]" && python -m kauha.adversary.search --mode rules-kept --budget 160
 ```
+
+ROS 2: see `ros2/README.md` (RoboStack environment, `colcon build`, launch files).
 
 Training (optional, CPU is enough):
 
@@ -73,6 +78,8 @@ This is a design and simulation baseline, not a validated product.
 - The Python safety logic is a reference model. The production version goes
   into a certified safety PLC toolchain.
 - The 3D lidar is modelled at object level, not as point clouds.
+- There is no remote operations console yet, and no operator baseline for
+  load-and-carry.
 
 `docs/results/README.md` lists what the simulation results do and do not
 show.

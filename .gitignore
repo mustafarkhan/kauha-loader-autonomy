@@ -9,3 +9,7 @@ models/*.ckpt.npz
 results/**/replay.json
 results/shift_*/
 .venv/
+ros2/build/
+ros2/install/
+ros2/log/
+*.mcap

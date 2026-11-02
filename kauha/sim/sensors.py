@@ -85,6 +85,7 @@ class ScanResult:
     front_side: bool              # SR-16 front-frame side fields, all sets (always evaluated)
     under_near: bool              # SR-16 under-bucket fields (always evaluated)
     under_far: bool
+    under_mid: bool               # SR-16 gap ahead of the near field, up to the low bucket's back edge
     points_front: np.ndarray      # (N,2) in front frame, for logging/visualisation
     points_rear: np.ndarray       # (N,2) in rear frame
 
@@ -92,6 +93,7 @@ class ScanResult:
 class SafetyScanners:
     def __init__(self, rng: np.random.Generator):
         self.rng = rng
+        self.last_ranges: dict[str, np.ndarray] = {}     # per scanner, for ROS LaserScan output
         self._prev = {"fp": False, "fw": False, "rp": False, "rw": False, "sp": False, "sc": False, "un": False,
                       "uf": False, "fs": False}
 
@@ -118,6 +120,7 @@ class SafetyScanners:
             hx = m.x + r * np.cos(local)
             hy = m.y + r * np.sin(local)
             hits[m.body].append((hx, hy, valid))
+            self.last_ranges[m.name] = r
 
         def eval_fields(body: str, polys: list) -> list[bool]:
             out = []
@@ -145,10 +148,10 @@ class SafetyScanners:
         contact = any(eval_fields("front", [fs.side_contact, [(x, -y) for x, y in fs.side_contact]])) or \
             any(eval_fields("rear", [fs.side_contact_rear, [(x, -y) for x, y in fs.side_contact_rear]]))
         # Multiple sampling: a field counts as violated in two consecutive scans.
-        un, uf = eval_fields("front", [fs.under_near, fs.under_far])
+        un, uf, um = eval_fields("front", [fs.under_near, fs.under_far, fs.under_mid])
         fsd = any(eval_fields("front", [fs.front_side, [(x, -y) for x, y in fs.front_side]]))
         now = {"fp": front_p, "fw": front_w, "rp": rear_p, "rw": rear_w, "sp": side, "sc": contact, "un": un, "uf": uf,
-               "fs": fsd}
+               "um": um, "fs": fsd}
         out = {k: now[k] and self._prev[k] for k in now}
         self._prev = now
         pf = np.column_stack([np.concatenate([h[0][h[2]] for h in hits["front"]]),
@@ -156,7 +159,7 @@ class SafetyScanners:
         pr = np.column_stack([np.concatenate([h[0][h[2]] for h in hits["rear"]]),
                               np.concatenate([h[1][h[2]] for h in hits["rear"]])])
         return ScanResult(out["fp"], out["fw"], out["rp"], out["rw"], out["sp"], out["sc"], out["fs"], out["un"],
-                          out["uf"], pf, pr)
+                          out["uf"], out["um"], pf, pr)
 
 
 # ------------------------------------------------------------------- GNSS etc

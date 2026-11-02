@@ -86,7 +86,7 @@ The current list, with the text of each property, is generated into
 | SR-12a–e | Recovery: implement off, motion toward the field trips, contact band trips, TELEOP only, creep limit |
 | SR-13 | Every stop and every reset is logged |
 | SR-14a/b | No dock set with the cab door open; door opening while docking stops |
-| SR-16a/b/c | Person between the front tyres and the bucket, under the raised bucket, or beside the front frame while reversing stops travel and holds the boom; recovery only backs away |
+| SR-16a/b/c | Person between the front tyres and the bucket (near and mid fields), under the raised bucket, or beside the front frame while reversing stops travel and holds the boom; recovery only backs away |
 
 ## What the adversarial search found next
 
@@ -105,6 +105,14 @@ behaviour (`kauha/adversary`) answered that question for the integrated system:
 - New requirement SR-16 adds under-bucket fields, front-side fields while
   reversing and a two-channel boom-angle sensor. It was then proved
   (SR-16a/b/c) and searched again. Results: `docs/results/README.md`.
+- The same search on the load-and-carry site found one more contact (−0.19 m).
+  A person stood in the gap between the near field (which ends at 2.8 m) and
+  the lowered bucket's back edge (3.57 m or more on level ground). With the
+  boom low, the far field is not used, because at scan height it contains the
+  bucket itself. So nothing covered the gap, the stop cleared, and the machine
+  reversed with the bucket's back edge into the person. SR-16 now adds a mid
+  field (2.8–3.35 m), watched at every boom position except in the dig zone and
+  beside a docked truck. SR-16a was re-proved with it.
 
 ## What is not proved
 

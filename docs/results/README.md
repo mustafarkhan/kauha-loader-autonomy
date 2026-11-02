@@ -217,7 +217,58 @@ Each was fixed or documented in `docs/safety/safety_concept.md`.
 9. **The bucket brought down or dragged onto a person, found by the adversarial
    search** (section 4). Fixed by SR-16.
 
-## 4. Assurance: proofs, adversarial search, safety case
+## 4. Load-and-carry to a hopper (phase 2)
+
+The v1 task in the operating domain is load-and-carry: dig at a stockpile, carry the
+bucket about 40 m and dump into a fixed hopper over a feeder. The twin now runs it on
+`hardware/config/site_carry.yaml` (`--task carry`). It uses the same autonomy and
+safety channel as truck loading. The hopper reuses the dock field set. It has no cab
+and no driver, and it drains at the feeder rate (400 t/h).
+
+| 60-minute shift, learned bucket, 3 seeds | Load-and-carry | Truck loading |
+|---|---|---|
+| Tonnes per hour | 187 (185–189) | 221 (221–221) |
+| Cycle time, median without stops | 83.1 s | 69.3 s |
+| Bucket fill factor | 0.90 | 0.92 |
+| Remote interventions per hour | 5.3 | 6.7 |
+| Protective / emergency stops | 6.7 | 7.7 |
+| Person entered a protective field while moving | 0 | 0 |
+| Closest person to the moving machine | 2.35 m | 1.32 m |
+
+**Where the cycle goes** (one 20-minute run, per cycle):
+
+| Phase | Load-and-carry | Truck loading |
+|---|---|---|
+| Carry to the dump target | 25.5 s, 41 m | 14.4 s, 13 m |
+| Return to the pile | 21.1 s, 38 m | 11.2 s, 13 m |
+| Reverse away from the dump | 14.6 s | 17.4 s |
+| Dig | 9.5 s | 9.5 s |
+| Other: back out, approach, dock, dump | 21.6 s | 22.3 s |
+| Travel per cycle | 123 m | 73 m |
+
+**What it shows.**
+- **Phase 2 works end to end in the twin.** It runs without remote help in nominal
+  operation. The interventions that remain are the scenario's injected faults (link
+  loss, computer freeze, e-stop test) and a few blocked paths.
+  3D replay of one shift: `kauha_3d_carry.html`.
+- **Turns and slow-downs cost more than the speed cap.** The two carry legs (79 m)
+  take 46.6 s. Estimated from straight-line motion with 1.2 m/s² acceleration and
+  braking:
+  - at the PLC's 2.97 m/s limit they would take 31.6 s;
+  - at the machine's 5.5 m/s top speed, 23.5 s.
+
+  So the 4 m scanner range costs about 8 s per cycle (about 10 %), and the planner
+  loses about 15 s to turns, curvature limits and warning-field slow-downs. A faster
+  speed profile through the turns is the first lever. Longer-range safety sensing
+  (safety-rated radar) is the second.
+- **The new site found a new safety gap.** The adversarial search on the carry
+  site found a contact that the truck site had not exposed. A person stood
+  between the front tyres and the lowered bucket. This is now closed by the
+  SR-16 mid field (section 5).
+- **No operator baseline yet.** As the solution design says, the comparison with a
+  skilled operator needs measurements on the pilot site.
+
+## 5. Assurance: proofs, adversarial search, safety case
 
 ### Formal proofs of the safety PLC
 
@@ -241,8 +292,10 @@ budget ran alongside it. Each episode is 150 s of the full stack.
 | Search | Episodes with valid routes | Contacts | Worst clearance: CMA-ES / random |
 |---|---|---|---|
 | Rules kept, before SR-16 | 80 | 1 | −0.25 m / 0.23 m |
-| Rules kept, with SR-16 | 105 | 0 | 0.07 m / 0.23 m |
-| Rules broken (zones entered), with SR-16 | 73 | 1 | −0.21 m / 0.09 m |
+| Rules kept, with SR-16 | 80 | 0 | 0.07 m / 0.23 m |
+| Rules broken (zones entered), with SR-16 | 94 | 1 | −0.21 m / 0.09 m |
+| Load-and-carry site, rules kept, SR-16 before the mid field | 83 | 1 | −0.19 m / 0.09 m |
+| Load-and-carry site, rules kept, with the mid field | 58 | 0 | 0.09 m / 0.09 m |
 
 - **The contact before SR-16 was a real design gap.**
   - After dumping, the loader reversed with its bucket raised and lowered it on
@@ -256,6 +309,27 @@ budget ran alongside it. Each episode is 150 s of the full stack.
   machine stopped on a front-side detection at 2.5 m/s. The person kept walking
   and reached it as it finished braking: the walker model stops people 0.3 m
   from the body, so about 0.05 m of edge clearance is that model's floor.
+- **The carry site found a second gap in SR-16, now closed.**
+  - A person stopped beside the front frame, then walked round into the gap
+    between the near field (which ends at 2.8 m) and the lowered bucket's back
+    edge (at least 3.57 m on level ground).
+  - With the boom low, the far field is not used, because at scan height it
+    contains the bucket itself. So no field covered that gap. The stop cleared,
+    the machine restarted, and it reversed with the bucket's back edge into the
+    person (−0.19 m).
+  - Fix: a mid field from 2.8 to 3.35 m, watched at every boom position except
+    in the dig zone and beside a docked truck. SR-16a was re-proved (120/120
+    proofs). Both rules-kept searches were re-run: no contacts. The fix added no
+    stops in an 8-minute shift on either site. The scenario is a regression test.
+  - Caveats:
+    - The walker model moves a blocked person round the machine by skipping
+      along the route; it does not simulate the walk itself. A real walk there
+      crosses the side and near fields first. That would only add stops.
+    - The front scanners now monitor eight fields at once, which is the
+      outdoorScan3 limit.
+    - The 0.35 m margin to the bucket's back edge assumes level ground. On a
+      ramp or in a rut, the lowered bucket can reach into the mid field and
+      cause nuisance stops. The pilot site has to check this.
 - **With the rules broken, the search found the zone risk.** The contact route
   crosses the dig and dock zones, which is what assumption A1 (zone access
   control) is for. It quantifies that assumption; it is not hidden.
@@ -281,19 +355,21 @@ CI fails if any claim loses its evidence. Four goals stay undeveloped because
 only hardware and certification can close them. The rendered argument is
 `safety_case.html`.
 
-## 5. Reproduce
+## 6. Reproduce
 
 ```bash
 python -m kauha.train.tune_baseline
 python -m kauha.train.train_bucket --steps 2000000
 python -m kauha.train.train_ppe --epochs 12
-python -m kauha.demo.campaign --seeds 1 2 3
+python -m kauha.demo.campaign --seeds 1 2 3            # includes the load-and-carry configuration
 python -m kauha.verify.prove
-python -m kauha.adversary.search --mode rules-kept --budget 200
-python -m kauha.adversary.search --mode rules-broken --budget 120
+python -m kauha.adversary.search --mode rules-kept --budget 160
+python -m kauha.adversary.search --mode rules-kept --budget 160 --task carry
+python -m kauha.adversary.search --mode rules-broken --budget 160
 python -m kauha.demo.report && python -m kauha.demo.replay3d
+python -m kauha.demo.replay3d --run results/runs/carry_s1 --out docs/results/kauha_3d_carry.html
 python -m kauha.assurance.case --check
 ```
 
-On 2 CPU cores the whole set takes about 2.5 h: about 40 min for the detector,
-15 min for PPO, about 35 min for the 15 shifts and 20 min for the two searches.
+On 2 CPU cores the whole set takes about 3.5 h: about 40 min for the detector,
+15 min for PPO, about 55 min for the 18 shifts and 30 min for the three searches.

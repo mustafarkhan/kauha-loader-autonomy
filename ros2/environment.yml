@@ -1,0 +1,30 @@
+# ROS 2 Jazzy through RoboStack (conda-forge), for CI and for any Linux/macOS machine:
+#   micromamba create -f ros2/environment.yml && micromamba activate kauha-ros
+name: kauha-ros
+channels:
+  - conda-forge
+  - robostack-jazzy
+dependencies:
+  - python=3.11
+  - ros-jazzy-ros-base=0.11.0
+  - ros-jazzy-rosbag2
+  - ros-jazzy-rosbag2-storage-mcap
+  - ros-jazzy-robot-state-publisher=3.3.3
+  - ros-jazzy-ackermann-msgs=2.0.2
+  - ros-jazzy-tf2-ros-py
+  - ros-jazzy-launch-ros
+  - ros-jazzy-geometry-msgs
+  - ros-jazzy-nav-msgs
+  - ros-jazzy-sensor-msgs
+  - ros-jazzy-visualization-msgs
+  - ros-jazzy-diagnostic-msgs
+  - colcon-common-extensions=0.3.0
+  - numpy
+  - pyyaml
+  - pytest
+  - pip
+  - pip:
+      - gymnasium>=0.29
+      - cantools>=39
+      - python-can>=4.3
+      - msgpack>=1.0

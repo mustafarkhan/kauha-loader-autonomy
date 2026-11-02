@@ -47,6 +47,19 @@
   ],
   "all_passed": true
  },
+ "AR-05": {
+  "tests": [
+   {
+    "test": "tests/scenario/test_carry_short.py::test_completes_load_and_carry_cycles",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/scenario/test_carry_short.py::test_hopper_drains_and_never_leaves",
+    "outcome": "passed"
+   }
+  ],
+  "all_passed": true
+ },
  "SR-01": {
   "tests": [
    {
@@ -533,11 +546,19 @@
     "outcome": "passed"
    },
    {
+    "test": "tests/adversary/test_found_scenarios.py::test_person_between_the_tyres_and_the_lowered_bucket_is_not_struck",
+    "outcome": "passed"
+   },
+   {
     "test": "tests/safety/test_plc.py::test_sr16_person_under_raised_bucket_stops_travel_and_holds_the_boom",
     "outcome": "passed"
    },
    {
     "test": "tests/safety/test_plc.py::test_sr16_ignored_with_the_bucket_down_and_far_field_exempt_at_a_docked_truck",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/safety/test_plc.py::test_sr16_gap_field_stops_at_any_boom_position_except_beside_a_docked_truck",
     "outcome": "passed"
    },
    {

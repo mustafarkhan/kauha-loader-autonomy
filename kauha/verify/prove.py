@@ -193,12 +193,14 @@ PROPS = [
              z3.Implies(z3.And(s.mem.state >= PROTECTIVE_STOP, o.state < PROTECTIVE_STOP),
                         z3.Or(*[as_bool(cond) for cond, kind, _ in o.events if kind == "reset"])))),
     # ---------------------------------------------------------------- SR-16
-    Prop("SR-16a", "SR-16", "Outside the dig zone, anyone between the front tyres and the bucket (near field, any boom "
-         "position) or under the raised bucket (far field, except beside a docked truck) stops travel and holds the "
-         "boom, unless backing away in recovery.",
+    Prop("SR-16a", "SR-16", "Outside the dig zone, anyone between the front tyres and the bucket (near field at any "
+         "boom position; mid field at any boom position, except beside a docked truck) or under the raised bucket "
+         "(far field, except beside a docked truck) stops travel and holds the boom, unless backing away in recovery.",
          lambda s, m, o, c: z3.Implies(z3.And(z3.Not(s.inp.in_dig_zone),
-                                              z3.Or(s.inp.under_near, z3.And(s.inp.boom_raised, s.inp.under_far,
-                                                                             z3.Not(c["exempt"]))),
+                                              z3.Or(s.inp.under_near,
+                                                    z3.And(z3.Or(s.inp.under_mid,
+                                                                 z3.And(s.inp.boom_raised, s.inp.under_far)),
+                                                           z3.Not(c["exempt"]))),
                                               z3.Not(has(m.recovery, UNDER_BUCKET))),
                                        z3.And(_stop(o), z3.Not(as_bool(o.implement_enable))))),
     Prop("SR-16c", "SR-16", "While reversing, anyone beside the front frame stops the machine (outside the dig zone "

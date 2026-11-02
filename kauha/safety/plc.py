@@ -112,6 +112,7 @@ class SafetyInputs:
     front_side: bool = False             # SR-16: front-frame side fields (every set, own output)
     under_near: bool = False             # SR-16: under-bucket field 2.0-2.8 m ahead of the front axle
     under_far: bool = False              # SR-16: under-bucket field 2.8-5.1 m
+    under_mid: bool = False              # SR-16: gap field 2.8-3.35 m, short of the lowered bucket
     position_valid: bool = True
 
 

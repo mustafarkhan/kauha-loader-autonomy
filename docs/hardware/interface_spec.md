@@ -71,7 +71,7 @@ The DBC is the reference. Key points:
 | Front/rear scanner OSSD pairs (protective) | in | 2 × 2 per scanner | Protective field violated | SR-02 |
 | Scanner warning outputs | in | 1 per scanner | Warning field violated | SR-03 |
 | Scanner contact-band outputs (second simultaneous field) | in | 2 per scanner | Someone or something within 0.35 m of the frame side; blocks teleop side recovery | SR-12 |
-| Front scanner under-bucket outputs, near and far | in | 2 + 2 per front scanner | Ground between the front tyres and the bucket, and under the raised bucket | SR-16 |
+| Front scanner under-bucket outputs, near, mid and far | in | 2 + 2 + 2 per front scanner | Ground between the front tyres and the bucket (near: 2.0–2.8 m; mid: 2.8–3.35 m, short of the lowered bucket's back edge), and under the raised bucket (far) | SR-16 |
 | Front scanner front-side output | in | 2 per front scanner | Beside the front frame, evaluated in every set (used while reversing) | SR-16 |
 | Boom angle | in | 2 (two independent sensors) | Bucket bottom above 1.0 m: the scan plane passes under the bucket | SR-16 |
 | Field-set select | out | 4–6 per scanner (encoded) | Selects speed/direction/sector set | SR-02, SR-10 |

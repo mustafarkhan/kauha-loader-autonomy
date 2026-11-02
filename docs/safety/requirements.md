@@ -29,7 +29,7 @@ each function, using its Annex H for wheel loaders.
 | SR-13 | Every stop, reset and recovery shall be recorded in a tamper-evident log. | — | `logger.py` hash chain | `test_sr13_*`, `test_log_detects_tampering`, scenario `test_safety_log_intact` |
 | SR-14 | While the cab door of the truck in the bay is open, the dock field set shall not be granted; if the door opens while docking, the machine shall make a protective stop that clears 3 s after the door closes. | c | Truck cab-door switch via the bay's safety radio; PLC | `test_sr14_*`, shift KPI `person_under_raised_bucket_moving_s` |
 | SR-15 | Loss of the safety PLC's relay refresh (PLC failure, cable cut) shall de-energise the brake/neutral relays and the pilot cut-off within 100 ms. | d | Fail-safe wiring: relays need power to allow motion | `tests/sil/test_processes.py::test_killing_the_safety_plc_drops_the_relays` |
-| SR-16 | Outside the dig zone, a person between the front tyres and the bucket (2.0–2.8 m ahead of the front axle, any boom position), under the raised bucket (2.8–5.1 m, bucket bottom above 1.0 m; not beside a docked truck), or beside the front frame while reversing (not beside a docked truck) shall cause a protective stop that holds the boom. Teleop recovery may only back away. | d | Under-bucket and front-side fields as simultaneous scanner fields; two-channel boom-angle sensor; PLC | `test_sr16_*`, proofs SR-16a/b/c, `tests/adversary/test_found_scenarios.py` |
+| SR-16 | Outside the dig zone, a person between the front tyres and the bucket (2.0–2.8 m ahead of the front axle, any boom position; 2.8–3.35 m, any boom position, not beside a docked truck), under the raised bucket (2.8–5.1 m, bucket bottom above 1.0 m; not beside a docked truck), or beside the front frame while reversing (not beside a docked truck) shall cause a protective stop that holds the boom. Teleop recovery may only back away. | d | Under-bucket and front-side fields as simultaneous scanner fields; two-channel boom-angle sensor; PLC | `test_sr16_*`, proofs SR-16a/b/c, `tests/adversary/test_found_scenarios.py` |
 
 ## Autonomy requirements (non-safety)
 
@@ -39,6 +39,7 @@ each function, using its Annex H for wheel loaders.
 | AR-02 | Localisation stays below 0.3 m error through a 60 s GNSS outage when ≥ 3 survey posts are visible. Dead reckoning alone shall report growing uncertainty. | `tests/autonomy/test_autonomy.py` |
 | AR-03 | Complete truck-loading V-cycles with fill factor 0.8–1.15 in the integrated twin. | `tests/scenario/test_shift_short.py` |
 | AR-04 | The autonomy limits speed so that mapped static objects (stockpiles, truck, walls, posts) stay outside the protective field the PLC will select along the path ahead, avoiding nuisance stops. | `tests/autonomy/test_autonomy.py::test_field_guard_*` |
+| AR-05 | Complete load-and-carry cycles from a stockpile to a fixed hopper about 40 m away (phase 2 task) with fill factor 0.8–1.15, without remote help in a nominal run. | `tests/scenario/test_carry_short.py`, campaign configuration `carry` |
 
 ## What these tests do not prove
 

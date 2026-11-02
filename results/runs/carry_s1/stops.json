@@ -1,0 +1,51 @@
+[
+ {
+  "t": 720.48,
+  "cause": "REMOTE_LINK",
+  "v": -0.42,
+  "objects": [],
+  "field": "rev_0.5_S"
+ },
+ {
+  "t": 1134.1,
+  "cause": "FIELD_FRONT",
+  "v": 1.0,
+  "objects": [
+   "fallen_block"
+  ],
+  "field": "fwd_1.5_S",
+  "false": false
+ },
+ {
+  "t": 1498.3,
+  "cause": "FIELD_REAR",
+  "v": -0.6,
+  "objects": [
+   "pile_A"
+  ],
+  "field": "rev_1.5_S",
+  "false": false
+ },
+ {
+  "t": 1663.8,
+  "cause": "FIELD_SIDE",
+  "v": 1.0,
+  "objects": [],
+  "field": "fwd_1.5_L2",
+  "false": true
+ },
+ {
+  "t": 2880.2,
+  "cause": "WATCHDOG",
+  "v": 1.88,
+  "objects": [],
+  "field": "fwd_2.5_R2"
+ },
+ {
+  "t": 3240.0,
+  "cause": "ESTOP_REMOTE",
+  "v": 0.86,
+  "objects": [],
+  "field": "fwd_1.5_L1"
+ }
+]

@@ -3,19 +3,19 @@
   "init": true,
   "dry/auto-restart": {
    "status": "proven",
-   "seconds": 0.407
+   "seconds": 0.508
   },
   "dry/supervisor-only": {
    "status": "proven",
-   "seconds": 0.539
+   "seconds": 0.465
   },
   "winter/auto-restart": {
    "status": "proven",
-   "seconds": 0.466
+   "seconds": 0.53
   },
   "winter/supervisor-only": {
    "status": "proven",
-   "seconds": 0.613
+   "seconds": 0.495
   }
  },
  "properties": [
@@ -25,7 +25,7 @@
    "text": "A stopped state always applies the brakes, cuts the implement and zeroes the speed limit.",
    "config": "dry/auto-restart",
    "status": "proven",
-   "seconds": 0.293
+   "seconds": 0.391
   },
   {
    "id": "SR-01a",
@@ -33,637 +33,157 @@
    "text": "A pressed e-stop (machine or remote) gives an emergency stop in the same cycle.",
    "config": "dry/auto-restart",
    "status": "proven",
-   "seconds": 0.429
+   "seconds": 0.536
   },
   {
    "id": "SR-01b",
    "req": "SR-01",
    "text": "An emergency stop is never cleared without a new supervisor reset (no automatic restart).",
    "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.006
-  },
-  {
-   "id": "SR-02a",
-   "req": "SR-02",
-   "text": "A violated front protective field of the selected set stops the machine in the same cycle, unless the front field is in supervised teleop recovery.",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.324
-  },
-  {
-   "id": "SR-02b",
-   "req": "SR-02",
-   "text": "Same for the rear protective field (reversing, or at standstill).",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.337
-  },
-  {
-   "id": "SR-02c",
-   "req": "SR-02",
-   "text": "Same for the side fields while the machine moves.",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.281
-  },
-  {
-   "id": "SR-02d",
-   "req": "SR-02",
-   "text": "A scanner fault stops the machine.",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.307
-  },
-  {
-   "id": "SR-03",
-   "req": "SR-03",
-   "text": "While the warning hold is active the speed limit is at most the warning speed.",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.314
-  },
-  {
-   "id": "SR-04a",
-   "req": "SR-04",
-   "text": "The commanded speed limit never exceeds the speed the scanners can protect.",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.384
-  },
-  {
-   "id": "SR-04b",
-   "req": "SR-04",
-   "text": "Whenever the brakes are released on a travel field set, the measured speed is within what that set's protective field can stop from.",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.338
-  },
-  {
-   "id": "SR-05",
-   "req": "SR-05",
-   "text": "Loss of the remote supervision heartbeat (> 0.5 s) in AUTO or TELEOP stops the machine.",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.37
-  },
-  {
-   "id": "SR-06",
-   "req": "SR-06",
-   "text": "A stale autonomy command (> 0.2 s) in AUTO or TELEOP stops the machine.",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.343
-  },
-  {
-   "id": "SR-07a",
-   "req": "SR-07",
-   "text": "In AUTO with a valid safety position outside the operating area, the machine stops.",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.27
-  },
-  {
-   "id": "SR-07b",
-   "req": "SR-07",
-   "text": "In AUTO, a safety position invalid for more than 2 s stops the machine.",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.25
-  },
-  {
-   "id": "SR-08",
-   "req": "SR-08",
-   "text": "The two speed channels disagreeing by more than 0.3 m/s for more than 0.2 s stops the machine.",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.258
-  },
-  {
-   "id": "SR-09",
-   "req": "SR-09",
-   "text": "A stop is only ever cleared at standstill.",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.196
-  },
-  {
-   "id": "SR-11",
-   "req": "SR-11",
-   "text": "Without a supervisor reset, only self-clearing causes (fields, truck door) restart automatically.",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.348
-  },
-  {
-   "id": "SR-10a",
-   "req": "SR-10",
-   "text": "The dig field set (front field muted) is only active when requested, inside the dig zone, with a valid position and at no more than the dig speed plus tolerance.",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.003
-  },
-  {
-   "id": "SR-10b",
-   "req": "SR-10",
-   "text": "Muting held for more than 25 s stops the machine.",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.286
-  },
-  {
-   "id": "SR-12a",
-   "req": "SR-12",
-   "text": "The implement (boom, bucket) is never enabled during recovery.",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.006
-  },
-  {
-   "id": "SR-12b",
-   "req": "SR-12",
-   "text": "During recovery from a front stop, moving forward stops the machine; from a rear stop, reversing stops it.",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.254
-  },
-  {
-   "id": "SR-12c",
-   "req": "SR-12",
-   "text": "During recovery from a side stop, an occupied contact band stops the machine (outside the access-controlled zones).",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.314
-  },
-  {
-   "id": "SR-12d",
-   "req": "SR-12",
-   "text": "Recovery exists only in TELEOP.",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.005
-  },
-  {
-   "id": "SR-12e",
-   "req": "SR-12",
-   "text": "While recovering with the brakes released, the speed limit is creep speed (0.5 m/s, 0.3 m/s for a side stop).",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.21
-  },
-  {
-   "id": "SR-13",
-   "req": "SR-13",
-   "text": "Every transition into a stop and every reset is written to the safety log.",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.246
-  },
-  {
-   "id": "SR-16a",
-   "req": "SR-16",
-   "text": "Outside the dig zone, anyone between the front tyres and the bucket (near field, any boom position) or under the raised bucket (far field, except beside a docked truck) stops travel and holds the boom, unless backing away in recovery.",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.2
-  },
-  {
-   "id": "SR-16c",
-   "req": "SR-16",
-   "text": "While reversing, anyone beside the front frame stops the machine (outside the dig zone and a docked truck), unless backing away from a side stop in recovery.",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.271
-  },
-  {
-   "id": "SR-16b",
-   "req": "SR-16",
-   "text": "During recovery from an under-bucket stop, moving forward stops the machine, and the boom stays held.",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.455
-  },
-  {
-   "id": "SR-14a",
-   "req": "SR-14",
-   "text": "The dock field set is never active while the truck's cab door is open.",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.007
-  },
-  {
-   "id": "SR-14b",
-   "req": "SR-14",
-   "text": "The cab door opening while docking in the dock zone stops the machine.",
-   "config": "dry/auto-restart",
-   "status": "proven",
-   "seconds": 0.307
-  },
-  {
-   "id": "OUT-1",
-   "req": "SR-01",
-   "text": "A stopped state always applies the brakes, cuts the implement and zeroes the speed limit.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.267
-  },
-  {
-   "id": "SR-01a",
-   "req": "SR-01",
-   "text": "A pressed e-stop (machine or remote) gives an emergency stop in the same cycle.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.49
-  },
-  {
-   "id": "SR-01b",
-   "req": "SR-01",
-   "text": "An emergency stop is never cleared without a new supervisor reset (no automatic restart).",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.274
-  },
-  {
-   "id": "SR-02a",
-   "req": "SR-02",
-   "text": "A violated front protective field of the selected set stops the machine in the same cycle, unless the front field is in supervised teleop recovery.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.376
-  },
-  {
-   "id": "SR-02b",
-   "req": "SR-02",
-   "text": "Same for the rear protective field (reversing, or at standstill).",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.262
-  },
-  {
-   "id": "SR-02c",
-   "req": "SR-02",
-   "text": "Same for the side fields while the machine moves.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.233
-  },
-  {
-   "id": "SR-02d",
-   "req": "SR-02",
-   "text": "A scanner fault stops the machine.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.312
-  },
-  {
-   "id": "SR-03",
-   "req": "SR-03",
-   "text": "While the warning hold is active the speed limit is at most the warning speed.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.306
-  },
-  {
-   "id": "SR-04a",
-   "req": "SR-04",
-   "text": "The commanded speed limit never exceeds the speed the scanners can protect.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.308
-  },
-  {
-   "id": "SR-04b",
-   "req": "SR-04",
-   "text": "Whenever the brakes are released on a travel field set, the measured speed is within what that set's protective field can stop from.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.247
-  },
-  {
-   "id": "SR-05",
-   "req": "SR-05",
-   "text": "Loss of the remote supervision heartbeat (> 0.5 s) in AUTO or TELEOP stops the machine.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.272
-  },
-  {
-   "id": "SR-06",
-   "req": "SR-06",
-   "text": "A stale autonomy command (> 0.2 s) in AUTO or TELEOP stops the machine.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.284
-  },
-  {
-   "id": "SR-07a",
-   "req": "SR-07",
-   "text": "In AUTO with a valid safety position outside the operating area, the machine stops.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.333
-  },
-  {
-   "id": "SR-07b",
-   "req": "SR-07",
-   "text": "In AUTO, a safety position invalid for more than 2 s stops the machine.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.263
-  },
-  {
-   "id": "SR-08",
-   "req": "SR-08",
-   "text": "The two speed channels disagreeing by more than 0.3 m/s for more than 0.2 s stops the machine.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.383
-  },
-  {
-   "id": "SR-09",
-   "req": "SR-09",
-   "text": "A stop is only ever cleared at standstill.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.315
-  },
-  {
-   "id": "SR-11",
-   "req": "SR-11",
-   "text": "Without a supervisor reset, only self-clearing causes (fields, truck door) restart automatically.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.302
-  },
-  {
-   "id": "SR-10a",
-   "req": "SR-10",
-   "text": "The dig field set (front field muted) is only active when requested, inside the dig zone, with a valid position and at no more than the dig speed plus tolerance.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.002
-  },
-  {
-   "id": "SR-10b",
-   "req": "SR-10",
-   "text": "Muting held for more than 25 s stops the machine.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.246
-  },
-  {
-   "id": "SR-12a",
-   "req": "SR-12",
-   "text": "The implement (boom, bucket) is never enabled during recovery.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.005
-  },
-  {
-   "id": "SR-12b",
-   "req": "SR-12",
-   "text": "During recovery from a front stop, moving forward stops the machine; from a rear stop, reversing stops it.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.416
-  },
-  {
-   "id": "SR-12c",
-   "req": "SR-12",
-   "text": "During recovery from a side stop, an occupied contact band stops the machine (outside the access-controlled zones).",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.297
-  },
-  {
-   "id": "SR-12d",
-   "req": "SR-12",
-   "text": "Recovery exists only in TELEOP.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.005
-  },
-  {
-   "id": "SR-12e",
-   "req": "SR-12",
-   "text": "While recovering with the brakes released, the speed limit is creep speed (0.5 m/s, 0.3 m/s for a side stop).",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.225
-  },
-  {
-   "id": "SR-13",
-   "req": "SR-13",
-   "text": "Every transition into a stop and every reset is written to the safety log.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.286
-  },
-  {
-   "id": "SR-16a",
-   "req": "SR-16",
-   "text": "Outside the dig zone, anyone between the front tyres and the bucket (near field, any boom position) or under the raised bucket (far field, except beside a docked truck) stops travel and holds the boom, unless backing away in recovery.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.205
-  },
-  {
-   "id": "SR-16c",
-   "req": "SR-16",
-   "text": "While reversing, anyone beside the front frame stops the machine (outside the dig zone and a docked truck), unless backing away from a side stop in recovery.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.199
-  },
-  {
-   "id": "SR-16b",
-   "req": "SR-16",
-   "text": "During recovery from an under-bucket stop, moving forward stops the machine, and the boom stays held.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.381
-  },
-  {
-   "id": "SR-14a",
-   "req": "SR-14",
-   "text": "The dock field set is never active while the truck's cab door is open.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.004
-  },
-  {
-   "id": "SR-14b",
-   "req": "SR-14",
-   "text": "The cab door opening while docking in the dock zone stops the machine.",
-   "config": "dry/supervisor-only",
-   "status": "proven",
-   "seconds": 0.338
-  },
-  {
-   "id": "OUT-1",
-   "req": "SR-01",
-   "text": "A stopped state always applies the brakes, cuts the implement and zeroes the speed limit.",
-   "config": "winter/auto-restart",
-   "status": "proven",
-   "seconds": 0.388
-  },
-  {
-   "id": "SR-01a",
-   "req": "SR-01",
-   "text": "A pressed e-stop (machine or remote) gives an emergency stop in the same cycle.",
-   "config": "winter/auto-restart",
-   "status": "proven",
-   "seconds": 0.514
-  },
-  {
-   "id": "SR-01b",
-   "req": "SR-01",
-   "text": "An emergency stop is never cleared without a new supervisor reset (no automatic restart).",
-   "config": "winter/auto-restart",
-   "status": "proven",
-   "seconds": 0.007
-  },
-  {
-   "id": "SR-02a",
-   "req": "SR-02",
-   "text": "A violated front protective field of the selected set stops the machine in the same cycle, unless the front field is in supervised teleop recovery.",
-   "config": "winter/auto-restart",
-   "status": "proven",
-   "seconds": 0.329
-  },
-  {
-   "id": "SR-02b",
-   "req": "SR-02",
-   "text": "Same for the rear protective field (reversing, or at standstill).",
-   "config": "winter/auto-restart",
-   "status": "proven",
-   "seconds": 0.378
-  },
-  {
-   "id": "SR-02c",
-   "req": "SR-02",
-   "text": "Same for the side fields while the machine moves.",
-   "config": "winter/auto-restart",
-   "status": "proven",
-   "seconds": 0.265
-  },
-  {
-   "id": "SR-02d",
-   "req": "SR-02",
-   "text": "A scanner fault stops the machine.",
-   "config": "winter/auto-restart",
-   "status": "proven",
-   "seconds": 0.298
-  },
-  {
-   "id": "SR-03",
-   "req": "SR-03",
-   "text": "While the warning hold is active the speed limit is at most the warning speed.",
-   "config": "winter/auto-restart",
-   "status": "proven",
-   "seconds": 0.339
-  },
-  {
-   "id": "SR-04a",
-   "req": "SR-04",
-   "text": "The commanded speed limit never exceeds the speed the scanners can protect.",
-   "config": "winter/auto-restart",
-   "status": "proven",
-   "seconds": 0.473
-  },
-  {
-   "id": "SR-04b",
-   "req": "SR-04",
-   "text": "Whenever the brakes are released on a travel field set, the measured speed is within what that set's protective field can stop from.",
-   "config": "winter/auto-restart",
-   "status": "proven",
-   "seconds": 0.258
-  },
-  {
-   "id": "SR-05",
-   "req": "SR-05",
-   "text": "Loss of the remote supervision heartbeat (> 0.5 s) in AUTO or TELEOP stops the machine.",
-   "config": "winter/auto-restart",
-   "status": "proven",
-   "seconds": 0.273
-  },
-  {
-   "id": "SR-06",
-   "req": "SR-06",
-   "text": "A stale autonomy command (> 0.2 s) in AUTO or TELEOP stops the machine.",
-   "config": "winter/auto-restart",
-   "status": "proven",
-   "seconds": 0.319
-  },
-  {
-   "id": "SR-07a",
-   "req": "SR-07",
-   "text": "In AUTO with a valid safety position outside the operating area, the machine stops.",
-   "config": "winter/auto-restart",
-   "status": "proven",
-   "seconds": 0.259
-  },
-  {
-   "id": "SR-07b",
-   "req": "SR-07",
-   "text": "In AUTO, a safety position invalid for more than 2 s stops the machine.",
-   "config": "winter/auto-restart",
-   "status": "proven",
-   "seconds": 0.261
-  },
-  {
-   "id": "SR-08",
-   "req": "SR-08",
-   "text": "The two speed channels disagreeing by more than 0.3 m/s for more than 0.2 s stops the machine.",
-   "config": "winter/auto-restart",
-   "status": "proven",
-   "seconds": 0.269
-  },
-  {
-   "id": "SR-09",
-   "req": "SR-09",
-   "text": "A stop is only ever cleared at standstill.",
-   "config": "winter/auto-restart",
-   "status": "proven",
-   "seconds": 0.338
-  },
-  {
-   "id": "SR-11",
-   "req": "SR-11",
-   "text": "Without a supervisor reset, only self-clearing causes (fields, truck door) restart automatically.",
-   "config": "winter/auto-restart",
-   "status": "proven",
-   "seconds": 0.547
-  },
-  {
-   "id": "SR-10a",
-   "req": "SR-10",
-   "text": "The dig field set (front field muted) is only active when requested, inside the dig zone, with a valid position and at no more than the dig speed plus tolerance.",
-   "config": "winter/auto-restart",
-   "status": "proven",
-   "seconds": 0.003
-  },
-  {
-   "id": "SR-10b",
-   "req": "SR-10",
-   "text": "Muting held for more than 25 s stops the machine.",
-   "config": "winter/auto-restart",
-   "status": "proven",
-   "seconds": 0.272
-  },
-  {
-   "id": "SR-12a",
-   "req": "SR-12",
-   "text": "The implement (boom, bucket) is never enabled during recovery.",
-   "config": "winter/auto-restart",
    "status": "proven",
    "seconds": 0.008
   },
   {
+   "id": "SR-02a",
+   "req": "SR-02",
+   "text": "A violated front protective field of the selected set stops the machine in the same cycle, unless the front field is in supervised teleop recovery.",
+   "config": "dry/auto-restart",
+   "status": "proven",
+   "seconds": 0.444
+  },
+  {
+   "id": "SR-02b",
+   "req": "SR-02",
+   "text": "Same for the rear protective field (reversing, or at standstill).",
+   "config": "dry/auto-restart",
+   "status": "proven",
+   "seconds": 0.327
+  },
+  {
+   "id": "SR-02c",
+   "req": "SR-02",
+   "text": "Same for the side fields while the machine moves.",
+   "config": "dry/auto-restart",
+   "status": "proven",
+   "seconds": 0.351
+  },
+  {
+   "id": "SR-02d",
+   "req": "SR-02",
+   "text": "A scanner fault stops the machine.",
+   "config": "dry/auto-restart",
+   "status": "proven",
+   "seconds": 0.441
+  },
+  {
+   "id": "SR-03",
+   "req": "SR-03",
+   "text": "While the warning hold is active the speed limit is at most the warning speed.",
+   "config": "dry/auto-restart",
+   "status": "proven",
+   "seconds": 0.354
+  },
+  {
+   "id": "SR-04a",
+   "req": "SR-04",
+   "text": "The commanded speed limit never exceeds the speed the scanners can protect.",
+   "config": "dry/auto-restart",
+   "status": "proven",
+   "seconds": 0.33
+  },
+  {
+   "id": "SR-04b",
+   "req": "SR-04",
+   "text": "Whenever the brakes are released on a travel field set, the measured speed is within what that set's protective field can stop from.",
+   "config": "dry/auto-restart",
+   "status": "proven",
+   "seconds": 0.347
+  },
+  {
+   "id": "SR-05",
+   "req": "SR-05",
+   "text": "Loss of the remote supervision heartbeat (> 0.5 s) in AUTO or TELEOP stops the machine.",
+   "config": "dry/auto-restart",
+   "status": "proven",
+   "seconds": 0.506
+  },
+  {
+   "id": "SR-06",
+   "req": "SR-06",
+   "text": "A stale autonomy command (> 0.2 s) in AUTO or TELEOP stops the machine.",
+   "config": "dry/auto-restart",
+   "status": "proven",
+   "seconds": 0.313
+  },
+  {
+   "id": "SR-07a",
+   "req": "SR-07",
+   "text": "In AUTO with a valid safety position outside the operating area, the machine stops.",
+   "config": "dry/auto-restart",
+   "status": "proven",
+   "seconds": 0.276
+  },
+  {
+   "id": "SR-07b",
+   "req": "SR-07",
+   "text": "In AUTO, a safety position invalid for more than 2 s stops the machine.",
+   "config": "dry/auto-restart",
+   "status": "proven",
+   "seconds": 0.314
+  },
+  {
+   "id": "SR-08",
+   "req": "SR-08",
+   "text": "The two speed channels disagreeing by more than 0.3 m/s for more than 0.2 s stops the machine.",
+   "config": "dry/auto-restart",
+   "status": "proven",
+   "seconds": 0.398
+  },
+  {
+   "id": "SR-09",
+   "req": "SR-09",
+   "text": "A stop is only ever cleared at standstill.",
+   "config": "dry/auto-restart",
+   "status": "proven",
+   "seconds": 0.291
+  },
+  {
+   "id": "SR-11",
+   "req": "SR-11",
+   "text": "Without a supervisor reset, only self-clearing causes (fields, truck door) restart automatically.",
+   "config": "dry/auto-restart",
+   "status": "proven",
+   "seconds": 0.484
+  },
+  {
+   "id": "SR-10a",
+   "req": "SR-10",
+   "text": "The dig field set (front field muted) is only active when requested, inside the dig zone, with a valid position and at no more than the dig speed plus tolerance.",
+   "config": "dry/auto-restart",
+   "status": "proven",
+   "seconds": 0.003
+  },
+  {
+   "id": "SR-10b",
+   "req": "SR-10",
+   "text": "Muting held for more than 25 s stops the machine.",
+   "config": "dry/auto-restart",
+   "status": "proven",
+   "seconds": 0.334
+  },
+  {
+   "id": "SR-12a",
+   "req": "SR-12",
+   "text": "The implement (boom, bucket) is never enabled during recovery.",
+   "config": "dry/auto-restart",
+   "status": "proven",
+   "seconds": 0.007
+  },
+  {
    "id": "SR-12b",
    "req": "SR-12",
    "text": "During recovery from a front stop, moving forward stops the machine; from a rear stop, reversing stops it.",
-   "config": "winter/auto-restart",
+   "config": "dry/auto-restart",
    "status": "proven",
    "seconds": 0.457
   },
@@ -671,15 +191,15 @@
    "id": "SR-12c",
    "req": "SR-12",
    "text": "During recovery from a side stop, an occupied contact band stops the machine (outside the access-controlled zones).",
-   "config": "winter/auto-restart",
+   "config": "dry/auto-restart",
    "status": "proven",
-   "seconds": 0.376
+   "seconds": 0.456
   },
   {
    "id": "SR-12d",
    "req": "SR-12",
    "text": "Recovery exists only in TELEOP.",
-   "config": "winter/auto-restart",
+   "config": "dry/auto-restart",
    "status": "proven",
    "seconds": 0.006
   },
@@ -687,9 +207,489 @@
    "id": "SR-12e",
    "req": "SR-12",
    "text": "While recovering with the brakes released, the speed limit is creep speed (0.5 m/s, 0.3 m/s for a side stop).",
+   "config": "dry/auto-restart",
+   "status": "proven",
+   "seconds": 0.384
+  },
+  {
+   "id": "SR-13",
+   "req": "SR-13",
+   "text": "Every transition into a stop and every reset is written to the safety log.",
+   "config": "dry/auto-restart",
+   "status": "proven",
+   "seconds": 0.624
+  },
+  {
+   "id": "SR-16a",
+   "req": "SR-16",
+   "text": "Outside the dig zone, anyone between the front tyres and the bucket (near field at any boom position; mid field at any boom position, except beside a docked truck) or under the raised bucket (far field, except beside a docked truck) stops travel and holds the boom, unless backing away in recovery.",
+   "config": "dry/auto-restart",
+   "status": "proven",
+   "seconds": 0.316
+  },
+  {
+   "id": "SR-16c",
+   "req": "SR-16",
+   "text": "While reversing, anyone beside the front frame stops the machine (outside the dig zone and a docked truck), unless backing away from a side stop in recovery.",
+   "config": "dry/auto-restart",
+   "status": "proven",
+   "seconds": 0.359
+  },
+  {
+   "id": "SR-16b",
+   "req": "SR-16",
+   "text": "During recovery from an under-bucket stop, moving forward stops the machine, and the boom stays held.",
+   "config": "dry/auto-restart",
+   "status": "proven",
+   "seconds": 0.447
+  },
+  {
+   "id": "SR-14a",
+   "req": "SR-14",
+   "text": "The dock field set is never active while the truck's cab door is open.",
+   "config": "dry/auto-restart",
+   "status": "proven",
+   "seconds": 0.004
+  },
+  {
+   "id": "SR-14b",
+   "req": "SR-14",
+   "text": "The cab door opening while docking in the dock zone stops the machine.",
+   "config": "dry/auto-restart",
+   "status": "proven",
+   "seconds": 0.549
+  },
+  {
+   "id": "OUT-1",
+   "req": "SR-01",
+   "text": "A stopped state always applies the brakes, cuts the implement and zeroes the speed limit.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.293
+  },
+  {
+   "id": "SR-01a",
+   "req": "SR-01",
+   "text": "A pressed e-stop (machine or remote) gives an emergency stop in the same cycle.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.439
+  },
+  {
+   "id": "SR-01b",
+   "req": "SR-01",
+   "text": "An emergency stop is never cleared without a new supervisor reset (no automatic restart).",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.272
+  },
+  {
+   "id": "SR-02a",
+   "req": "SR-02",
+   "text": "A violated front protective field of the selected set stops the machine in the same cycle, unless the front field is in supervised teleop recovery.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.389
+  },
+  {
+   "id": "SR-02b",
+   "req": "SR-02",
+   "text": "Same for the rear protective field (reversing, or at standstill).",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.393
+  },
+  {
+   "id": "SR-02c",
+   "req": "SR-02",
+   "text": "Same for the side fields while the machine moves.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.308
+  },
+  {
+   "id": "SR-02d",
+   "req": "SR-02",
+   "text": "A scanner fault stops the machine.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.38
+  },
+  {
+   "id": "SR-03",
+   "req": "SR-03",
+   "text": "While the warning hold is active the speed limit is at most the warning speed.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.339
+  },
+  {
+   "id": "SR-04a",
+   "req": "SR-04",
+   "text": "The commanded speed limit never exceeds the speed the scanners can protect.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.453
+  },
+  {
+   "id": "SR-04b",
+   "req": "SR-04",
+   "text": "Whenever the brakes are released on a travel field set, the measured speed is within what that set's protective field can stop from.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.318
+  },
+  {
+   "id": "SR-05",
+   "req": "SR-05",
+   "text": "Loss of the remote supervision heartbeat (> 0.5 s) in AUTO or TELEOP stops the machine.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.365
+  },
+  {
+   "id": "SR-06",
+   "req": "SR-06",
+   "text": "A stale autonomy command (> 0.2 s) in AUTO or TELEOP stops the machine.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.347
+  },
+  {
+   "id": "SR-07a",
+   "req": "SR-07",
+   "text": "In AUTO with a valid safety position outside the operating area, the machine stops.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.294
+  },
+  {
+   "id": "SR-07b",
+   "req": "SR-07",
+   "text": "In AUTO, a safety position invalid for more than 2 s stops the machine.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.305
+  },
+  {
+   "id": "SR-08",
+   "req": "SR-08",
+   "text": "The two speed channels disagreeing by more than 0.3 m/s for more than 0.2 s stops the machine.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.302
+  },
+  {
+   "id": "SR-09",
+   "req": "SR-09",
+   "text": "A stop is only ever cleared at standstill.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.299
+  },
+  {
+   "id": "SR-11",
+   "req": "SR-11",
+   "text": "Without a supervisor reset, only self-clearing causes (fields, truck door) restart automatically.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.336
+  },
+  {
+   "id": "SR-10a",
+   "req": "SR-10",
+   "text": "The dig field set (front field muted) is only active when requested, inside the dig zone, with a valid position and at no more than the dig speed plus tolerance.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.003
+  },
+  {
+   "id": "SR-10b",
+   "req": "SR-10",
+   "text": "Muting held for more than 25 s stops the machine.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.357
+  },
+  {
+   "id": "SR-12a",
+   "req": "SR-12",
+   "text": "The implement (boom, bucket) is never enabled during recovery.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.006
+  },
+  {
+   "id": "SR-12b",
+   "req": "SR-12",
+   "text": "During recovery from a front stop, moving forward stops the machine; from a rear stop, reversing stops it.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.412
+  },
+  {
+   "id": "SR-12c",
+   "req": "SR-12",
+   "text": "During recovery from a side stop, an occupied contact band stops the machine (outside the access-controlled zones).",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.414
+  },
+  {
+   "id": "SR-12d",
+   "req": "SR-12",
+   "text": "Recovery exists only in TELEOP.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.007
+  },
+  {
+   "id": "SR-12e",
+   "req": "SR-12",
+   "text": "While recovering with the brakes released, the speed limit is creep speed (0.5 m/s, 0.3 m/s for a side stop).",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.42
+  },
+  {
+   "id": "SR-13",
+   "req": "SR-13",
+   "text": "Every transition into a stop and every reset is written to the safety log.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.379
+  },
+  {
+   "id": "SR-16a",
+   "req": "SR-16",
+   "text": "Outside the dig zone, anyone between the front tyres and the bucket (near field at any boom position; mid field at any boom position, except beside a docked truck) or under the raised bucket (far field, except beside a docked truck) stops travel and holds the boom, unless backing away in recovery.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.35
+  },
+  {
+   "id": "SR-16c",
+   "req": "SR-16",
+   "text": "While reversing, anyone beside the front frame stops the machine (outside the dig zone and a docked truck), unless backing away from a side stop in recovery.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.323
+  },
+  {
+   "id": "SR-16b",
+   "req": "SR-16",
+   "text": "During recovery from an under-bucket stop, moving forward stops the machine, and the boom stays held.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.424
+  },
+  {
+   "id": "SR-14a",
+   "req": "SR-14",
+   "text": "The dock field set is never active while the truck's cab door is open.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.003
+  },
+  {
+   "id": "SR-14b",
+   "req": "SR-14",
+   "text": "The cab door opening while docking in the dock zone stops the machine.",
+   "config": "dry/supervisor-only",
+   "status": "proven",
+   "seconds": 0.317
+  },
+  {
+   "id": "OUT-1",
+   "req": "SR-01",
+   "text": "A stopped state always applies the brakes, cuts the implement and zeroes the speed limit.",
    "config": "winter/auto-restart",
    "status": "proven",
-   "seconds": 0.518
+   "seconds": 0.318
+  },
+  {
+   "id": "SR-01a",
+   "req": "SR-01",
+   "text": "A pressed e-stop (machine or remote) gives an emergency stop in the same cycle.",
+   "config": "winter/auto-restart",
+   "status": "proven",
+   "seconds": 0.559
+  },
+  {
+   "id": "SR-01b",
+   "req": "SR-01",
+   "text": "An emergency stop is never cleared without a new supervisor reset (no automatic restart).",
+   "config": "winter/auto-restart",
+   "status": "proven",
+   "seconds": 0.007
+  },
+  {
+   "id": "SR-02a",
+   "req": "SR-02",
+   "text": "A violated front protective field of the selected set stops the machine in the same cycle, unless the front field is in supervised teleop recovery.",
+   "config": "winter/auto-restart",
+   "status": "proven",
+   "seconds": 0.34
+  },
+  {
+   "id": "SR-02b",
+   "req": "SR-02",
+   "text": "Same for the rear protective field (reversing, or at standstill).",
+   "config": "winter/auto-restart",
+   "status": "proven",
+   "seconds": 0.429
+  },
+  {
+   "id": "SR-02c",
+   "req": "SR-02",
+   "text": "Same for the side fields while the machine moves.",
+   "config": "winter/auto-restart",
+   "status": "proven",
+   "seconds": 0.329
+  },
+  {
+   "id": "SR-02d",
+   "req": "SR-02",
+   "text": "A scanner fault stops the machine.",
+   "config": "winter/auto-restart",
+   "status": "proven",
+   "seconds": 0.472
+  },
+  {
+   "id": "SR-03",
+   "req": "SR-03",
+   "text": "While the warning hold is active the speed limit is at most the warning speed.",
+   "config": "winter/auto-restart",
+   "status": "proven",
+   "seconds": 0.325
+  },
+  {
+   "id": "SR-04a",
+   "req": "SR-04",
+   "text": "The commanded speed limit never exceeds the speed the scanners can protect.",
+   "config": "winter/auto-restart",
+   "status": "proven",
+   "seconds": 0.38
+  },
+  {
+   "id": "SR-04b",
+   "req": "SR-04",
+   "text": "Whenever the brakes are released on a travel field set, the measured speed is within what that set's protective field can stop from.",
+   "config": "winter/auto-restart",
+   "status": "proven",
+   "seconds": 0.303
+  },
+  {
+   "id": "SR-05",
+   "req": "SR-05",
+   "text": "Loss of the remote supervision heartbeat (> 0.5 s) in AUTO or TELEOP stops the machine.",
+   "config": "winter/auto-restart",
+   "status": "proven",
+   "seconds": 0.313
+  },
+  {
+   "id": "SR-06",
+   "req": "SR-06",
+   "text": "A stale autonomy command (> 0.2 s) in AUTO or TELEOP stops the machine.",
+   "config": "winter/auto-restart",
+   "status": "proven",
+   "seconds": 0.314
+  },
+  {
+   "id": "SR-07a",
+   "req": "SR-07",
+   "text": "In AUTO with a valid safety position outside the operating area, the machine stops.",
+   "config": "winter/auto-restart",
+   "status": "proven",
+   "seconds": 0.278
+  },
+  {
+   "id": "SR-07b",
+   "req": "SR-07",
+   "text": "In AUTO, a safety position invalid for more than 2 s stops the machine.",
+   "config": "winter/auto-restart",
+   "status": "proven",
+   "seconds": 0.285
+  },
+  {
+   "id": "SR-08",
+   "req": "SR-08",
+   "text": "The two speed channels disagreeing by more than 0.3 m/s for more than 0.2 s stops the machine.",
+   "config": "winter/auto-restart",
+   "status": "proven",
+   "seconds": 0.316
+  },
+  {
+   "id": "SR-09",
+   "req": "SR-09",
+   "text": "A stop is only ever cleared at standstill.",
+   "config": "winter/auto-restart",
+   "status": "proven",
+   "seconds": 0.405
+  },
+  {
+   "id": "SR-11",
+   "req": "SR-11",
+   "text": "Without a supervisor reset, only self-clearing causes (fields, truck door) restart automatically.",
+   "config": "winter/auto-restart",
+   "status": "proven",
+   "seconds": 0.37
+  },
+  {
+   "id": "SR-10a",
+   "req": "SR-10",
+   "text": "The dig field set (front field muted) is only active when requested, inside the dig zone, with a valid position and at no more than the dig speed plus tolerance.",
+   "config": "winter/auto-restart",
+   "status": "proven",
+   "seconds": 0.003
+  },
+  {
+   "id": "SR-10b",
+   "req": "SR-10",
+   "text": "Muting held for more than 25 s stops the machine.",
+   "config": "winter/auto-restart",
+   "status": "proven",
+   "seconds": 0.356
+  },
+  {
+   "id": "SR-12a",
+   "req": "SR-12",
+   "text": "The implement (boom, bucket) is never enabled during recovery.",
+   "config": "winter/auto-restart",
+   "status": "proven",
+   "seconds": 0.006
+  },
+  {
+   "id": "SR-12b",
+   "req": "SR-12",
+   "text": "During recovery from a front stop, moving forward stops the machine; from a rear stop, reversing stops it.",
+   "config": "winter/auto-restart",
+   "status": "proven",
+   "seconds": 0.468
+  },
+  {
+   "id": "SR-12c",
+   "req": "SR-12",
+   "text": "During recovery from a side stop, an occupied contact band stops the machine (outside the access-controlled zones).",
+   "config": "winter/auto-restart",
+   "status": "proven",
+   "seconds": 0.441
+  },
+  {
+   "id": "SR-12d",
+   "req": "SR-12",
+   "text": "Recovery exists only in TELEOP.",
+   "config": "winter/auto-restart",
+   "status": "proven",
+   "seconds": 0.008
+  },
+  {
+   "id": "SR-12e",
+   "req": "SR-12",
+   "text": "While recovering with the brakes released, the speed limit is creep speed (0.5 m/s, 0.3 m/s for a side stop).",
+   "config": "winter/auto-restart",
+   "status": "proven",
+   "seconds": 0.392
   },
   {
    "id": "SR-13",
@@ -697,15 +697,15 @@
    "text": "Every transition into a stop and every reset is written to the safety log.",
    "config": "winter/auto-restart",
    "status": "proven",
-   "seconds": 0.309
+   "seconds": 0.355
   },
   {
    "id": "SR-16a",
    "req": "SR-16",
-   "text": "Outside the dig zone, anyone between the front tyres and the bucket (near field, any boom position) or under the raised bucket (far field, except beside a docked truck) stops travel and holds the boom, unless backing away in recovery.",
+   "text": "Outside the dig zone, anyone between the front tyres and the bucket (near field at any boom position; mid field at any boom position, except beside a docked truck) or under the raised bucket (far field, except beside a docked truck) stops travel and holds the boom, unless backing away in recovery.",
    "config": "winter/auto-restart",
    "status": "proven",
-   "seconds": 0.253
+   "seconds": 0.296
   },
   {
    "id": "SR-16c",
@@ -713,7 +713,7 @@
    "text": "While reversing, anyone beside the front frame stops the machine (outside the dig zone and a docked truck), unless backing away from a side stop in recovery.",
    "config": "winter/auto-restart",
    "status": "proven",
-   "seconds": 0.28
+   "seconds": 0.303
   },
   {
    "id": "SR-16b",
@@ -721,7 +721,7 @@
    "text": "During recovery from an under-bucket stop, moving forward stops the machine, and the boom stays held.",
    "config": "winter/auto-restart",
    "status": "proven",
-   "seconds": 0.391
+   "seconds": 0.369
   },
   {
    "id": "SR-14a",
@@ -737,7 +737,7 @@
    "text": "The cab door opening while docking in the dock zone stops the machine.",
    "config": "winter/auto-restart",
    "status": "proven",
-   "seconds": 0.378
+   "seconds": 0.307
   },
   {
    "id": "OUT-1",
@@ -745,7 +745,7 @@
    "text": "A stopped state always applies the brakes, cuts the implement and zeroes the speed limit.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.26
+   "seconds": 0.307
   },
   {
    "id": "SR-01a",
@@ -753,7 +753,7 @@
    "text": "A pressed e-stop (machine or remote) gives an emergency stop in the same cycle.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.438
+   "seconds": 0.574
   },
   {
    "id": "SR-01b",
@@ -761,7 +761,7 @@
    "text": "An emergency stop is never cleared without a new supervisor reset (no automatic restart).",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.189
+   "seconds": 0.252
   },
   {
    "id": "SR-02a",
@@ -769,7 +769,7 @@
    "text": "A violated front protective field of the selected set stops the machine in the same cycle, unless the front field is in supervised teleop recovery.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.257
+   "seconds": 0.356
   },
   {
    "id": "SR-02b",
@@ -777,7 +777,7 @@
    "text": "Same for the rear protective field (reversing, or at standstill).",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.28
+   "seconds": 0.413
   },
   {
    "id": "SR-02c",
@@ -785,7 +785,7 @@
    "text": "Same for the side fields while the machine moves.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.3
+   "seconds": 0.402
   },
   {
    "id": "SR-02d",
@@ -793,7 +793,7 @@
    "text": "A scanner fault stops the machine.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.298
+   "seconds": 0.429
   },
   {
    "id": "SR-03",
@@ -801,7 +801,7 @@
    "text": "While the warning hold is active the speed limit is at most the warning speed.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.286
+   "seconds": 0.388
   },
   {
    "id": "SR-04a",
@@ -809,7 +809,7 @@
    "text": "The commanded speed limit never exceeds the speed the scanners can protect.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.385
+   "seconds": 0.311
   },
   {
    "id": "SR-04b",
@@ -817,7 +817,7 @@
    "text": "Whenever the brakes are released on a travel field set, the measured speed is within what that set's protective field can stop from.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.294
+   "seconds": 0.412
   },
   {
    "id": "SR-05",
@@ -825,7 +825,7 @@
    "text": "Loss of the remote supervision heartbeat (> 0.5 s) in AUTO or TELEOP stops the machine.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.287
+   "seconds": 0.34
   },
   {
    "id": "SR-06",
@@ -833,7 +833,7 @@
    "text": "A stale autonomy command (> 0.2 s) in AUTO or TELEOP stops the machine.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.275
+   "seconds": 0.326
   },
   {
    "id": "SR-07a",
@@ -841,7 +841,7 @@
    "text": "In AUTO with a valid safety position outside the operating area, the machine stops.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.219
+   "seconds": 0.298
   },
   {
    "id": "SR-07b",
@@ -849,7 +849,7 @@
    "text": "In AUTO, a safety position invalid for more than 2 s stops the machine.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.302
+   "seconds": 0.285
   },
   {
    "id": "SR-08",
@@ -857,7 +857,7 @@
    "text": "The two speed channels disagreeing by more than 0.3 m/s for more than 0.2 s stops the machine.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.276
+   "seconds": 0.283
   },
   {
    "id": "SR-09",
@@ -865,7 +865,7 @@
    "text": "A stop is only ever cleared at standstill.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.24
+   "seconds": 0.287
   },
   {
    "id": "SR-11",
@@ -873,7 +873,7 @@
    "text": "Without a supervisor reset, only self-clearing causes (fields, truck door) restart automatically.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.316
+   "seconds": 0.403
   },
   {
    "id": "SR-10a",
@@ -889,7 +889,7 @@
    "text": "Muting held for more than 25 s stops the machine.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.25
+   "seconds": 0.418
   },
   {
    "id": "SR-12a",
@@ -897,7 +897,7 @@
    "text": "The implement (boom, bucket) is never enabled during recovery.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.006
+   "seconds": 0.005
   },
   {
    "id": "SR-12b",
@@ -905,7 +905,7 @@
    "text": "During recovery from a front stop, moving forward stops the machine; from a rear stop, reversing stops it.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.44
+   "seconds": 0.379
   },
   {
    "id": "SR-12c",
@@ -913,7 +913,7 @@
    "text": "During recovery from a side stop, an occupied contact band stops the machine (outside the access-controlled zones).",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.311
+   "seconds": 0.37
   },
   {
    "id": "SR-12d",
@@ -921,7 +921,7 @@
    "text": "Recovery exists only in TELEOP.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.006
+   "seconds": 0.007
   },
   {
    "id": "SR-12e",
@@ -929,7 +929,7 @@
    "text": "While recovering with the brakes released, the speed limit is creep speed (0.5 m/s, 0.3 m/s for a side stop).",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.317
+   "seconds": 0.346
   },
   {
    "id": "SR-13",
@@ -937,15 +937,15 @@
    "text": "Every transition into a stop and every reset is written to the safety log.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.312
+   "seconds": 0.455
   },
   {
    "id": "SR-16a",
    "req": "SR-16",
-   "text": "Outside the dig zone, anyone between the front tyres and the bucket (near field, any boom position) or under the raised bucket (far field, except beside a docked truck) stops travel and holds the boom, unless backing away in recovery.",
+   "text": "Outside the dig zone, anyone between the front tyres and the bucket (near field at any boom position; mid field at any boom position, except beside a docked truck) or under the raised bucket (far field, except beside a docked truck) stops travel and holds the boom, unless backing away in recovery.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.278
+   "seconds": 0.33
   },
   {
    "id": "SR-16c",
@@ -953,7 +953,7 @@
    "text": "While reversing, anyone beside the front frame stops the machine (outside the dig zone and a docked truck), unless backing away from a side stop in recovery.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.24
+   "seconds": 0.33
   },
   {
    "id": "SR-16b",
@@ -961,7 +961,7 @@
    "text": "During recovery from an under-bucket stop, moving forward stops the machine, and the boom stays held.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.337
+   "seconds": 0.413
   },
   {
    "id": "SR-14a",
@@ -969,7 +969,7 @@
    "text": "The dock field set is never active while the truck's cab door is open.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.003
+   "seconds": 0.004
   },
   {
    "id": "SR-14b",
@@ -977,7 +977,7 @@
    "text": "The cab door opening while docking in the dock zone stops the machine.",
    "config": "winter/supervisor-only",
    "status": "proven",
-   "seconds": 0.595
+   "seconds": 0.362
   }
  ],
  "configs": [

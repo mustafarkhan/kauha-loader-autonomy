@@ -20,7 +20,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
       - name: Lint
-        run: ruff check kauha tests
+        run: ruff check kauha tests ros2
       - name: Tests with requirement traceability
         env:
           KAUHA_TRACE: results/traceability.json
@@ -30,7 +30,7 @@ jobs:
           python - <<'PY'
           import json, sys
           m = json.load(open("results/traceability.json"))
-          need = [f"SR-{i:02d}" for i in range(1, 17)] + ["AR-01", "AR-02", "AR-03", "AR-04"]
+          need = [f"SR-{i:02d}" for i in range(1, 17)] + ["AR-01", "AR-02", "AR-03", "AR-04", "AR-05"]
           missing = [r for r in need if r not in m or not m[r]["all_passed"]]
           print("requirements covered:", len(m))
           sys.exit(f"uncovered or failing: {missing}" if missing else 0)
@@ -48,3 +48,27 @@ jobs:
             results/verification.json
             results/safety_case.json
             docs/results/safety_case.html
+
+  ros2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-file: ros2/environment.yml
+          cache-environment: true
+      - name: Build the ROS 2 workspace
+        shell: bash -el {0}
+        run: |
+          pip install --no-deps -e .
+          cd ros2 && colcon build
+      - name: ROS 2 tests (URDF geometry, twin bridge, ROS-driven SIL over CAN)
+        shell: bash -el {0}
+        env:
+          PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
+          ROS_AUTOMATIC_DISCOVERY_RANGE: LOCALHOST
+        run: |
+          source ros2/install/setup.bash
+          cd ros2/kauha_ros && python -m pytest -q -p no:cacheprovider test/
+

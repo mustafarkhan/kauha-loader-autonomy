@@ -43,6 +43,8 @@ AREA = (-4.0, 69.0, -31.0, 29.0)                     # x0, x1, y0, y1 inside the
 DIG_ZONES = [(40, 75, -9.5, 0.0), (40, 75, 0.0, 10.5)]
 DOCK_ZONE = (33, 47, -16.6, -8.0)
 TRUCK = (35.5, 44.5, -19.25, -16.75)
+# per task: (dump target footprint, its dock zone); the carry site has a hopper instead of the truck bay
+TARGETS = {"truck": (TRUCK, DOCK_ZONE), "carry": ((5.0, 11.0, -19.5, -16.5), (1.0, 15.0, -16.6, -8.0))}
 PILES = [(50, 69, -7.5, -1.5), (50, 69, 1.5, 7.5)]   # standing on a stockpile is not walking
 
 
@@ -87,11 +89,12 @@ def _inside(p, box):
     return box[0] <= p[0] <= box[1] and box[2] <= p[1] <= box[3]
 
 
-def route_violation(sc: Scenario, mode: str) -> float:
+def route_violation(sc: Scenario, mode: str, task: str = "truck") -> float:
     """How far the route goes where this mode does not allow people (0 = allowed)."""
     pts = [sc.start, sc.wp1, sc.wp2]
     bad = 0.0
-    forbidden = [TRUCK] + PILES + (DIG_ZONES + [DOCK_ZONE] if mode == "rules-kept" else [])
+    target, dock = TARGETS[task]
+    forbidden = [target] + PILES + (DIG_ZONES + [dock] if mode == "rules-kept" else [])
     for a, b in zip(pts, pts[1:]):
         for u in np.linspace(0, 1, 30):
             p = (a[0] + u * (b[0] - a[0]), a[1] + u * (b[1] - a[1]))
@@ -105,15 +108,16 @@ def route_violation(sc: Scenario, mode: str) -> float:
 
 def episode(args: tuple) -> dict:
     """Run one episode; returns the clearance metrics for the adversary."""
-    x, mode, controller, seed = args
+    x, mode, controller, seed, *rest = args
+    task = rest[0] if rest else "truck"
     from kauha.demo.shift import ShiftSim
     sc = decode(np.asarray(x))
-    viol = route_violation(sc, mode)
+    viol = route_violation(sc, mode, task)
     res = {"scenario": asdict(sc), "violation": round(viol, 3)}
     if viol > 0:
         res.update(objective=5.0 + viol, min_clearance_moving_m=None)
         return res
-    sim = ShiftSim(controller, EPISODE_S / 60.0, seed=seed)
+    sim = ShiftSim(controller, EPISODE_S / 60.0, seed=seed, task=task)
     sim.site.people = [sc.person()]
     sim.site.events = sc.events()
     sim.obstacles = []
@@ -128,14 +132,15 @@ def episode(args: tuple) -> dict:
     return res
 
 
-def search(mode: str, budget: int, workers: int, controller: str, seed: int, popsize: int = 8) -> dict:
+def search(mode: str, budget: int, workers: int, controller: str, seed: int, popsize: int = 8,
+           task: str = "truck") -> dict:
     import cma
     rng = np.random.default_rng(seed)
     log: list[dict] = []
     pool = ProcessPoolExecutor(workers)
 
     def evaluate(xs, method):
-        out = list(pool.map(episode, [(list(map(float, x)), mode, controller, seed) for x in xs]))
+        out = list(pool.map(episode, [(list(map(float, x)), mode, controller, seed, task) for x in xs]))
         for x, r in zip(xs, out):
             r.update(method=method, x=[round(float(v), 4) for v in x], n=len(log))
             log.append(r)
@@ -157,7 +162,7 @@ def search(mode: str, budget: int, workers: int, controller: str, seed: int, pop
         rs = [r for r in log if r["method"] == method and r.get("min_clearance_moving_m") is not None]
         return min(rs, key=lambda r: r["objective"]) if rs else None
     valid = [r for r in log if r.get("min_clearance_moving_m") is not None]
-    return {"mode": mode, "controller": controller, "budget": budget, "episode_s": EPISODE_S,
+    return {"mode": mode, "task": task, "controller": controller, "budget": budget, "episode_s": EPISODE_S,
             "wall_s": round(time.time() - t0, 1), "valid_episodes": len(valid),
             "contacts": sum(r["min_clearance_moving_m"] < 0.0 for r in valid),
             "field_entries_while_moving": sum(r["field_entries_moving"] > 0 for r in valid),
@@ -171,10 +176,11 @@ def main() -> None:
     ap.add_argument("--workers", type=int, default=2)
     ap.add_argument("--controller", default="learned")
     ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument("--task", choices=("truck", "carry"), default="truck")
     ap.add_argument("--out", type=Path, default=None)
     a = ap.parse_args()
-    rep = search(a.mode, a.budget, a.workers, a.controller, a.seed)
-    out = a.out or REPO_ROOT / "results" / f"adversary_{a.mode}.json"
+    rep = search(a.mode, a.budget, a.workers, a.controller, a.seed, task=a.task)
+    out = a.out or REPO_ROOT / "results" / f"adversary_{a.mode}{'' if a.task == 'truck' else '_' + a.task}.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(rep, indent=1))
     for k in ("best_random", "best_cma"):
