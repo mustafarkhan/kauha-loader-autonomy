@@ -55,6 +55,8 @@ def main() -> None:
     a = ap.parse_args()
     data = build(a.run)
     page = TEMPLATE.read_text().replace("/*__DATA__*/null", json.dumps(data, separators=(",", ":")))
+    if data.get("site", {}).get("target_kind") == "hopper":
+        page = page.replace("<title>KAUHA 3D Shift Replay</title>", "<title>KAUHA 3D Load-and-Carry Replay</title>", 1)
     a.out.parent.mkdir(parents=True, exist_ok=True)
     a.out.write_text(page)
     print(f"wrote {a.out} ({a.out.stat().st_size / 1e6:.2f} MB, {len(data['frames'])} frames)")
