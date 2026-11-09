@@ -299,10 +299,14 @@ function start() {
     }
     let exShown = 0;
     function frame(now) {
+      if (!window.KAUHA.hold) draw(now);      // hold: a scripted recorder calls KAUHA.draw() itself
+      requestAnimationFrame(frame);
+    }
+    function draw(now) {
       resize();
       if (cycle) { const [a, b, k] = cyclePose((now - t0) / 1000 * (window.KAUHA.speed || 1)); setPose(a, b, k); }
       if (spin && !reduce) root.rotation.y += 0.0035;
-      exShown += (exploded - exShown) * 0.18;
+      exShown += (exploded - exShown) * (window.KAUHA.hold ? 1 : 0.18);
       for (const m of meshes) {
         const p = info[m.userData.part];
         m.visible = chanOn[p.channel] && !(p.channel === "machine" && machineMode === "off");
@@ -312,8 +316,8 @@ function start() {
       }
       for (const f of fans) f.visible = fieldsOn && chanOn.safety && exShown < 0.05;
       controls.update(); renderer.render(scene, camera);
-      requestAnimationFrame(frame);
     }
+    window.KAUHA.draw = () => draw(performance.now());
     requestAnimationFrame(frame);
     window.KAUHA.ready = true;
   }, (err) => { $("load").textContent = "The model could not be read: " + err.message; });
