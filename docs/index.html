@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KAUHA Demos</title>
+<meta name="description" content="Autonomy retrofit kit for articulated wheel loaders: live demos of the digital twin, concept CAD, remote console and safety case.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap">
+<style>
+/* A plain index sheet: the project line, then one row per demo with what it shows and what it is built from. */
+:root { --bg: #f4f5f2; --panel: #ffffff; --ink: #1d232b; --muted: #4d5763; --line: #c9ced5; --machine: #c98f0a; --safety: #c53a2a; --link: #1f5fbf;
+  --display: "Barlow Condensed", "Arial Narrow", sans-serif; --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace; color-scheme: light; }
+@media (prefers-color-scheme: dark) { :root { --bg: #12161a; --panel: #1a2026; --ink: #e5e8ec; --muted: #9aa4b0; --line: #313a44; --machine: #e2a312; --safety: #ef6a5a; --link: #7fa8f0; color-scheme: dark; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 var(--body); }
+.wrap { max-width: 980px; margin: 0 auto; padding-block: 48px 64px; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); display: grid; gap: 28px; }
+.eyebrow { font: 500 13px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { font: 700 clamp(44px, 8vw, 76px)/.95 var(--display); margin: 10px 0 0; letter-spacing: .01em; text-wrap: balance; }
+.lede { font-size: 19px; color: var(--muted); max-width: 66ch; margin: 0; }
+.note { border-left: 3px solid var(--machine); padding: 2px 0 2px 14px; color: var(--muted); font-size: 15px; max-width: 70ch; }
+.list { display: grid; border-top: 2px solid var(--ink); }
+a.row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto; gap: 8px 24px; align-items: baseline; padding: 18px 4px; border-bottom: 1px solid var(--line); color: var(--ink); text-decoration: none; }
+a.row:hover h2, a.row:focus-visible h2 { color: var(--link); }
+a.row:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+.row h2 { font: 700 28px/1.05 var(--display); margin: 0; letter-spacing: .01em; }
+.row p { margin: 0; color: var(--muted); font-size: 15px; }
+.row span { font: 12px var(--mono); color: var(--muted); white-space: nowrap; }
+.foot { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; font: 13px var(--mono); color: var(--muted); }
+.foot a { color: var(--link); }
+@media (max-width: 680px) { a.row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">KAUHA · autonomy retrofit for articulated wheel loaders</div>
+    <h1>Live demos</h1>
+  </header>
+  <p class="lede">A bolt-on kit that lets a 15.5 t loader load trucks and hoppers on its own, with one remote supervisor for several machines. Each page below runs in the browser from data the repository generates.</p>
+  <p class="note">Design and simulation stage. Every figure comes from the digital twin; no hardware has been built.</p>
+  <nav class="list" aria-label="Demos">
+    <a class="row" href="results/kauha_3d.html"><h2>3D shift replay</h2><p>A simulated 60-minute truck-loading shift with the safety fields drawn as the scanners see them.</p><span>three.js</span></a>
+    <a class="row" href="results/kauha_3d_carry.html"><h2>Load-and-carry replay</h2><p>The same stack carrying from a stockpile to a hopper that drains at the feeder rate.</p><span>three.js</span></a>
+    <a class="row" href="results/kauha_cad.html"><h2>Kit CAD viewer</h2><p>The 32-part kit on the loader: explode it, move the joints, play a work cycle, inspect each part.</p><span>CadQuery · GLB</span></a>
+    <a class="row" href="results/kauha_console.html"><h2>Supervisor console</h2><p>Prototype of the remote station: three machines, requests, a 360° view, stop authority and teleop.</p><span>prototype</span></a>
+    <a class="row" href="results/safety_case.html"><h2>Safety case</h2><p>The GSN argument generated from the hazard list, with proofs, tests, shifts and searches as evidence.</p><span>generated in CI</span></a>
+    <a class="row" href="results/kauha_shift.html"><h2>Shift report</h2><p>2D replay with KPIs, every stop, and the learned bucket against the tuned rule set.</p><span>KPIs</span></a>
+  </nav>
+  <div class="foot">
+    <span>Mustafa R. Khan</span>
+    <a href="https://github.com/mustafarkhan/kauha-loader-autonomy">Source and results on GitHub</a>
+  </div>
+</div>
+</body>
+</html>
