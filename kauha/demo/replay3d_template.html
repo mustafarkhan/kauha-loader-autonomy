@@ -364,7 +364,7 @@ function init3d() {
   new MutationObserver(recolor).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
   recolor(); resize();
   R3 = { update }; update(T); setCam("follow");
-  window.KAUHA3D = { camera, controls, render, setCam };   // for scripted filming
+  window.KAUHA3D = { camera, controls, render, setCam, renderer };   // for scripted filming
   (function tick() { if (cam !== "follow" || playing) controls.update(); requestAnimationFrame(tick); })();
 }
 

@@ -231,7 +231,7 @@ function start() {
     canvas.addEventListener("pointerup", (ev) => {
       if (down && Math.hypot(ev.clientX - down[0], ev.clientY - down[1]) < 5) select(pick(ev));
     });
-    window.KAUHA = { select: (n) => select(n), setPose, setExplode: (v) => { $("s-exp").value = v; $("s-exp").dispatchEvent(new Event("input")); },
+    window.KAUHA = { renderer, sun, select: (n) => select(n), setPose, setExplode: (v) => { $("s-exp").value = v; $("s-exp").dispatchEvent(new Event("input")); },
       setMachine: (m) => $("m-" + m).click(), view: (v) => setView(v), camera, controls, fields: (on) => { fieldsOn = on; } , cycle: (on) => { cycle = on; t0 = performance.now(); } };
 
     function select(nm) {
