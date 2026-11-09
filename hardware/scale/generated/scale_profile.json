@@ -1,0 +1,423 @@
+{
+  "scale": 8.0,
+  "laws": "Froude: L/k, v and t /sqrt(k), m and F /k^3, torque /k^4",
+  "machine": {
+    "operating_mass_kg": 30.2734375,
+    "lf": 0.2,
+    "lr": 0.2,
+    "track_width": 0.2625,
+    "body_length": 0.975,
+    "body_width": 0.31875,
+    "max_articulation": 0.698,
+    "articulation_rate": 0.9899494936611666,
+    "max_speed": 1.9445436482630056,
+    "max_accel": 1.2,
+    "brake_decel": 2.5,
+    "actuator_latency": 0.04242640687119285,
+    "traction_coefficient": 0.55,
+    "bucket_volume": 0.005859375,
+    "bucket_width": 0.3375,
+    "boom_pivot_forward": 0.1125,
+    "boom_pivot_height": 0.24375,
+    "boom_length": 0.36875,
+    "bucket_length": 0.1625,
+    "boom_min": -0.62,
+    "boom_max": 0.95,
+    "boom_rate": 0.7636753236814714,
+    "bucket_min": -0.75,
+    "bucket_max": 0.85,
+    "bucket_rate": 1.5556349186104048,
+    "breakout_force": 273.4375,
+    "auto_max_speed": 1.0606601717798212,
+    "warning_speed": 0.35355339059327373,
+    "teleop_max_speed": 1.0606601717798212,
+    "materials": {
+      "sand": {
+        "name": "sand",
+        "density_t_m3": 1.6,
+        "k_resist": 1.0,
+        "friction_deg": 33
+      },
+      "gravel": {
+        "name": "gravel",
+        "density_t_m3": 1.75,
+        "k_resist": 1.35,
+        "friction_deg": 36
+      },
+      "crushed_rock": {
+        "name": "crushed_rock",
+        "density_t_m3": 1.6,
+        "k_resist": 2.1,
+        "friction_deg": 42
+      },
+      "wood_chips": {
+        "name": "wood_chips",
+        "density_t_m3": 0.35,
+        "k_resist": 0.45,
+        "friction_deg": 40
+      }
+    }
+  },
+  "profiles": {
+    "full": {
+      "profile": "full",
+      "params": {
+        "remote_timeout_s": 0.5,
+        "watchdog_timeout_s": 0.2,
+        "overspeed_tol": 0.2,
+        "decel_ramp": 0.8,
+        "ramp_reaction_s": 0.3,
+        "discrepancy_tol": 0.3,
+        "discrepancy_time_s": 0.2,
+        "position_invalid_s": 2.0,
+        "max_mute_s": 25.0,
+        "auto_restart_clear_s": 3.0,
+        "warning_hold_s": 2.0,
+        "auto_speed": 3.0,
+        "teleop_speed": 3.0,
+        "warning_speed": 1.0,
+        "standstill": 0.05,
+        "recovery_speed": 0.5,
+        "side_recovery_speed": 0.3
+      },
+      "stop_budget": {
+        "scanner_response_s": 0.1,
+        "plc_cycle_s": 0.025,
+        "plc_cycles": 2,
+        "actuator_latency_s": 0.12,
+        "brake_buildup_s": 0.2,
+        "decel_m_s2": 2.5,
+        "margin_m": 0.5,
+        "reaction_s": 0.47000000000000003
+      },
+      "field_design": {
+        "protective_range": 4.0,
+        "warning_range": 10.0,
+        "side_margin": 0.5,
+        "side_width": 0.6,
+        "min_protective": 1.0,
+        "warning_extra": 2.0,
+        "warning_time": 1.5,
+        "contact_band": 0.35,
+        "bands": [
+          0.5,
+          1.5,
+          2.5,
+          3.0
+        ],
+        "sectors": [
+          [
+            "R2",
+            -0.7,
+            -0.3
+          ],
+          [
+            "R1",
+            -0.3,
+            -0.1
+          ],
+          [
+            "S",
+            -0.1,
+            0.1
+          ],
+          [
+            "L1",
+            0.1,
+            0.3
+          ],
+          [
+            "L2",
+            0.3,
+            0.7
+          ]
+        ],
+        "dig_speed": 1.0,
+        "dock_speed": 0.6,
+        "standstill": 0.1,
+        "speed_cap_margin": 0.2,
+        "lf": 1.6,
+        "lr": 1.6
+      },
+      "geometry": {
+        "front_contour_x": 5.1,
+        "rear_contour_x": 1.7,
+        "half_width": 1.4,
+        "wheelbase_half": 1.6,
+        "rear_half_width": 1.3,
+        "scanner_x": 2.0,
+        "dock_field_end_x": 2.8,
+        "gap_field_end_x": 3.35,
+        "dig_side_end_x": 1.0
+      },
+      "field_table": {
+        "bands": [
+          0.5,
+          1.5,
+          2.5,
+          3.0
+        ],
+        "sectors": [
+          -0.3,
+          -0.1,
+          0.1,
+          0.3
+        ],
+        "n_sectors": 5,
+        "standstill": 0.1,
+        "dig_speed": 1.0,
+        "dock_speed": 0.6,
+        "v_protected": [
+          0.7949302018091909,
+          1.5000000000000002,
+          2.5,
+          3.1701841157769137
+        ],
+        "field_cap": 3.1701841157769137,
+        "speed_cap": 2.9701841157769135
+      },
+      "n_field_sets": 43,
+      "checks": "pass"
+    },
+    "scale8_nanoscan3": {
+      "profile": "scale8_nanoscan3",
+      "params": {
+        "remote_timeout_s": 0.5,
+        "watchdog_timeout_s": 0.2,
+        "overspeed_tol": 0.07071067811865475,
+        "decel_ramp": 0.8,
+        "ramp_reaction_s": 0.1,
+        "discrepancy_tol": 0.10606601717798211,
+        "discrepancy_time_s": 0.2,
+        "position_invalid_s": 2.0,
+        "max_mute_s": 8.838834764831843,
+        "auto_restart_clear_s": 1.0606601717798212,
+        "warning_hold_s": 0.7071067811865475,
+        "auto_speed": 1.0606601717798212,
+        "teleop_speed": 1.0606601717798212,
+        "warning_speed": 0.35355339059327373,
+        "standstill": 0.017677669529663688,
+        "recovery_speed": 0.17677669529663687,
+        "side_recovery_speed": 0.10606601717798211
+      },
+      "stop_budget": {
+        "scanner_response_s": 0.07,
+        "plc_cycle_s": 0.025,
+        "plc_cycles": 2,
+        "actuator_latency_s": 0.02,
+        "brake_buildup_s": 0.0,
+        "decel_m_s2": 2.0,
+        "margin_m": 0.0625,
+        "reaction_s": 0.14
+      },
+      "field_design": {
+        "protective_range": 0.5,
+        "warning_range": 1.25,
+        "side_margin": 0.0625,
+        "side_width": 0.075,
+        "min_protective": 0.125,
+        "warning_extra": 0.25,
+        "warning_time": 0.5303300858899106,
+        "contact_band": 0.04375,
+        "bands": [
+          0.17677669529663687,
+          0.5303300858899106,
+          0.8838834764831843,
+          1.0606601717798212
+        ],
+        "sectors": [
+          [
+            "R2",
+            -0.7,
+            -0.3
+          ],
+          [
+            "R1",
+            -0.3,
+            -0.1
+          ],
+          [
+            "S",
+            -0.1,
+            0.1
+          ],
+          [
+            "L1",
+            0.1,
+            0.3
+          ],
+          [
+            "L2",
+            0.3,
+            0.7
+          ]
+        ],
+        "dig_speed": 0.35355339059327373,
+        "dock_speed": 0.21213203435596423,
+        "standstill": 0.035355339059327376,
+        "speed_cap_margin": 0.07071067811865475,
+        "lf": 0.2,
+        "lr": 0.2
+      },
+      "geometry": {
+        "front_contour_x": 0.6375,
+        "rear_contour_x": 0.2125,
+        "half_width": 0.175,
+        "wheelbase_half": 0.2,
+        "rear_half_width": 0.1625,
+        "scanner_x": 0.25,
+        "dock_field_end_x": 0.35,
+        "gap_field_end_x": 0.41875,
+        "dig_side_end_x": 0.125
+      },
+      "field_table": {
+        "bands": [
+          0.17677669529663687,
+          0.5303300858899106,
+          0.8838834764831843,
+          1.0606601717798212
+        ],
+        "sectors": [
+          -0.3,
+          -0.1,
+          0.1,
+          0.3
+        ],
+        "n_sectors": 5,
+        "standstill": 0.035355339059327376,
+        "dig_speed": 0.35355339059327373,
+        "dock_speed": 0.21213203435596423,
+        "v_protected": [
+          0.29306195127577617,
+          0.5303300858899106,
+          0.8838834764831844,
+          1.0721834195108295
+        ],
+        "field_cap": 1.0721834195108295,
+        "speed_cap": 1.0014727413921747
+      },
+      "n_field_sets": 43,
+      "checks": "pass"
+    },
+    "scale8_evaluator": {
+      "profile": "scale8_evaluator",
+      "params": {
+        "remote_timeout_s": 0.5,
+        "watchdog_timeout_s": 0.2,
+        "overspeed_tol": 0.07071067811865475,
+        "decel_ramp": 0.8,
+        "ramp_reaction_s": 0.1,
+        "discrepancy_tol": 0.10606601717798211,
+        "discrepancy_time_s": 0.2,
+        "position_invalid_s": 2.0,
+        "max_mute_s": 8.838834764831843,
+        "auto_restart_clear_s": 1.0606601717798212,
+        "warning_hold_s": 0.7071067811865475,
+        "auto_speed": 1.0606601717798212,
+        "teleop_speed": 1.0606601717798212,
+        "warning_speed": 0.35355339059327373,
+        "standstill": 0.017677669529663688,
+        "recovery_speed": 0.17677669529663687,
+        "side_recovery_speed": 0.10606601717798211
+      },
+      "stop_budget": {
+        "scanner_response_s": 0.2,
+        "plc_cycle_s": 0.025,
+        "plc_cycles": 2,
+        "actuator_latency_s": 0.02,
+        "brake_buildup_s": 0.0,
+        "decel_m_s2": 2.0,
+        "margin_m": 0.0625,
+        "reaction_s": 0.27
+      },
+      "field_design": {
+        "protective_range": 0.5,
+        "warning_range": 1.25,
+        "side_margin": 0.0625,
+        "side_width": 0.075,
+        "min_protective": 0.125,
+        "warning_extra": 0.25,
+        "warning_time": 0.5303300858899106,
+        "contact_band": 0.04375,
+        "bands": [
+          0.17677669529663687,
+          0.5303300858899106,
+          0.8838834764831843,
+          1.0606601717798212
+        ],
+        "sectors": [
+          [
+            "R2",
+            -0.7,
+            -0.3
+          ],
+          [
+            "R1",
+            -0.3,
+            -0.1
+          ],
+          [
+            "S",
+            -0.1,
+            0.1
+          ],
+          [
+            "L1",
+            0.1,
+            0.3
+          ],
+          [
+            "L2",
+            0.3,
+            0.7
+          ]
+        ],
+        "dig_speed": 0.35355339059327373,
+        "dock_speed": 0.21213203435596423,
+        "standstill": 0.035355339059327376,
+        "speed_cap_margin": 0.07071067811865475,
+        "lf": 0.2,
+        "lr": 0.2
+      },
+      "geometry": {
+        "front_contour_x": 0.6375,
+        "rear_contour_x": 0.2125,
+        "half_width": 0.175,
+        "wheelbase_half": 0.2,
+        "rear_half_width": 0.1625,
+        "scanner_x": 0.25,
+        "dock_field_end_x": 0.35,
+        "gap_field_end_x": 0.41875,
+        "dig_side_end_x": 0.125
+      },
+      "field_table": {
+        "bands": [
+          0.17677669529663687,
+          0.5303300858899106,
+          0.8838834764831843,
+          1.0606601717798212
+        ],
+        "sectors": [
+          -0.3,
+          -0.1,
+          0.1,
+          0.3
+        ],
+        "n_sectors": 5,
+        "standstill": 0.035355339059327376,
+        "dig_speed": 0.35355339059327373,
+        "dock_speed": 0.21213203435596423,
+        "v_protected": [
+          0.195934779718964,
+          0.5303300858899107,
+          0.8838834764831843,
+          0.88884568795934
+        ],
+        "field_cap": 0.88884568795934,
+        "speed_cap": 0.8181350098406853
+      },
+      "n_field_sets": 43,
+      "checks": "pass"
+    }
+  }
+}
