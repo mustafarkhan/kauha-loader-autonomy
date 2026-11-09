@@ -1,0 +1,633 @@
+{
+ "frames": "x forward, y left, z up; origin front axle centre on the ground",
+ "joints": {
+  "rear_joint": {
+   "at": [
+    -1.6,
+    0,
+    0
+   ],
+   "axis": [
+    0,
+    0,
+    -1
+   ],
+   "range": [
+    -0.698,
+    0.698
+   ]
+  },
+  "boom_joint": {
+   "at": [
+    0.9,
+    0,
+    1.95
+   ],
+   "axis": [
+    0,
+    -1,
+    0
+   ],
+   "range": [
+    -0.62,
+    0.95
+   ]
+  },
+  "bucket_joint": {
+   "at_boom": [
+    2.95,
+    0,
+    0
+   ],
+   "axis": [
+    0,
+    -1,
+    0
+   ],
+   "range": [
+    -0.75,
+    0.85
+   ],
+   "pitch": "-boom + bucket"
+  }
+ },
+ "parts": [
+  {
+   "name": "front_frame",
+   "group": "front",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "Front frame with boom towers and articulation hitch",
+   "color": "#e2a312"
+  },
+  {
+   "name": "front_axle",
+   "group": "front",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "",
+   "color": "#3a3326"
+  },
+  {
+   "name": "front_tyre_left",
+   "group": "front",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "",
+   "color": "#1f2122"
+  },
+  {
+   "name": "front_rim_left",
+   "group": "front",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "",
+   "color": "#8c8a83"
+  },
+  {
+   "name": "front_fender_left",
+   "group": "front",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "",
+   "color": "#e2a312"
+  },
+  {
+   "name": "front_tyre_right",
+   "group": "front",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "",
+   "color": "#1f2122"
+  },
+  {
+   "name": "front_rim_right",
+   "group": "front",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "",
+   "color": "#8c8a83"
+  },
+  {
+   "name": "front_fender_right",
+   "group": "front",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "",
+   "color": "#e2a312"
+  },
+  {
+   "name": "lift_cylinder_left",
+   "group": "front",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "Shown at the carry pose; not animated",
+   "color": "#5d636b"
+  },
+  {
+   "name": "lift_cylinder_right",
+   "group": "front",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "Shown at the carry pose; not animated",
+   "color": "#5d636b"
+  },
+  {
+   "name": "rear_frame",
+   "group": "rear",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "Rear frame, engine hood and exhaust",
+   "color": "#e2a312"
+  },
+  {
+   "name": "counterweight",
+   "group": "rear",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "",
+   "color": "#3a3326"
+  },
+  {
+   "name": "cab_frame",
+   "group": "rear",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "Cab with ROPS posts",
+   "color": "#e2a312"
+  },
+  {
+   "name": "cab_glass",
+   "group": "rear",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "",
+   "color": "#9fc3d1"
+  },
+  {
+   "name": "access_steps",
+   "group": "rear",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "",
+   "color": "#5d636b"
+  },
+  {
+   "name": "rear_axle",
+   "group": "rear",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "",
+   "color": "#3a3326"
+  },
+  {
+   "name": "rear_tyre_left",
+   "group": "rear",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "",
+   "color": "#1f2122"
+  },
+  {
+   "name": "rear_rim_left",
+   "group": "rear",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "",
+   "color": "#8c8a83"
+  },
+  {
+   "name": "rear_fender_left",
+   "group": "rear",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "",
+   "color": "#e2a312"
+  },
+  {
+   "name": "rear_tyre_right",
+   "group": "rear",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "",
+   "color": "#1f2122"
+  },
+  {
+   "name": "rear_rim_right",
+   "group": "rear",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "",
+   "color": "#8c8a83"
+  },
+  {
+   "name": "rear_fender_right",
+   "group": "rear",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "",
+   "color": "#e2a312"
+  },
+  {
+   "name": "boom",
+   "group": "boom",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "",
+   "color": "#e2a312"
+  },
+  {
+   "name": "tilt_cylinder",
+   "group": "boom",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "",
+   "color": "#5d636b"
+  },
+  {
+   "name": "bucket",
+   "group": "bucket",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "3 m³, 2.7 m wide",
+   "color": "#3a3326"
+  },
+  {
+   "name": "cutting_edge",
+   "group": "bucket",
+   "channel": "machine",
+   "kit": false,
+   "bom": "",
+   "note": "",
+   "color": "#5d636b"
+  },
+  {
+   "name": "scanner_front_left",
+   "group": "front",
+   "channel": "safety",
+   "kit": true,
+   "bom": "A2",
+   "note": "SICK outdoorScan3, 275°, yaw ±45° outward",
+   "color": "#d43b2a"
+  },
+  {
+   "name": "bracket_front_left",
+   "group": "front",
+   "channel": "safety",
+   "kit": true,
+   "bom": "A2",
+   "note": "Bolt-on arm from the frame nose with a bash hoop; keeps the scanner ahead of the tyre at 0.5 m",
+   "color": "#5d636b"
+  },
+  {
+   "name": "scanner_front_right",
+   "group": "front",
+   "channel": "safety",
+   "kit": true,
+   "bom": "A2",
+   "note": "SICK outdoorScan3, 275°, yaw ±45° outward",
+   "color": "#d43b2a"
+  },
+  {
+   "name": "bracket_front_right",
+   "group": "front",
+   "channel": "safety",
+   "kit": true,
+   "bom": "A2",
+   "note": "Bolt-on arm from the frame nose with a bash hoop; keeps the scanner ahead of the tyre at 0.5 m",
+   "color": "#5d636b"
+  },
+  {
+   "name": "scanner_rear_left",
+   "group": "rear",
+   "channel": "safety",
+   "kit": true,
+   "bom": "A3",
+   "note": "SICK outdoorScan3 under the counterweight corner, 45° outward",
+   "color": "#d43b2a"
+  },
+  {
+   "name": "bracket_rear_left",
+   "group": "rear",
+   "channel": "safety",
+   "kit": true,
+   "bom": "A3",
+   "note": "",
+   "color": "#5d636b"
+  },
+  {
+   "name": "scanner_rear_right",
+   "group": "rear",
+   "channel": "safety",
+   "kit": true,
+   "bom": "A3",
+   "note": "SICK outdoorScan3 under the counterweight corner, 45° outward",
+   "color": "#d43b2a"
+  },
+  {
+   "name": "bracket_rear_right",
+   "group": "rear",
+   "channel": "safety",
+   "kit": true,
+   "bom": "A3",
+   "note": "",
+   "color": "#5d636b"
+  },
+  {
+   "name": "safety_plc_enclosure",
+   "group": "rear",
+   "channel": "safety",
+   "kit": true,
+   "bom": "A1 + A9",
+   "note": "Safety PLC (PL d) and force-guided relays, IP67 enclosure on the rear deck",
+   "color": "#d43b2a"
+  },
+  {
+   "name": "safety_radio_receiver",
+   "group": "rear",
+   "channel": "safety",
+   "kit": true,
+   "bom": "A7",
+   "note": "Remote e-stop radio, separate from the data radio",
+   "color": "#d43b2a"
+  },
+  {
+   "name": "estop_left",
+   "group": "rear",
+   "channel": "safety",
+   "kit": true,
+   "bom": "A8",
+   "note": "Two-channel mushroom e-stop reachable from the ground",
+   "color": "#d43b2a"
+  },
+  {
+   "name": "estop_right",
+   "group": "rear",
+   "channel": "safety",
+   "kit": true,
+   "bom": "A8",
+   "note": "Two-channel mushroom e-stop reachable from the ground",
+   "color": "#d43b2a"
+  },
+  {
+   "name": "estop_cab",
+   "group": "rear",
+   "channel": "safety",
+   "kit": true,
+   "bom": "A8",
+   "note": "",
+   "color": "#d43b2a"
+  },
+  {
+   "name": "safety_gnss_antenna",
+   "group": "rear",
+   "channel": "safety",
+   "kit": true,
+   "bom": "A6",
+   "note": "Independent geofence GNSS, not RTK",
+   "color": "#d43b2a"
+  },
+  {
+   "name": "beacon_left",
+   "group": "rear",
+   "channel": "safety",
+   "kit": true,
+   "bom": "A11",
+   "note": "Amber beacon, autonomous-mode warning",
+   "color": "#d43b2a"
+  },
+  {
+   "name": "beacon_right",
+   "group": "rear",
+   "channel": "safety",
+   "kit": true,
+   "bom": "A11",
+   "note": "Amber beacon, autonomous-mode warning",
+   "color": "#d43b2a"
+  },
+  {
+   "name": "articulation_sensor",
+   "group": "front",
+   "channel": "safety",
+   "kit": true,
+   "bom": "A5",
+   "note": "Contactless angle sensor on the joint pin (field sector selection)",
+   "color": "#d43b2a"
+  },
+  {
+   "name": "boom_angle_sensor_left",
+   "group": "front",
+   "channel": "safety",
+   "kit": true,
+   "bom": "A11 (boom)",
+   "note": "Two independent channels: bucket above 1.0 m enables the far under-bucket field (SR-16)",
+   "color": "#d43b2a"
+  },
+  {
+   "name": "boom_angle_sensor_right",
+   "group": "front",
+   "channel": "safety",
+   "kit": true,
+   "bom": "A11 (boom)",
+   "note": "Two independent channels: bucket above 1.0 m enables the far under-bucket field (SR-16)",
+   "color": "#d43b2a"
+  },
+  {
+   "name": "pilot_cutoff_valve",
+   "group": "front",
+   "channel": "safety",
+   "kit": true,
+   "bom": "A10",
+   "note": "Normally closed: no pilot pressure without the PLC",
+   "color": "#d43b2a"
+  },
+  {
+   "name": "sensor_mast",
+   "group": "front",
+   "channel": "autonomy",
+   "kit": true,
+   "bom": "",
+   "note": "On the front frame, so the lidar turns with the bucket; clears the boom and the cab at full articulation",
+   "color": "#5d636b"
+  },
+  {
+   "name": "lidar",
+   "group": "front",
+   "channel": "autonomy",
+   "kit": true,
+   "bom": "B1",
+   "note": "Ouster OS1, 0.5-60 m",
+   "color": "#2563c9"
+  },
+  {
+   "name": "gnss_antenna_left",
+   "group": "front",
+   "channel": "autonomy",
+   "kit": true,
+   "bom": "B4",
+   "note": "RTK GNSS, 1.6 m heading baseline",
+   "color": "#2563c9"
+  },
+  {
+   "name": "gnss_antenna_right",
+   "group": "front",
+   "channel": "autonomy",
+   "kit": true,
+   "bom": "B4",
+   "note": "RTK GNSS, 1.6 m heading baseline",
+   "color": "#2563c9"
+  },
+  {
+   "name": "radar",
+   "group": "front",
+   "channel": "autonomy",
+   "kit": true,
+   "bom": "B2",
+   "note": "4D radar on the frame nose, under the boom's swept volume (moved from 2.2 m in CAD layout)",
+   "color": "#2563c9"
+  },
+  {
+   "name": "camera_front",
+   "group": "rear",
+   "channel": "autonomy",
+   "kit": true,
+   "bom": "B3",
+   "note": "Heated GMSL2 camera: person/PPE detection and remote video",
+   "color": "#2563c9"
+  },
+  {
+   "name": "camera_rear",
+   "group": "rear",
+   "channel": "autonomy",
+   "kit": true,
+   "bom": "B3",
+   "note": "Heated GMSL2 camera: person/PPE detection and remote video",
+   "color": "#2563c9"
+  },
+  {
+   "name": "camera_left",
+   "group": "rear",
+   "channel": "autonomy",
+   "kit": true,
+   "bom": "B3",
+   "note": "Heated GMSL2 camera: person/PPE detection and remote video",
+   "color": "#2563c9"
+  },
+  {
+   "name": "camera_right",
+   "group": "rear",
+   "channel": "autonomy",
+   "kit": true,
+   "bom": "B3",
+   "note": "Heated GMSL2 camera: person/PPE detection and remote video",
+   "color": "#2563c9"
+  },
+  {
+   "name": "autonomy_computer",
+   "group": "rear",
+   "channel": "autonomy",
+   "kit": true,
+   "bom": "C1 + C2 + C4 + C5",
+   "note": "Jetson AGX Orin, CAN interface, switch and SSD in one IP67 box",
+   "color": "#2563c9"
+  },
+  {
+   "name": "drive_by_wire_gateway",
+   "group": "rear",
+   "channel": "autonomy",
+   "kit": true,
+   "bom": "D1",
+   "note": "Bridges the KAUHA bus to the OEM bus; applies the PLC speed limit",
+   "color": "#2563c9"
+  },
+  {
+   "name": "data_radio",
+   "group": "rear",
+   "channel": "autonomy",
+   "kit": true,
+   "bom": "C3",
+   "note": "Private LTE/5G router, two modems",
+   "color": "#2563c9"
+  }
+ ],
+ "scanners": [
+  {
+   "name": "front_left",
+   "group": "front",
+   "x": 2.0,
+   "y": 1.35,
+   "z": 0.5,
+   "yaw": 0.7853981633974483
+  },
+  {
+   "name": "front_right",
+   "group": "front",
+   "x": 2.0,
+   "y": -1.35,
+   "z": 0.5,
+   "yaw": -0.7853981633974483
+  },
+  {
+   "name": "rear_left",
+   "group": "rear",
+   "x": -3.3,
+   "y": 1.2,
+   "z": 0.5,
+   "yaw": 3.9269908169872414
+  },
+  {
+   "name": "rear_right",
+   "group": "rear",
+   "x": -3.3,
+   "y": -1.2,
+   "z": 0.5,
+   "yaw": 2.356194490192345
+  }
+ ],
+ "checks": {
+  "poses": 27,
+  "kit_parts": 32,
+  "problems": [],
+  "layout_findings": [
+   {
+    "part": "radar",
+    "was": [
+     2.2,
+     0.0,
+     1.2
+    ],
+    "now": [
+     1.16,
+     0.0,
+     1.0
+    ],
+    "finding": "At the documented position the 4D radar is struck by the boom's tilt cylinder when the boom is fully lowered. Moved to the frame nose, below the boom's swept volume."
+   }
+  ]
+ }
+}

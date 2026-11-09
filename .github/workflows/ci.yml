@@ -72,3 +72,19 @@ jobs:
           source ros2/install/setup.bash
           cd ros2/kauha_ros && python -m pytest -q -p no:cacheprovider test/
 
+
+  cad:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install with the CAD extra
+        run: pip install -e ".[dev,cad]"
+      - name: CAD positions and interference sweep
+        run: python -m hardware.cad.kauha_cad --check
+      - name: CAD tests
+        run: python -m pytest -q tests/hardware

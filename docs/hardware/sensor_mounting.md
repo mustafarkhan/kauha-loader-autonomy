@@ -1,5 +1,8 @@
 # Sensor mounting
 
+The concept CAD (`hardware/cad/kauha_cad.py`, viewer `docs/results/kauha_cad.html`)
+places every part below, and its check sweeps the joints for interference.
+
 Coordinates are machine coordinates. The front-frame origin is the front axle
 centre, with x forward. The rear-frame origin is the rear axle centre, with x
 pointing backwards. Height is above ground.
@@ -10,10 +13,10 @@ pointing backwards. Height is above ground.
 | Front-right safety scanner | front | (2.0, −1.35, 0.5) | yaw −45°, 275° scan | Mirror of the above |
 | Rear-left safety scanner | rear | (1.7, −1.2, 0.5) | yaw −45°, 275° scan | Behind the counterweight, and forward along the rear frame to the articulation joint |
 | Rear-right safety scanner | rear | (1.7, +1.2, 0.5) | yaw +45°, 275° scan | Mirror of the above |
-| 3D lidar | front (cab roof) | (−0.4, 0, 3.4) | level | Over the bucket at carry height; sees the pile face and the truck body |
-| 4D radar | front | (2.2, 0, 1.2) | forward | Behind the bucket's swept volume; dust fallback |
-| Cameras | cab roof corners | — | front, rear, left, right | Person detection and remote video |
-| GNSS antennas | cab roof | (−0.6, ±0.8, 3.5) | — | 1.6 m baseline for heading |
+| 3D lidar | front (sensor mast) | (−0.4, 0, 3.4) | level | Over the bucket at carry height; sees the pile face and the truck body. On a mast on the front frame, so it turns with the bucket |
+| 4D radar | front (frame nose) | (1.16, 0, 1.0) | forward | Dust fallback. Moved from (2.2, 0, 1.2) during CAD layout: there the boom's tilt cylinder struck it with the boom fully lowered |
+| Cameras | rear (cab roof edges) | — | front, rear, left, right | Person detection and remote video |
+| GNSS antennas | front (sensor mast crossbar) | (−0.6, ±0.8, 3.4) | — | 1.6 m baseline for heading, on the same frame as the lidar |
 | Safety GNSS antenna | rear frame | (0.5, 0, 2.8) | — | Separate from the RTK antennas |
 
 Turning each corner scanner 45° outward uses the 275° scan angle to look both

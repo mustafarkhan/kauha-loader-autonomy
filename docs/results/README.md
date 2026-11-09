@@ -355,7 +355,33 @@ CI fails if any claim loses its evidence. Four goals stay undeveloped because
 only hardware and certification can close them. The rendered argument is
 `safety_case.html`.
 
-## 6. Reproduce
+## 6. Concept CAD and remote console
+
+**Concept CAD** (`hardware/cad/kauha_cad.py`, viewer `kauha_cad.html`).
+- 32 kit parts on a simplified 15.5 t loader, built in CadQuery from the same
+  numbers the twin and the URDF use. Each kit part exports as STEP and STL;
+  the assembly exports as STEP and as a GLB with joint nodes.
+- The check puts each scanner's optics within 0.04 m of where the twin
+  ray-casts from. It then sweeps 27 joint poses (articulation, boom, bucket)
+  for interference between the kit and the moving frames: none.
+- It found one layout error. The 4D radar at its documented position (2.2 m
+  ahead, 1.2 m up) is struck by the boom's tilt cylinder when the boom is fully
+  lowered. It moved to the frame nose. A test keeps that finding true.
+- Limits: concept geometry, no wiring, hoses, welds or tolerances. The base
+  loader is simplified, so clearances to a real machine's guards and lights
+  must be checked against its own drawings.
+
+**Remote console prototype** (`kauha/demo/console.py`, `kauha_console.html`).
+- Three machines play back three recorded shifts (truck loading, load-and-carry,
+  winter truck loading). Requests from the shifts appear in a queue.
+- The supervisor can stop a machine, stop all (hold 1 s), reset, take teleop
+  with task-space commands at creep speed, and hand back. Reset and hand back
+  are refused while a person is within 6 m. Every action is added to a SHA-256
+  hash chain beside the recorded safety log.
+- Limits: the commands act on the playback, not on the twin. The 360° view is
+  drawn from the twin's ground truth; camera video is not simulated.
+
+## 7. Reproduce
 
 ```bash
 python -m kauha.train.tune_baseline
@@ -369,6 +395,7 @@ python -m kauha.adversary.search --mode rules-broken --budget 160
 python -m kauha.demo.report && python -m kauha.demo.replay3d
 python -m kauha.demo.replay3d --run results/runs/carry_s1 --out docs/results/kauha_3d_carry.html
 python -m kauha.assurance.case --check
+python -m kauha.demo.console
 ```
 
 On 2 CPU cores the whole set takes about 3.5 h: about 40 min for the detector,

@@ -1,0 +1,456 @@
+<title>KAUHA Ops Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: a control-room station. Fleet on the left, the selected machine's site in the middle, its state and stop authority on the right, the timeline and tamper-evident log along the bottom. Dark first; light mirrors it. */
+:root {
+  --bg: #0e1317; --panel: #151c22; --panel-2: #1b242b; --line: #29343d; --ink: #e2e8ed; --muted: #8995a0;
+  --accent: #4fc3cc; --run: #3fb27f; --warn: #e3a33a; --stop: #e5534b; --estop: #ff4f8b; --teleop: #6c9cf0;
+  --machine: #e2a312; --machine-ink: #3a2c08; --pile-a: #9c8761; --pile-b: #77838f; --zone: rgba(79,195,204,.08); --dock: rgba(229,83,75,.07);
+  --display: "Barlow Condensed", "Arial Narrow", sans-serif; --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace; color-scheme: dark;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
+  --bg: #e9edf0; --panel: #f9fafb; --panel-2: #f0f3f5; --line: #cfd6dc; --ink: #172028; --muted: #5d6973;
+  --accent: #0e7c86; --run: #1f8a57; --warn: #b7791f; --stop: #c53030; --estop: #c2185b; --teleop: #2f5fc4;
+  --machine: #d99a0b; --machine-ink: #3a2c08; --pile-a: #b9a37a; --pile-b: #98a3ae; --zone: rgba(14,124,134,.08); --dock: rgba(197,48,48,.06); color-scheme: light } }
+:root[data-theme="light"] {
+  --bg: #e9edf0; --panel: #f9fafb; --panel-2: #f0f3f5; --line: #cfd6dc; --ink: #172028; --muted: #5d6973;
+  --accent: #0e7c86; --run: #1f8a57; --warn: #b7791f; --stop: #c53030; --estop: #c2185b; --teleop: #2f5fc4;
+  --machine: #d99a0b; --machine-ink: #3a2c08; --pile-a: #b9a37a; --pile-b: #98a3ae; --zone: rgba(14,124,134,.08); --dock: rgba(197,48,48,.06); color-scheme: light }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font: 14px/1.4 var(--body); }
+.wrap { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 12px 20px; display: grid; gap: 12px; }
+.top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+.brand { font: 700 24px/1 var(--display); letter-spacing: .02em; }
+.brand small { font: 500 12px var(--mono); color: var(--muted); margin-left: 8px; letter-spacing: 0; }
+.clock { font: 500 22px var(--mono); font-variant-numeric: tabular-nums; }
+.chip { font: 500 11px var(--mono); color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; }
+.spacer { flex: 1; }
+.pb { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.pb button { background: var(--panel); color: var(--ink); border: 0; border-right: 1px solid var(--line); padding: 7px 11px; font: 500 12px var(--mono); cursor: pointer; }
+.pb button:last-child { border-right: 0; }
+.pb button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.stopall { position: relative; overflow: hidden; background: var(--estop); color: #fff; border: 0; border-radius: 6px; padding: 10px 16px; font: 700 15px var(--display); letter-spacing: .06em; text-transform: uppercase; cursor: pointer; }
+.stopall .fill { position: absolute; inset: 0 auto 0 0; width: 0; background: rgba(0,0,0,.28); }
+.stopall span { position: relative; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.grid { display: grid; grid-template-columns: 290px minmax(0, 1fr) 340px; gap: 12px; align-items: stretch; }
+.grid > aside:first-child { align-self: start; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; min-width: 0; }
+.ph { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 10px 12px 0; }
+h2 { font: 600 13px var(--display); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0; }
+.fleet { display: grid; gap: 8px; padding: 10px 12px 12px; }
+.card { text-align: left; display: grid; gap: 6px; background: var(--panel-2); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 10px; cursor: pointer; font: inherit; position: relative; }
+.card[aria-current="true"] { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+.card .r1 { display: flex; align-items: center; gap: 8px; }
+.card .nm { font: 600 18px/1 var(--display); letter-spacing: .03em; }
+.card .task { color: var(--muted); font-size: 12px; }
+.card .stats { display: grid; grid-template-columns: .7fr 1.6fr .6fr; gap: 4px; font: 12px var(--mono); font-variant-numeric: tabular-nums; }
+.card .stats b { display: block; font-weight: 500; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card .stats span { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; }
+.pill { font: 600 11px var(--mono); letter-spacing: .04em; padding: 2px 7px; border-radius: 4px; margin-left: auto; white-space: nowrap; }
+.s0 { background: color-mix(in srgb, var(--run) 20%, transparent); color: var(--run); }
+.s1 { background: color-mix(in srgb, var(--warn) 22%, transparent); color: var(--warn); }
+.s2 { background: var(--stop); color: #fff; }
+.s3 { background: var(--estop); color: #fff; }
+.s4 { background: var(--teleop); color: #fff; }
+.badge { position: absolute; top: -6px; right: -6px; background: var(--warn); color: #1b1300; font: 700 11px var(--mono); border-radius: 999px; min-width: 20px; height: 20px; display: grid; place-items: center; padding: 0 5px; animation: pulse 1.4s ease-in-out infinite; }
+@keyframes pulse { 50% { transform: scale(1.12); } }
+.queue { padding: 0 12px 12px; display: grid; gap: 6px; }
+.req { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; align-items: center; border: 1px solid color-mix(in srgb, var(--warn) 55%, var(--line)); border-radius: 6px; padding: 8px 10px; background: color-mix(in srgb, var(--warn) 8%, transparent); }
+.req .w { font: 12px var(--mono); color: var(--muted); grid-column: 1; }
+.req button { grid-row: 1 / 3; grid-column: 2; }
+.empty { color: var(--muted); font-size: 13px; padding: 2px 0 4px; }
+.mapwrap { display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 520px; }
+.mh { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; padding: 10px 12px 6px; }
+.mh .nm { font: 700 22px/1 var(--display); letter-spacing: .02em; }
+.mh .task { color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 10px; font: 11px var(--mono); color: var(--muted); margin-left: auto; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+canvas { display: block; width: 100%; }
+#map { height: 100%; min-height: 460px; }
+.detail { display: grid; gap: 0; }
+.sec { padding: 10px 12px 12px; border-top: 1px solid var(--line); display: grid; gap: 8px; }
+.sec:first-child { border-top: 0; }
+.state { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 10px; align-items: center; }
+.state .big { font: 700 22px/1.1 var(--display); letter-spacing: .04em; padding: 6px 10px; border-radius: 6px; grid-row: 1 / 3; text-transform: uppercase; }
+.state .cause { font: 500 13px var(--mono); }
+.state .why { color: var(--muted); font-size: 12px; }
+#eye { aspect-ratio: 1 / 1; max-width: 100%; border-radius: 6px; background: var(--panel-2); }
+.cap { color: var(--muted); font-size: 11px; font-family: var(--mono); }
+.kv { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; font-size: 13px; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+.bar { height: 8px; border-radius: 4px; background: var(--panel-2); position: relative; overflow: hidden; border: 1px solid var(--line); }
+.bar i { position: absolute; inset: 0 auto 0 0; background: var(--accent); }
+.bar u { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--stop); }
+.cmds { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.btn { background: var(--panel-2); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; font: 600 13px var(--body); cursor: pointer; }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.btn.stop { background: var(--stop); border-color: var(--stop); color: #fff; }
+.btn.go { border-color: var(--run); color: var(--run); }
+.btn.tele { border-color: var(--teleop); color: var(--teleop); }
+.msg { font-size: 12px; min-height: 1.4em; color: var(--muted); }
+.msg.bad { color: var(--stop); }
+.tele-panel { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.lower { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.tl { padding: 10px 12px 12px; display: grid; gap: 6px; }
+.track { position: relative; height: 26px; }
+.track input { position: absolute; inset: 0; width: 100%; margin: 0; accent-color: var(--accent); }
+.mk { position: absolute; top: 0; width: 2px; height: 8px; pointer-events: none; }
+.ticks { display: flex; justify-content: space-between; font: 11px var(--mono); color: var(--muted); }
+.logw { overflow-x: auto; padding: 0 12px 12px; }
+table { border-collapse: collapse; width: 100%; font-size: 12px; min-width: 640px; }
+th, td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { font: 600 11px var(--display); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+td.m { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+td.h { font-family: var(--mono); color: var(--muted); }
+tr.op td { background: color-mix(in srgb, var(--teleop) 9%, transparent); }
+.foot { color: var(--muted); font-size: 12px; max-width: 90ch; }
+@media (max-width: 1180px) { .grid { grid-template-columns: 260px minmax(0, 1fr); } .detail { grid-column: 1 / -1; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); } .detail .sec { border-top: 0; } }
+@media (max-width: 760px) { .grid { grid-template-columns: 1fr; } .mapwrap { min-height: 0; } #map { min-height: 340px; height: 340px; } .clock { font-size: 18px; } }
+@media (prefers-reduced-motion: reduce) { .badge { animation: none; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">KAUHA Ops<small>supervisor station 1</small></div>
+    <div class="clock" id="clock" aria-live="off">00:00:00</div>
+    <span class="chip">Replay of three simulated shifts</span>
+    <div class="spacer"></div>
+    <div class="pb" role="group" aria-label="Playback">
+      <button id="play" aria-pressed="true" aria-label="Pause">❚❚</button>
+      <button data-sp="1" aria-pressed="false">1×</button><button data-sp="10" aria-pressed="true">10×</button><button data-sp="30" aria-pressed="false">30×</button>
+    </div>
+    <button class="stopall" id="stopall" aria-describedby="stopall-hint"><div class="fill" id="stopfill"></div><span>Stop all · hold</span></button>
+    <span id="stopall-hint" hidden>Hold for one second, or press twice within two seconds, to send an emergency stop to every machine.</span>
+  </header>
+
+  <div class="grid">
+    <aside class="panel" aria-label="Fleet">
+      <div class="ph"><h2>Fleet</h2><span class="cap" id="fleet-sum"></span></div>
+      <div class="fleet" id="fleet"></div>
+      <div class="ph" style="padding-top:0"><h2>Needs you</h2><span class="cap" id="q-count"></span></div>
+      <div class="queue" id="queue"></div>
+    </aside>
+
+    <section class="panel mapwrap" aria-label="Site">
+      <div class="mh"><span class="nm" id="m-name"></span><span class="task" id="m-task"></span>
+        <div class="legend"><span><i style="background:var(--stop)"></i>protective field</span><span><i style="border:1px dashed var(--warn)"></i>warning field</span><span><i style="background:var(--accent)"></i>person</span><span><i style="background:var(--zone);border:1px dashed var(--accent)"></i>dig zone</span></div></div>
+      <canvas id="map" aria-label="Site map of the selected machine"></canvas>
+    </section>
+
+    <aside class="panel detail" aria-label="Selected machine">
+      <div class="sec">
+        <div class="state"><div class="big s0" id="d-state">RUN</div><div class="cause" id="d-cause">—</div><div class="why" id="d-why"></div></div>
+      </div>
+      <div class="sec">
+        <h2>360° around the machine</h2>
+        <canvas id="eye" aria-label="Bird's-eye view around the machine"></canvas>
+        <div class="cap">Drawn from the twin's ground truth. Camera video is not simulated.</div>
+      </div>
+      <div class="sec">
+        <h2>Machine</h2>
+        <dl class="kv">
+          <dt>Speed / PLC limit</dt><dd id="d-speed">0.0 / 0.0 m/s</dd>
+        </dl>
+        <div class="bar"><i id="d-sbar"></i><u id="d-slim"></u></div>
+        <dl class="kv">
+          <dt>Phase</dt><dd id="d-phase"></dd><dt>Field set</dt><dd id="d-fs"></dd><dt>Bucket load</dt><dd id="d-load"></dd>
+          <dt>Radio link · GNSS</dt><dd id="d-link"></dd><dt>Teleop latency p50 / p95</dt><dd id="d-lat"></dd>
+        </dl>
+      </div>
+      <div class="sec">
+        <h2>Stop authority</h2>
+        <div class="cmds">
+          <button class="btn stop" id="c-stop">Protective stop</button>
+          <button class="btn go" id="c-reset">Reset</button>
+          <button class="btn tele" id="c-tele">Take teleop</button>
+          <button class="btn" id="c-hand">Hand back</button>
+        </div>
+        <div class="tele-panel" id="tele" hidden>
+          <button class="btn tele" data-tc="back">Back off 2 m</button><button class="btn tele" data-tc="fwd">Creep 1 m</button><button class="btn tele" data-tc="halt">Halt</button>
+        </div>
+        <div class="msg" id="c-msg" role="status"></div>
+      </div>
+    </aside>
+  </div>
+
+  <section class="panel lower" aria-label="Timeline and event log">
+    <div class="tl">
+      <div class="ph" style="padding:0"><h2>Shift timeline</h2><span class="cap">ticks: protective stops on the selected machine</span></div>
+      <div class="track" id="track"><input type="range" id="scrub" min="0" max="3599" step="1" value="0" aria-label="Shift time"></div>
+      <div class="ticks"><span>00:00</span><span>15:00</span><span>30:00</span><span>45:00</span><span>60:00</span></div>
+    </div>
+    <div class="ph" style="padding-top:0"><h2>Safety event log</h2><span class="cap" id="chain">SHA-256 hash chain</span></div>
+    <div class="logw"><table><thead><tr><th>Time</th><th>Machine</th><th>Event</th><th>Detail</th><th>Hash</th></tr></thead><tbody id="log"></tbody></table></div>
+  </section>
+  <p class="foot">Prototype of the remote supervisor's station: one person watches several machines, answers their requests and holds stop authority over each (Machinery Regulation, Annex III 3.2.4). The three machines play back shifts recorded in the KAUHA digital twin. Your stop, e-stop, reset and teleop commands act on the playback and are added to the log with their own hashes; they do not run the twin.</p>
+</div>
+
+<script>
+const D = /*__DATA__*/null;
+const $ = (id) => document.getElementById(id);
+const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const STATES = ["RUN", "WARNING", "PROTECTIVE STOP", "EMERGENCY STOP", "TELEOP"];
+const PH = { GOTO_PILE: "to pile", APPROACH: "approach face", DIG: "digging", BACKOUT: "reversing from pile", WAIT_TRUCK: "waiting for truck", GOTO_TRUCK: "to target", DOCK: "docking", DUMP: "dumping", BACKOFF: "reversing from target" };
+const REASON = { blocked_path: "Path blocked, asks for teleop", remote_link: "Radio link lost, needs reset", watchdog: "Computer watchdog stop, needs reset",
+  estop_remote: "Remote e-stop, needs reset", phase_timeout_goto_pile: "Cannot reach the pile, asks for teleop", phase_timeout_goto_truck: "Cannot reach the target, asks for teleop",
+  phase_timeout_dock: "Docking timed out", phase_timeout_approach: "Approach timed out", person_in_field: "Person in field, needs reset" };
+const CAUSE = { FIELD_FRONT: "Object in the front field", FIELD_REAR: "Object in the rear field", FIELD_SIDE: "Object beside the frame", REMOTE_LINK: "Supervision link lost",
+  WATCHDOG: "Autonomy computer silent", ESTOP_REMOTE: "Remote e-stop", ESTOP_LOCAL: "Machine e-stop", UNDER_BUCKET: "Person under or near the bucket",
+  OVERSPEED: "Over the field's protected speed", GEOFENCE: "Outside the geofence", SUPERVISOR: "Stopped by you", SUPERVISOR_ESTOP: "Emergency stop by you" };
+let T = 380, speed = 10, playing = true, sel = 0, last = performance.now();
+const M = D.fleet.map((f) => ({ ...f, offset: 0, hold: null, tele: null, disp: 0, dispTarget: 0 }));
+const opLog = []; let opPrev = "0".repeat(64);
+
+const fmtT = (s) => { s = Math.max(0, Math.floor(s)); return [s / 3600 | 0, (s / 60 | 0) % 60, s % 60].map((v) => String(v).padStart(2, "0")).join(":"); };
+const lerpA = (a, b, u) => { let d = b - a; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; return a + d * u; };
+function pt(m) { return Math.min(3599, Math.max(0, (m.hold ? m.hold.since : T) - m.offset)); }
+function frame(m) {
+  const p = pt(m), F = m.frames, i = Math.min(F.length - 2, Math.floor(p)), a = F[i], b = F[i + 1], u = Math.min(1, Math.max(0, p - a[0]));
+  const f = { t: p, x: a[1] + (b[1] - a[1]) * u, y: a[2] + (b[2] - a[2]) * u, th: lerpA(a[3], b[3], u), g: a[4] + (b[4] - a[4]) * u, v: a[5] + (b[5] - a[5]) * u,
+    boom: a[6] + (b[6] - a[6]) * u, bkt: a[7] + (b[7] - a[7]) * u, load: a[8], st: a[9], fs: a[10], ph: D.phases[a[11]], mode: a[12], dust: !!(a[13] & 1), gnss: !!(a[13] & 2),
+    link: !!(a[13] & 4), lim: a[14], tr: [a[15], a[16]], ppl: a[17].map((q, k) => { const r = (b[17][k] || q); return [q[0] + (r[0] - q[0]) * u, q[1] + (r[1] - q[1]) * u]; }), obs: a[18] };
+  let cause = null;
+  if (f.st >= 2) { for (const s of m.stops) if (s.t <= p + 0.5) cause = s.cause; }
+  if (m.hold) {
+    f.v = 0; f.st = m.hold.kind === "estop" ? 3 : 2; cause = m.hold.kind === "estop" ? "SUPERVISOR_ESTOP" : "SUPERVISOR";
+    if (m.tele) { f.st = 4; f.x += m.disp * Math.cos(f.th); f.y += m.disp * Math.sin(f.th); f.v = m.tele.v; f.lim = 0.5; }
+  }
+  f.cause = cause; f.disp = m.disp;
+  return f;
+}
+function openRequests(m) { const p = pt(m); return m.interventions.filter((r) => r.t_request <= p && p < r.t_response && !r.ack); }
+
+// ---------------------------------------------------------------- operator actions + hash chain
+async function sha(s) {
+  try { const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)); return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join(""); }
+  catch (e) { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) | 0; return (h >>> 0).toString(16).padStart(8, "0").repeat(8); }
+}
+async function op(m, kind, detail) {
+  const rec = { t: pt(m), machine: m.name, kind, detail, prev: opPrev };
+  rec.hash = await sha(rec.prev + JSON.stringify([rec.t, rec.machine, kind, detail]));
+  opPrev = rec.hash; opLog.push(rec); logDirty = true;
+}
+function say(text, bad = false) { const el = $("c-msg"); el.textContent = text; el.className = "msg" + (bad ? " bad" : ""); }
+function personNear(m, r = 6) { const f = frame(m); return f.ppl.some(([px, py]) => Math.hypot(px - f.x, py - f.y) < r); }
+function stopM(m, kind) { if (m.hold && (m.hold.kind === "estop" || kind !== "estop")) return false; m.hold = { kind, since: m.hold ? m.hold.since : T }; m.tele = null; return true; }
+function release(m) { m.offset += T - m.hold.since; m.hold = null; m.tele = null; m.disp = 0; m.dispTarget = 0; }
+
+$("c-stop").onclick = () => { const m = M[sel]; if (stopM(m, "stop")) { op(m, "supervisor stop", "protective stop from the console"); say(`${m.name} stopped. Reset when the area is clear.`); } };
+$("c-reset").onclick = () => {
+  const m = M[sel];
+  if (!m.hold) { say("Nothing to reset: the machine is not held by you."); return; }
+  if (m.tele) { say("Hand back from teleop first.", true); return; }
+  if (personNear(m)) { say("Reset refused: a person is within 6 m of the machine. Check the 360° view.", true); op(m, "reset refused", "person within 6 m"); return; }
+  release(m); op(m, "reset", "supervisor reset, autonomy resumes"); say(`${m.name} reset. Autonomy resumes.`);
+};
+$("c-tele").onclick = () => {
+  const m = M[sel];
+  if (!m.hold) stopM(m, "stop");
+  if (m.hold.kind === "estop") { say("Release the emergency stop with Reset before teleop.", true); return; }
+  m.tele = { v: 0 }; op(m, "teleop", "supervisor took teleop, creep limit 0.5 m/s"); say("Teleop: task-space commands at creep speed. Fields stay active.");
+};
+$("c-hand").onclick = () => {
+  const m = M[sel];
+  if (!m.tele) { say("Hand back applies after teleop."); return; }
+  if (personNear(m)) { say("Hand back refused: a person is within 6 m.", true); return; }
+  release(m); op(m, "hand back", "autonomy resumes the recorded shift"); say(`${m.name} back in autonomy. It resumes the recorded shift.`);
+};
+document.querySelectorAll("[data-tc]").forEach((b) => b.onclick = () => {
+  const m = M[sel]; if (!m.tele) return;
+  const c = b.dataset.tc;
+  if (c === "halt") { m.dispTarget = m.disp; m.tele.v = 0; }
+  else { m.dispTarget = m.disp + (c === "back" ? -2 : 1); }
+  op(m, "teleop command", { back: "back off 2 m", fwd: "creep forward 1 m", halt: "halt" }[c]);
+});
+// Stop all: hold 1 s, or press twice within 2 s.
+let holdT = null, holdStart = 0, armed = 0;
+function stopAll() { for (const m of M) if (stopM(m, "estop")) op(m, "e-stop", "stop all from the console"); say("Emergency stop sent to every machine. Reset each one when its area is clear."); }
+$("stopall").addEventListener("pointerdown", (e) => { e.preventDefault(); holdStart = performance.now(); holdT = setInterval(() => {
+  const u = (performance.now() - holdStart) / 1000; $("stopfill").style.width = Math.min(100, u * 100) + "%"; if (u >= 1) { clearInterval(holdT); holdT = null; $("stopfill").style.width = "0"; stopAll(); } }, 30); });
+for (const ev of ["pointerup", "pointerleave", "pointercancel"]) $("stopall").addEventListener(ev, () => { if (holdT) { clearInterval(holdT); holdT = null; } $("stopfill").style.width = "0"; });
+$("stopall").addEventListener("keydown", (e) => { if (e.key !== "Enter" && e.key !== " ") return; e.preventDefault();
+  const now = performance.now(); if (now - armed < 2000) { armed = 0; stopAll(); } else { armed = now; say("Press again within 2 s to stop every machine."); } });
+
+// ---------------------------------------------------------------- playback controls
+$("play").onclick = () => { playing = !playing; $("play").textContent = playing ? "❚❚" : "▶"; $("play").setAttribute("aria-label", playing ? "Pause" : "Play"); $("play").setAttribute("aria-pressed", String(playing)); };
+document.querySelectorAll("[data-sp]").forEach((b) => b.onclick = () => { speed = +b.dataset.sp; document.querySelectorAll("[data-sp]").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); });
+$("scrub").addEventListener("input", () => { const nt = +$("scrub").value; for (const m of M) { if (m.hold) { m.hold.since = nt + m.offset; } } T = nt + M[sel].offset; logDirty = true; });
+document.addEventListener("keydown", (e) => { if (e.target.closest("input, button")) return; if (e.key === " ") { e.preventDefault(); $("play").click(); } });
+
+// ---------------------------------------------------------------- fleet + queue
+function buildFleet() {
+  const el = $("fleet"); el.innerHTML = "";
+  M.forEach((m, i) => {
+    const b = document.createElement("button"); b.className = "card"; b.id = "card" + i;
+    b.innerHTML = `<div class="r1"><span class="nm">${m.name}</span><span class="pill s0" id="pill${i}">RUN</span></div>
+      <div class="task">${m.site_name} · ${m.task}</div>
+      <div class="stats"><div><span>speed</span><b id="sp${i}">0.0</b></div><div><span>phase</span><b id="ph${i}">—</b></div><div><span>t/h</span><b>${Math.round(m.kpi.tonnes_per_hour)}</b></div></div>
+      <span class="badge" id="bd${i}" hidden>1</span>`;
+    b.onclick = () => select(i); el.appendChild(b);
+  });
+}
+function select(i) { sel = i; M.forEach((_, k) => $("card" + k).setAttribute("aria-current", String(k === i))); markers(); say(""); logDirty = true; }
+function markers() {
+  document.querySelectorAll(".mk").forEach((x) => x.remove());
+  for (const s of M[sel].stops) { const d = document.createElement("div"); d.className = "mk"; d.style.left = (s.t / 3600 * 100) + "%"; d.style.background = css(s.cause === "ESTOP_REMOTE" ? "--estop" : "--stop"); $("track").appendChild(d); }
+}
+function respond(i, r) {
+  select(i); const m = M[i];
+  if (r.kind === "teleop") { $("c-tele").click(); } else { if (!m.hold) stopM(m, "stop"); say(`${REASON[r.reason] || r.reason}. Check the 360° view, then Reset.`); }
+  r.ack = true; op(m, "request answered", REASON[r.reason] || r.reason);
+}
+
+// ---------------------------------------------------------------- drawing
+function fit(cv) { const r = cv.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1); const w = Math.round(r.width * dpr), h = Math.round(r.height * dpr); if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; } return dpr; }
+const rot = (ox, oy, th, pts) => { const c = Math.cos(th), s = Math.sin(th); return pts.map(([a, b]) => [ox + a * c - b * s, oy + a * s + b * c]); };
+const rect = (cx, cy, th, fwd, back, hw) => rot(cx, cy, th, [[fwd, hw], [fwd, -hw], [back, -hw], [back, hw]]);
+const tipLocal = (boom, bkt) => 0.9 + 2.95 * Math.cos(boom) + 1.3 * Math.cos(-0.35 * bkt);
+function alpha(c, a) { if (c.startsWith("#")) { const n = parseInt(c.slice(1), 16); return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${a})`; } return c; }
+function drawWorld(ctx, P, sc, m, f, opts) {
+  const S = m.site;
+  const poly = (pts, fill, stroke, dash) => { ctx.beginPath(); pts.forEach(([x, y], k) => { const [a, b] = P(x, y); k ? ctx.lineTo(a, b) : ctx.moveTo(a, b); }); ctx.closePath();
+    if (fill) { ctx.fillStyle = fill; ctx.fill(); } if (stroke) { ctx.setLineDash(dash || []); ctx.strokeStyle = stroke; ctx.stroke(); ctx.setLineDash([]); } };
+  ctx.lineWidth = 1;
+  if (opts.site) {
+    poly(S.area, null, css("--line"), [6, 6]);
+    ctx.lineWidth = 3; ctx.strokeStyle = css("--muted");
+    for (const w of S.walls) { const [a, b] = P(w[0], w[1]), [c, d] = P(w[2], w[3]); ctx.beginPath(); ctx.moveTo(a, b); ctx.lineTo(c, d); ctx.stroke(); }
+    ctx.lineWidth = 1;
+    for (const z of Object.values(S.dig_zones)) poly(z, css("--zone"), css("--accent"), [4, 4]);
+    poly(S.dock_zone, css("--dock"), css("--stop"), [4, 4]);
+  }
+  for (const [name, p] of Object.entries(S.piles)) p.slots.forEach(([yc, w]) => poly([[50, yc - w / 2], [p.back_x, yc - w / 2], [p.back_x, yc + w / 2], [50, yc + w / 2]], css(name === "A" ? "--pile-a" : "--pile-b"), null));
+  const [tcx, tcy, tl, tw] = S.truck, hopper = S.target_kind === "hopper";
+  const tpts = rect(tcx, tcy, 0, tl / 2, -tl / 2, tw / 2);
+  if (f.tr[0] || hopper) {
+    poly(tpts, css("--panel-2"), css("--muted"));
+    const frac = Math.min(1, f.tr[1] / (S.target_capacity_t || 20));
+    poly([[tcx - tl / 2 + .3, tcy - tw / 2 + .3], [tcx - tl / 2 + .3 + (tl - .6) * frac, tcy - tw / 2 + .3], [tcx - tl / 2 + .3 + (tl - .6) * frac, tcy + tw / 2 - .3], [tcx - tl / 2 + .3, tcy + tw / 2 - .3]], css("--pile-a"));
+  } else poly(tpts, null, css("--muted"), [3, 5]);
+  if (opts.labels) {
+    ctx.fillStyle = css("--muted"); ctx.font = `500 ${Math.max(10, Math.round(sc * 1.0))}px ${css("--mono")}`;
+    const [a, b] = P(tcx - tl / 2, tcy - tw / 2 - 0.8); ctx.fillText(hopper ? `hopper · ${f.tr[1].toFixed(1)} t` : f.tr[0] ? `truck · ${f.tr[1].toFixed(1)} t` : "truck bay", a, b + sc);
+    for (const [name, p] of Object.entries(S.piles)) { const [lx, ly] = P(52, p.slots[p.slots.length - 1][0] + 2.2); ctx.fillText(`pile ${name} · ${p.material.replace("_", " ")}`, lx, ly); }
+  }
+  for (const [ox, oy, r] of f.obs || []) { const [a, b] = P(ox, oy); ctx.fillStyle = css("--ink"); ctx.fillRect(a - r * sc, b - r * sc, 2 * r * sc, 2 * r * sc); }
+  const th = f.th, g = f.g, x = f.x, y = f.y, MM = D.machine;
+  const jx = x - MM.lf * Math.cos(th), jy = y - MM.lf * Math.sin(th), thr = th - g;
+  const rx = jx - MM.lr * Math.cos(thr), ry = jy - MM.lr * Math.sin(thr);
+  const fs = D.fields[f.fs];
+  if (fs) {
+    const front = [x, y, th], rear = [rx, ry, thr + Math.PI];
+    const stopped = f.st >= 2;
+    const draw = (body, pts, kind) => { if (!pts || !pts.length) return; const w = rot(body[0], body[1], body[2], pts);
+      if (kind === "p") poly(w, alpha(css("--stop"), stopped ? 0.38 : 0.16), css("--stop")); else poly(w, null, css("--warn"), [6, 5]); };
+    if (fs.dir >= 0) { draw(front, fs.warn, "w"); draw(front, fs.prot, "p"); }
+    if (fs.dir <= 0) { draw(rear, fs.rwarn.length ? fs.rwarn : fs.warn, "w"); draw(rear, fs.rprot.length ? fs.rprot : fs.prot, "p"); }
+    if (fs.side.length) { draw(front, fs.side, "p"); draw(front, fs.side.map(([a, b]) => [a, -b]), "p"); }
+    if (fs.rside.length) { draw(rear, fs.rside, "p"); draw(rear, fs.rside.map(([a, b]) => [a, -b]), "p"); }
+  }
+  const hw = MM.width / 2;
+  poly(rect(rx, ry, thr, MM.lr, -1.7, hw), css("--machine"), css("--machine-ink"));
+  poly(rect(x, y, th, 1.9, -MM.lf, hw), css("--machine"), css("--machine-ink"));
+  const tip = tipLocal(f.boom, f.bkt);
+  poly(rect(x, y, th, tip, tip - 1.3, 1.35), f.load > 0.05 ? css("--pile-a") : css("--panel"), css("--machine-ink"));
+  poly(rect(rx, ry, thr, 1.5, 0.3, 0.75), css("--machine-ink"));
+  for (const [px, py] of f.ppl) { const [a, b] = P(px, py); ctx.beginPath(); ctx.arc(a, b, Math.max(4, 0.35 * sc), 0, 7); ctx.fillStyle = css("--accent"); ctx.fill(); ctx.strokeStyle = css("--bg"); ctx.lineWidth = 2; ctx.stroke(); ctx.lineWidth = 1; }
+  if (f.dust && opts.site) { ctx.fillStyle = alpha(css("--muted"), 0.12); ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height); }
+}
+function drawMap(m, f) {
+  const cv = $("map"), ctx = cv.getContext("2d"), dpr = fit(cv), W = cv.width, H = cv.height;
+  ctx.clearRect(0, 0, W, H);
+  const x0 = -8, x1 = 73, y0 = -35, y1 = 33, sc = Math.min(W / (x1 - x0), H / (y1 - y0));
+  const ox = (W - (x1 - x0) * sc) / 2, oy = (H - (y1 - y0) * sc) / 2;
+  const P = (x, y) => [ox + (x - x0) * sc, oy + (y1 - y) * sc];
+  drawWorld(ctx, P, sc, m, f, { site: true, labels: true });
+  ctx.fillStyle = css("--muted"); ctx.font = `500 ${11 * dpr}px ${css("--mono")}`;
+  const [lx, ly] = P(-3, 27.5);
+  ctx.fillText(`${m.site_name} · 75 × 62 m · north up`, lx, ly);
+  if (f.dust) ctx.fillText("airborne dust in the pit", lx, ly + 16 * dpr);
+}
+function drawEye(m, f) {
+  const cv = $("eye"), ctx = cv.getContext("2d"), dpr = fit(cv), W = cv.width, H = cv.height;
+  ctx.clearRect(0, 0, W, H);
+  const R = 14, sc = W / (2 * R), c = Math.cos(-f.th + Math.PI / 2), s = Math.sin(-f.th + Math.PI / 2);
+  const cx = f.x - 1.0 * Math.cos(f.th), cy = f.y - 1.0 * Math.sin(f.th);
+  const P = (x, y) => { const dx = x - cx, dy = y - cy; return [W / 2 + (dx * c - dy * s) * sc, H / 2 - (dx * s + dy * c) * sc]; };
+  ctx.strokeStyle = css("--line"); ctx.lineWidth = 1;
+  for (const r of [5, 10]) { ctx.beginPath(); ctx.arc(W / 2, H / 2, r * sc, 0, 7); ctx.stroke(); }
+  drawWorld(ctx, P, sc, m, f, { site: false, labels: false });
+  ctx.fillStyle = css("--muted"); ctx.font = `500 ${10 * dpr}px ${css("--mono")}`; ctx.fillText("5 m", W / 2 + 5 * sc * 0.72, H / 2 - 5 * sc * 0.72); ctx.fillText("10 m", W / 2 + 10 * sc * 0.72, H / 2 - 10 * sc * 0.72);
+  ctx.fillText("▲ bucket", 8 * dpr, 16 * dpr);
+}
+
+// ---------------------------------------------------------------- panels
+let logDirty = true, lastLogKey = "";
+function updatePanels() {
+  let open = 0; const q = $("queue"); const items = [];
+  M.forEach((m, i) => {
+    const f = frame(m); const st = Math.min(4, f.st), pill = $("pill" + i);
+    pill.className = "pill s" + st; pill.textContent = STATES[st];
+    $("sp" + i).textContent = Math.abs(f.v).toFixed(1); $("ph" + i).textContent = PH[f.ph] || f.ph;
+    const reqs = m.hold ? [] : openRequests(m); open += reqs.length;
+    $("bd" + i).hidden = !reqs.length; $("bd" + i).textContent = reqs.length;
+    for (const r of reqs) items.push([i, r, pt(m) - r.t_request]);
+  });
+  const key = items.map(([i, r]) => i + ":" + r.t_request).join(",");
+  if (key !== q.dataset.key) {
+    q.dataset.key = key; q.innerHTML = "";
+    if (!items.length) q.innerHTML = '<div class="empty">No machine is waiting for you.</div>';
+    for (const [i, r] of items) {
+      const d = document.createElement("div"); d.className = "req";
+      d.innerHTML = `<div><b>${M[i].name}</b> · ${REASON[r.reason] || r.reason}</div><div class="w" data-w></div><button class="btn ${r.kind === "teleop" ? "tele" : "go"}">${r.kind === "teleop" ? "Teleop" : "Check"}</button>`;
+      d.querySelector("button").onclick = () => respond(i, r); d.dataset.i = i; d.dataset.t = r.t_request; q.appendChild(d);
+    }
+  }
+  q.querySelectorAll(".req").forEach((d) => { const m = M[+d.dataset.i]; d.querySelector("[data-w]").textContent = `waiting ${Math.round(pt(m) - +d.dataset.t)} s`; });
+  $("q-count").textContent = open ? `${open} open` : "";
+  $("fleet-sum").textContent = `${M.filter((m) => frame(m).st < 2).length} of ${M.length} working`;
+  const m = M[sel], f = frame(m), st = Math.min(4, f.st);
+  $("m-name").textContent = m.name; $("m-task").textContent = `${m.site_name} · ${m.task}`;
+  const ds = $("d-state"); ds.className = "big s" + st; ds.textContent = STATES[st];
+  $("d-cause").textContent = st >= 2 ? (CAUSE[f.cause] || f.cause || "Stopped") : st === 1 ? "Warning field occupied, slowing" : "Working autonomously";
+  $("d-why").textContent = m.tele ? "Creep speed only. The safety fields stay active." : st >= 2 && !m.hold ? "Recorded stop in the shift" : m.hold ? "Held by the console until you reset" : (D.fields[f.fs] || {}).name ? "Fields follow speed and articulation" : "";
+  const lim = Math.max(0.01, f.lim), v = Math.abs(f.v);
+  $("d-speed").textContent = `${v.toFixed(2)} / ${f.lim.toFixed(2)} m/s`;
+  $("d-sbar").style.width = Math.min(100, v / 3.2 * 100) + "%"; $("d-slim").style.left = Math.min(99, lim / 3.2 * 100) + "%";
+  $("d-phase").textContent = PH[f.ph] || f.ph; $("d-fs").textContent = (D.fields[f.fs] || {}).name || "—";
+  $("d-load").textContent = f.load > 0.05 ? (f.load * 100).toFixed(0) + " %" : "empty";
+  $("d-link").textContent = `${f.link ? "up" : "DOWN"} · ${f.gnss ? "RTK" : "outage"}`;
+  $("d-lat").textContent = `${Math.round(m.kpi.teleop_latency_p50_ms)} / ${Math.round(m.kpi.teleop_latency_p95_ms)} ms`;
+  $("c-stop").disabled = !!m.hold; $("c-reset").disabled = !m.hold || !!m.tele; $("c-hand").disabled = !m.tele; $("c-tele").disabled = !!m.tele;
+  $("tele").hidden = !m.tele;
+  if (document.activeElement !== $("scrub")) $("scrub").value = Math.floor(pt(m));
+  $("clock").textContent = fmtT(T);
+  drawMap(m, f); drawEye(m, f);
+  updateLog();
+}
+function updateLog() {
+  const rows = [];
+  M.forEach((m) => { const p = pt(m); for (const e of m.log) if (e.t <= p) rows.push({ t: e.t, mach: m.name, kind: e.kind, detail: Object.entries(e.data).map(([k, v]) => `${k} ${v}`).join(", "), hash: e.hash, op: false }); });
+  for (const e of opLog) rows.push({ t: e.t, mach: e.machine, kind: e.kind, detail: e.detail, hash: e.hash, op: true });
+  const key = rows.length + ":" + opLog.length;
+  if (key === lastLogKey && !logDirty) return; lastLogKey = key; logDirty = false;
+  rows.sort((a, b) => b.t - a.t);
+  $("log").innerHTML = rows.slice(0, 30).map((r) => `<tr class="${r.op ? "op" : ""}"><td class="m">${fmtT(r.t)}</td><td>${r.mach}</td><td>${r.op ? "<b>you</b> · " : ""}${r.kind}</td><td>${r.detail}</td><td class="h">${r.hash.slice(0, 12)}…</td></tr>`).join("") ||
+    '<tr><td colspan="5" class="empty">No safety events yet in this shift.</td></tr>';
+  $("chain").textContent = `SHA-256 hash chain · ${M.reduce((n, m) => n + m.log.length, 0)} recorded records, chains verified: ${M.every((m) => m.kpi.log_chain_ok) ? "yes" : "no"} · ${opLog.length} from you`;
+}
+
+function tick(now) {
+  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  if (playing) T = Math.min(3599 + Math.max(...M.map((m) => m.offset)), T + dt * speed);
+  for (const m of M) if (m.tele) {
+    const d = m.dispTarget - m.disp, step = 0.4 * dt * (playing ? Math.max(1, speed / 10) : 1);
+    if (Math.abs(d) > 1e-3) { m.disp += Math.sign(d) * Math.min(Math.abs(d), step); m.tele.v = Math.sign(d) * 0.4; } else m.tele.v = 0;
+  }
+  updatePanels();
+  requestAnimationFrame(tick);
+}
+buildFleet(); select(0); window.CONSOLE = { M, setT: (t) => { T = t; }, select, stopAll, op, setSpeed: (s) => { speed = s; }, pause: () => { playing = false; } };
+requestAnimationFrame(tick);
+</script>

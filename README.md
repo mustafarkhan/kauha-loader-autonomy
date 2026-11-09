@@ -24,6 +24,8 @@ physical machine is involved:
 | Safety case | GSN assurance argument generated from the hazard list and the evidence (proofs, traced tests, shifts, search, SIL); CI fails if any claim loses its evidence | `kauha/assurance`, `docs/safety/hazards.yaml`, `docs/results/safety_case.html` |
 | ROS 2 (Jazzy) | `kauha_ros` package: the twin as ROS 2 topics (TF, URDF, LaserScan per safety scanner, odometry, diagnostics, field markers), rosbag2 MCAP recording, and a CAN bridge so ROS autonomy drives the SIL machine while the safety PLC stays on CAN | `ros2/` |
 | Load-and-carry | Hopper over a feeder, carry route, hopper dumping, KPIs against truck loading (`--task carry`) | `hardware/config/site_carry.yaml`, `docs/results/README.md` §4 |
+| Concept CAD | Parametric CadQuery model of the 32-part kit on a simplified loader; STEP/STL per part, assembly STEP, GLB; checks that scanner origins match the twin and that nothing interferes over the joint ranges; interactive viewer | `hardware/cad`, `docs/results/kauha_cad.html` |
+| Remote console | Clickable prototype of the supervisor's station on three recorded shifts: fleet, requests, 360° view, stop, e-stop, reset, task-space teleop, hash-chained log | `kauha/demo/console.py`, `docs/results/kauha_console.html` |
 | Demonstration | 60-minute shift with people, link loss, an obstacle, dust, a GNSS outage, a material change, a computer freeze and a remote e-stop; KPIs, 2D and 3D replay | `kauha/demo`, `docs/results` |
 
 ## Quick start
@@ -40,6 +42,14 @@ pip install -e ".[adversary]" && python -m kauha.adversary.search --mode rules-k
 ```
 
 ROS 2: see `ros2/README.md` (RoboStack environment, `colcon build`, launch files).
+
+CAD (optional, about 150 MB of wheels):
+
+```bash
+pip install -e ".[cad]"
+python -m hardware.cad.kauha_cad --check   # positions and interference only
+python -m hardware.cad.kauha_cad && python -m hardware.cad.viewer
+```
 
 Training (optional, CPU is enough):
 
@@ -78,8 +88,10 @@ This is a design and simulation baseline, not a validated product.
 - The Python safety logic is a reference model. The production version goes
   into a certified safety PLC toolchain.
 - The 3D lidar is modelled at object level, not as point clouds.
-- There is no remote operations console yet, and no operator baseline for
-  load-and-carry.
+- The remote console is a prototype on recorded shifts, not a live link to the
+  twin. There is no operator baseline for load-and-carry.
+- The CAD is concept geometry for layout and clearance, not manufacturing
+  drawings.
 
 `docs/results/README.md` lists what the simulation results do and do not
 show.

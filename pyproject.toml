@@ -16,6 +16,7 @@ dependencies = [
 train = ["stable-baselines3>=2.3", "torch>=2.2", "ultralytics>=8.3"]
 dev = ["pytest>=8", "hypothesis>=6.100", "ruff>=0.5", "z3-solver>=4.12"]   # z3: safety PLC proofs
 adversary = ["cma>=3.3"]
+cad = ["cadquery>=2.4", "trimesh>=4.0"]
 
 [build-system]
 requires = ["setuptools>=68"]

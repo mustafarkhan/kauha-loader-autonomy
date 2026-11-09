@@ -1,0 +1,345 @@
+<title>KAUHA Kit CAD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: a drawing sheet. 3D model space on the left, a title block and controls in a right-hand column; on phones the column stacks under the model. */
+:root {
+  --paper: #eef0f2; --sheet: #f8f9fa; --ink: #1d232b; --ink-2: #4d5763; --rule: #c9ced5; --grid: #dde1e6;
+  --machine: #e2a312; --safety: #d43b2a; --autonomy: #2563c9; --focus: #0e7c86;
+  --display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #14181d; --sheet: #1b2027; --ink: #e5e8ec; --ink-2: #9aa4b0; --rule: #333b45; --grid: #262d36;
+  --safety: #ef6a5a; --autonomy: #6c9cf0; --focus: #4fc3cc; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #14181d; --sheet: #1b2027; --ink: #e5e8ec; --ink-2: #9aa4b0; --rule: #333b45; --grid: #262d36;
+  --safety: #ef6a5a; --autonomy: #6c9cf0; --focus: #4fc3cc; color-scheme: dark }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 14px; }
+.app { height: 100%; display: grid; grid-template-columns: minmax(0, 1fr) 380px; }
+.stage { position: relative; min-width: 0; min-height: 0; }
+#gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+.side { background: var(--sheet); border-left: 1px solid var(--rule); overflow-y: auto; display: flex; flex-direction: column;
+  padding-block: 0 24px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.tb { display: grid; grid-template-columns: 1fr auto; border-bottom: 2px solid var(--ink); padding-block: 18px 12px; gap: 2px 12px; }
+.tb h1 { font-family: var(--display); font-weight: 700; font-size: 30px; line-height: 1; margin: 0; letter-spacing: .01em; text-wrap: balance; }
+.tb .dwg { font-family: var(--mono); font-size: 11px; color: var(--ink-2); text-align: right; align-self: end; }
+.tb p { grid-column: 1 / -1; margin: 6px 0 0; color: var(--ink-2); line-height: 1.45; }
+section { border-bottom: 1px solid var(--rule); padding-block: 14px; display: flex; flex-direction: column; gap: 10px; }
+h2 { font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; margin: 0; color: var(--ink-2); }
+.legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.chan { display: flex; align-items: center; gap: 8px; border: 1px solid var(--rule); border-radius: 4px; padding: 7px 8px; background: transparent;
+  color: var(--ink); font: 500 12px var(--body); cursor: pointer; text-align: left; }
+.chan[aria-pressed="false"] { opacity: .45; }
+.chan i { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+.chan b { font-family: var(--mono); font-weight: 500; margin-left: auto; color: var(--ink-2); font-size: 11px; }
+.row { display: grid; grid-template-columns: 92px minmax(0, 1fr) 58px; align-items: center; gap: 10px; }
+.row label { font-size: 12px; color: var(--ink-2); }
+.row output { font-family: var(--mono); font-size: 12px; text-align: right; font-variant-numeric: tabular-nums; }
+input[type=range] { width: 100%; accent-color: var(--focus); }
+.btns { display: flex; flex-wrap: wrap; gap: 6px; }
+button.b { border: 1px solid var(--rule); background: var(--paper); color: var(--ink); border-radius: 4px; padding: 6px 10px; font: 500 12px var(--body); cursor: pointer; }
+button.b[aria-pressed="true"] { background: var(--ink); color: var(--sheet); border-color: var(--ink); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+.seg button { border: 0; border-right: 1px solid var(--rule); background: transparent; color: var(--ink); padding: 6px 9px; font: 500 12px var(--body); cursor: pointer; }
+.seg button:last-child { border-right: 0; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--sheet); }
+.parts { display: flex; flex-direction: column; max-height: 330px; overflow-y: auto; border: 1px solid var(--rule); border-radius: 4px; }
+.parts button { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; gap: 8px; align-items: center; text-align: left; border: 0; border-bottom: 1px solid var(--grid);
+  background: transparent; color: var(--ink); padding: 6px 8px; font: 13px var(--body); cursor: pointer; }
+.parts button:hover, .parts button[aria-selected="true"] { background: var(--paper); }
+.parts button[aria-selected="true"] { box-shadow: inset 3px 0 0 var(--focus); }
+.parts i { width: 8px; height: 8px; border-radius: 2px; }
+.parts span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.parts small { font-family: var(--mono); color: var(--ink-2); font-size: 11px; }
+.detail { border: 1px solid var(--rule); border-radius: 4px; padding: 10px 12px; display: grid; gap: 4px; min-height: 92px; }
+.detail .nm { font-family: var(--mono); font-size: 13px; font-weight: 500; }
+.detail .meta { font-size: 12px; color: var(--ink-2); }
+.detail p { margin: 2px 0 0; line-height: 1.45; font-size: 13px; }
+.check { font-size: 13px; line-height: 1.5; margin: 0; display: grid; gap: 6px; }
+.check .ok { font-family: var(--mono); font-size: 12px; }
+.check .ok::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #2f9e57; margin-right: 6px; }
+.fnd { border-left: 3px solid var(--machine); padding-left: 10px; color: var(--ink); }
+.hud { position: absolute; left: max(12px, env(safe-area-inset-left, 0px)); top: 12px; display: flex; gap: 8px; flex-wrap: wrap; pointer-events: none; }
+.hud span { background: color-mix(in srgb, var(--sheet) 88%, transparent); border: 1px solid var(--rule); border-radius: 4px; padding: 4px 8px; font: 500 11px var(--mono); color: var(--ink-2); }
+.views { position: absolute; right: 12px; bottom: 12px; pointer-events: auto; }
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--sheet); font: 12px var(--mono); padding: 3px 7px; border-radius: 3px; white-space: nowrap; }
+.load { position: absolute; inset: 0; display: grid; place-items: center; color: var(--ink-2); font-family: var(--mono); font-size: 12px; text-align: center; padding: 16px; }
+.files { font-family: var(--mono); font-size: 12px; color: var(--ink-2); line-height: 1.6; margin: 0; }
+@media (max-width: 860px) {
+  .app { grid-template-columns: 1fr; grid-template-rows: 58vh auto; height: auto; }
+  html, body { height: auto; }
+  .stage { height: 58vh; }
+  .side { border-left: 0; border-top: 1px solid var(--rule); overflow: visible; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+
+<div class="app">
+  <div class="stage">
+    <canvas id="gl" aria-label="3D model of the KAUHA retrofit kit on the loader"></canvas>
+    <div class="hud"><span id="hud-pose">γ 0° · boom −0.20 · bucket 0.55</span><span id="hud-sel">click a part</span></div>
+    <div class="views"><div class="seg" role="group" aria-label="View">
+      <button id="v-iso" aria-pressed="true">Iso</button><button id="v-side" aria-pressed="false">Side</button>
+      <button id="v-top" aria-pressed="false">Top</button><button id="v-front" aria-pressed="false">Front</button></div></div>
+    <div class="tip" id="tip" hidden></div>
+    <div class="load" id="load">Loading model…</div>
+  </div>
+  <aside class="side">
+    <div class="tb">
+      <h1>KAUHA retrofit kit</h1><div class="dwg">KAUHA-KIT-001<br>Rev C · m · ISO 128</div>
+      <p>Concept CAD of the bolt-on kit on a 15.5 t articulated loader. Every sensor sits where the digital twin and the URDF put it.</p>
+    </div>
+    <section>
+      <h2>Channels</h2>
+      <div class="legend" id="legend"></div>
+    </section>
+    <section>
+      <h2>Pose</h2>
+      <div class="row"><label for="s-art">Articulation</label><input type="range" id="s-art" min="-40" max="40" step="0.5" value="0"><output id="o-art">0°</output></div>
+      <div class="row"><label for="s-boom">Boom</label><input type="range" id="s-boom" min="-0.62" max="0.95" step="0.01" value="-0.2"><output id="o-boom">−0.20</output></div>
+      <div class="row"><label for="s-bkt">Bucket</label><input type="range" id="s-bkt" min="-0.75" max="0.85" step="0.01" value="0.55"><output id="o-bkt">0.55</output></div>
+      <div class="btns"><button class="b" id="b-cycle" aria-pressed="false">Play work cycle</button><button class="b" id="b-reset">Carry pose</button></div>
+    </section>
+    <section>
+      <h2>View</h2>
+      <div class="row"><label for="s-exp">Explode kit</label><input type="range" id="s-exp" min="0" max="1" step="0.01" value="0"><output id="o-exp">0%</output></div>
+      <div class="row"><label>Machine</label><div class="seg" role="group" aria-label="Base machine display">
+        <button id="m-solid" aria-pressed="true">Solid</button><button id="m-ghost" aria-pressed="false">Ghost</button><button id="m-off" aria-pressed="false">Hidden</button></div><span></span></div>
+      <div class="btns"><button class="b" id="b-fields" aria-pressed="true">Scanner fields</button><button class="b" id="b-spin" aria-pressed="false">Turntable</button></div>
+    </section>
+    <section>
+      <h2>Selected part</h2>
+      <div class="detail" id="detail"><div class="meta">Click a part in the model or the list.</div></div>
+    </section>
+    <section>
+      <h2>Parts</h2>
+      <div class="parts" id="parts" role="listbox" aria-label="Parts"></div>
+    </section>
+    <section>
+      <h2>Layout checks</h2>
+      <div class="check" id="checks"></div>
+    </section>
+    <section>
+      <h2>Files</h2>
+      <p class="files">hardware/cad/kauha_cad.py — source<br>export/kauha_assembly.step<br>export/step/*.step · export/stl/*.stl<br>export/kauha_kit.glb · export/parts.json</p>
+    </section>
+  </aside>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/GLTFLoader.js"></script>
+<script>
+const META = /*__META__*/null;
+const GLB64 = "/*__GLB__*/";
+const $ = (id) => document.getElementById(id);
+const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const CHANNELS = [["safety", "Safety"], ["autonomy", "Autonomy"], ["machine", "Machine"]];
+const chanOn = { safety: true, autonomy: true, machine: true };
+let machineMode = "solid", exploded = 0, cycle = false, spin = false, fieldsOn = true, selected = null;
+const pose = { art: 0, boom: -0.2, bkt: 0.55 };
+
+function start() {
+  if (!window.THREE || !THREE.GLTFLoader) { $("load").textContent = "The 3D view needs three.js, which did not load. The part list below still works."; buildLists(); return; }
+  const canvas = $("gl");
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 200);
+  const controls = new THREE.OrbitControls(camera, canvas);
+  controls.enableDamping = true; controls.target.set(-0.4, 1.2, 0); controls.maxPolarAngle = Math.PI * 0.495;
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8f96, 0.75));
+  const sun = new THREE.DirectionalLight(0xffffff, 0.95); sun.position.set(6, 12, 7); sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.03; Object.assign(sun.shadow.camera, { left: -9, right: 9, top: 9, bottom: -9, near: 1, far: 40 });
+  scene.add(sun);
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.ShadowMaterial({ opacity: 0.18 }));
+  ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+  let grid = null;
+  function paintTheme() {
+    scene.background = new THREE.Color(css("--paper"));
+    if (grid) scene.remove(grid);
+    grid = new THREE.GridHelper(40, 40, new THREE.Color(css("--rule")), new THREE.Color(css("--grid")));
+    grid.position.y = 0.001; scene.add(grid);
+  }
+  paintTheme();
+  new MutationObserver(paintTheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", paintTheme);
+
+  const bin = Uint8Array.from(atob(GLB64), (c) => c.charCodeAt(0)).buffer;
+  new THREE.GLTFLoader().parse(bin, "", (gltf) => {
+    $("load").hidden = true;
+    const root = gltf.scene; scene.add(root);
+    const byName = {}; root.traverse((o) => { if (o.name) byName[o.name] = byName[o.name] || o; });
+    const joints = { rear: byName.rear_joint, boom: byName.boom_joint, bucket: byName.bucket_joint, front: byName.front_joint };
+    const info = Object.fromEntries(META.parts.map((p) => [p.name, p]));
+    const meshes = [];
+    root.traverse((o) => {
+      if (!o.isMesh) return;
+      const nm = info[o.name] ? o.name : (o.parent && info[o.parent.name] ? o.parent.name : null);
+      if (!nm) return;
+      o.castShadow = true; o.receiveShadow = true;
+      const glass = nm.includes("glass");
+      o.material = new THREE.MeshStandardMaterial({ color: new THREE.Color(info[nm].color), roughness: glass ? 0.1 : 0.62,
+        metalness: info[nm].channel === "machine" ? 0.12 : 0.28, transparent: true, opacity: glass ? 0.45 : 1, side: THREE.DoubleSide });
+      o.userData.part = nm; o.userData.home = o.position.clone(); meshes.push(o);
+    });
+    // Explode direction per kit part: away from the machine centre line, plus up.
+    for (const m of meshes) {
+      if (!info[m.userData.part].kit) continue;
+      m.geometry.computeBoundingBox(); const c = m.geometry.boundingBox.getCenter(new THREE.Vector3());
+      const d = new THREE.Vector3(0, Math.abs(c.y) > 0.2 ? Math.sign(c.y) * 0.75 : 0, c.z < 0.9 ? 0.35 : 0.9);
+      m.userData.dir = d;       // in the joint's z-up local frame
+    }
+    // Scanner field fans: 275 degrees, 4 m protective range, at scanner height.
+    const fans = [];
+    for (const s of META.scanners) {
+      const g = new THREE.Group(); g.position.set(s.x, s.y, s.z); g.rotation.z = s.yaw;
+      const half = 275 / 2 * Math.PI / 180;
+      const fan = new THREE.Mesh(new THREE.CircleGeometry(4.0, 64, -half, 2 * half),
+        new THREE.MeshBasicMaterial({ color: new THREE.Color(css("--safety")), transparent: true, opacity: 0.09, side: THREE.DoubleSide, depthWrite: false }));
+      const edgePts = []; for (let k = 0; k <= 64; k++) { const a = -half + 2 * half * k / 64; edgePts.push(new THREE.Vector3(4 * Math.cos(a), 4 * Math.sin(a), 0)); }
+      edgePts.unshift(new THREE.Vector3(0, 0, 0)); edgePts.push(new THREE.Vector3(0, 0, 0));
+      const edge = new THREE.Line(new THREE.BufferGeometry().setFromPoints(edgePts),
+        new THREE.LineBasicMaterial({ color: new THREE.Color(css("--safety")), transparent: true, opacity: 0.5 }));
+      g.add(fan, edge); joints[s.group].add(g); fans.push(g);
+    }
+    const tip = $("tip"); const ray = new THREE.Raycaster(); const mouse = new THREE.Vector2();
+    function pick(ev) {
+      const r = canvas.getBoundingClientRect();
+      mouse.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
+      ray.setFromCamera(mouse, camera);
+      const hit = ray.intersectObjects(meshes.filter((m) => m.visible), false)[0];
+      return hit ? hit.object.userData.part : null;
+    }
+    canvas.addEventListener("pointermove", (ev) => {
+      const nm = pick(ev);
+      if (!nm) { tip.hidden = true; canvas.style.cursor = ""; return; }
+      const r = canvas.getBoundingClientRect();
+      tip.textContent = nm + (info[nm].bom ? "  ·  " + info[nm].bom : ""); tip.hidden = false;
+      tip.style.left = (ev.clientX - r.left + 14) + "px"; tip.style.top = (ev.clientY - r.top + 10) + "px"; canvas.style.cursor = "pointer";
+    });
+    canvas.addEventListener("pointerleave", () => { tip.hidden = true; });
+    let down = null;
+    canvas.addEventListener("pointerdown", (ev) => { down = [ev.clientX, ev.clientY]; });
+    canvas.addEventListener("pointerup", (ev) => {
+      if (down && Math.hypot(ev.clientX - down[0], ev.clientY - down[1]) < 5) select(pick(ev));
+    });
+    window.KAUHA = { select: (n) => select(n), setPose, setExplode: (v) => { $("s-exp").value = v; $("s-exp").dispatchEvent(new Event("input")); },
+      setMachine: (m) => $("m-" + m).click(), view: (v) => setView(v), camera, controls, fields: (on) => { fieldsOn = on; } , cycle: (on) => { cycle = on; t0 = performance.now(); } };
+
+    function select(nm) {
+      selected = nm;
+      for (const m of meshes) m.material.emissive = new THREE.Color(m.userData.part === nm ? css("--focus") : "#000000"), m.material.emissiveIntensity = 0.55;
+      document.querySelectorAll("#parts button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.part === nm)));
+      const d = $("detail");
+      if (!nm) { d.innerHTML = '<div class="meta">Click a part in the model or the list.</div>'; $("hud-sel").textContent = "click a part"; return; }
+      const p = info[nm]; const grp = { front: "front frame", rear: "rear frame", boom: "boom", bucket: "bucket" }[p.group];
+      d.innerHTML = `<div class="nm">${nm}</div><div class="meta">${p.channel === "machine" ? "Base machine" : p.channel === "safety" ? "Safety channel" : "Autonomy kit"} · on the ${grp}${p.bom ? " · BOM " + p.bom : ""}</div>` +
+        (p.note ? `<p>${p.note}</p>` : "") + (p.kit ? `<div class="meta" style="font-family:var(--mono)">step/${nm}.step</div>` : "");
+      $("hud-sel").textContent = nm;
+      const b = document.querySelector(`#parts button[data-part="${nm}"]`); if (b) b.scrollIntoView({ block: "nearest" });
+    }
+    buildLists(select);
+
+    function setPose(art, boom, bkt) {
+      pose.art = art; pose.boom = boom; pose.bkt = bkt;
+      joints.rear.rotation.set(0, 0, -art);
+      joints.boom.rotation.set(0, -boom, 0);
+      joints.bucket.rotation.set(0, boom - bkt, 0);
+      $("s-art").value = (art * 180 / Math.PI).toFixed(1); $("o-art").textContent = Math.round(art * 180 / Math.PI) + "°";
+      $("s-boom").value = boom; $("o-boom").textContent = fmt(boom); $("s-bkt").value = bkt; $("o-bkt").textContent = fmt(bkt);
+      $("hud-pose").textContent = `γ ${Math.round(art * 180 / Math.PI)}° · boom ${fmt(boom)} · bucket ${fmt(bkt)}`;
+    }
+    const fmt = (v) => (v < 0 ? "−" : "") + Math.abs(v).toFixed(2);
+    for (const [id, key] of [["s-art", "art"], ["s-boom", "boom"], ["s-bkt", "bkt"]])
+      $(id).addEventListener("input", () => { cycle = false; $("b-cycle").setAttribute("aria-pressed", "false");
+        const v = parseFloat($(id).value); const p = { ...pose, [key]: key === "art" ? v * Math.PI / 180 : v }; setPose(p.art, p.boom, p.bkt); });
+    $("b-reset").onclick = () => { cycle = false; $("b-cycle").setAttribute("aria-pressed", "false"); setPose(0, -0.2, 0.55); };
+    let t0 = performance.now();
+    $("b-cycle").onclick = () => { cycle = !cycle; t0 = performance.now(); $("b-cycle").setAttribute("aria-pressed", String(cycle)); };
+    $("s-exp").addEventListener("input", () => { exploded = parseFloat($("s-exp").value); $("o-exp").textContent = Math.round(exploded * 100) + "%"; });
+    for (const m of ["solid", "ghost", "off"]) $("m-" + m).onclick = () => { machineMode = m; for (const k of ["solid", "ghost", "off"]) $("m-" + k).setAttribute("aria-pressed", String(k === m)); };
+    $("b-fields").onclick = () => { fieldsOn = !fieldsOn; $("b-fields").setAttribute("aria-pressed", String(fieldsOn)); };
+    $("b-spin").onclick = () => { spin = !spin; $("b-spin").setAttribute("aria-pressed", String(spin)); };
+
+    const VIEWS = { iso: [[10.5, 7.5, 14], [-0.4, 1.2, 0]], side: [[-0.4, 2.0, 21], [-0.4, 1.6, 0]], top: [[-0.4, 24, 0.01], [-0.4, 0, 0]], front: [[17, 2.6, 0], [0, 1.6, 0]] };
+    function setView(v) {
+      const [p, t] = VIEWS[v]; camera.position.set(...p); controls.target.set(...t); controls.update();
+      for (const k in VIEWS) $("v-" + k).setAttribute("aria-pressed", String(k === v));
+    }
+    for (const k in VIEWS) $("v-" + k).onclick = () => setView(k);
+    setView("iso"); setPose(0, -0.2, 0.55);
+
+    // Work cycle keyframes: [t s, articulation rad, boom, bucket]
+    const K = [[0, 0, -0.2, 0.55], [2, 0, -0.6, 0.0], [4, 0, -0.55, 0.8], [5.5, 0, -0.2, 0.6], [8, -0.55, 0.35, 0.55], [10, -0.6, 0.85, 0.55],
+      [12, -0.6, 0.85, -0.7], [13.5, -0.6, 0.85, -0.7], [15.5, 0.3, 0.2, 0.3], [18, 0, -0.2, 0.55]];
+    const ease = (u) => u * u * (3 - 2 * u);
+    function cyclePose(t) {
+      t %= K[K.length - 1][0];
+      for (let i = 0; i < K.length - 1; i++) if (t <= K[i + 1][0]) {
+        const u = ease((t - K[i][0]) / (K[i + 1][0] - K[i][0])); const a = K[i], b = K[i + 1];
+        return [a[1] + (b[1] - a[1]) * u, a[2] + (b[2] - a[2]) * u, a[3] + (b[3] - a[3]) * u];
+      }
+      return K[0].slice(1);
+    }
+    window.KAUHA.cyclePose = cyclePose;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function resize() {
+      const w = canvas.clientWidth, h = canvas.clientHeight;
+      if (canvas.width !== Math.floor(w * renderer.getPixelRatio()) || canvas.height !== Math.floor(h * renderer.getPixelRatio())) {
+        renderer.setSize(w, h, false); camera.aspect = w / Math.max(1, h); camera.updateProjectionMatrix();
+      }
+    }
+    let exShown = 0;
+    function frame(now) {
+      resize();
+      if (cycle) { const [a, b, k] = cyclePose((now - t0) / 1000 * (window.KAUHA.speed || 1)); setPose(a, b, k); }
+      if (spin && !reduce) root.rotation.y += 0.0035;
+      exShown += (exploded - exShown) * 0.18;
+      for (const m of meshes) {
+        const p = info[m.userData.part];
+        m.visible = chanOn[p.channel] && !(p.channel === "machine" && machineMode === "off");
+        if (p.channel === "machine") m.material.opacity = p.name.includes("glass") ? (machineMode === "ghost" ? 0.12 : 0.45) : (machineMode === "ghost" ? 0.16 : 1);
+        m.material.depthWrite = !(p.channel === "machine" && machineMode === "ghost");
+        if (m.userData.dir) m.position.copy(m.userData.home).addScaledVector(m.userData.dir, exShown * 2.2);
+      }
+      for (const f of fans) f.visible = fieldsOn && chanOn.safety && exShown < 0.05;
+      controls.update(); renderer.render(scene, camera);
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+    window.KAUHA.ready = true;
+  }, (err) => { $("load").textContent = "The model could not be read: " + err.message; });
+}
+
+function buildLists(select = () => {}) {
+  const counts = { safety: 0, autonomy: 0, machine: 0 };
+  for (const p of META.parts) counts[p.channel]++;
+  const lg = $("legend"); lg.innerHTML = "";
+  for (const [k, label] of CHANNELS) {
+    const b = document.createElement("button"); b.className = "chan"; b.setAttribute("aria-pressed", "true");
+    b.innerHTML = `<i style="background:var(--${k})"></i>${label}<b>${counts[k]}</b>`;
+    b.onclick = () => { chanOn[k] = !chanOn[k]; b.setAttribute("aria-pressed", String(chanOn[k])); };
+    lg.appendChild(b);
+  }
+  const list = $("parts"); list.innerHTML = "";
+  const order = { safety: 0, autonomy: 1, machine: 2 };
+  for (const p of [...META.parts].sort((a, b) => order[a.channel] - order[b.channel] || a.name.localeCompare(b.name))) {
+    const b = document.createElement("button"); b.dataset.part = p.name; b.setAttribute("role", "option");
+    b.innerHTML = `<i style="background:var(--${p.channel})"></i><span>${p.name}</span><small>${p.bom || ""}</small>`;
+    b.onclick = () => select(p.name); list.appendChild(b);
+  }
+  const c = META.checks, ch = $("checks");
+  ch.innerHTML = `<div class="ok">${c.problems.length ? c.problems.length + " interferences" : "No interference"}: ${c.kit_parts} kit parts × ${c.poses} poses</div>` +
+    `<div class="ok">Scanner origins match the twin and URDF (±0.04 m)</div>` +
+    c.layout_findings.map((f) => `<div class="fnd"><b>${f.part}</b> moved from (${f.was.join(", ")}) to (${f.now.join(", ")}) m. ${f.finding}</div>`).join("");
+}
+start();
+</script>
