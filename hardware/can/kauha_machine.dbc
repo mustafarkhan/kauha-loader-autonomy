@@ -1,4 +1,4 @@
-VERSION "KAUHA machine bus 0.3"
+VERSION "KAUHA machine bus 0.4"
 
 
 NS_ :
@@ -11,7 +11,7 @@ NS_ :
 
 BS_:
 
-BU_: AUTONOMY SAFETY_PLC REMOTE_GW MACHINE_GW
+BU_: AUTONOMY SAFETY_PLC REMOTE_GW MACHINE_GW SENSOR_NODE FIELD_EVAL ZONE_SRC
 
 BO_ 2365526144 DriveCmd: 8 AUTONOMY
  SG_ SpeedReq : 0|16@1- (0.001,0) [-6|6] "m/s" MACHINE_GW,SAFETY_PLC
@@ -62,11 +62,47 @@ BO_ 2365538434 RemoteHeartbeat: 8 REMOTE_GW
  SG_ AliveCounter : 48|4@1+ (1,0) [0|15] "" SAFETY_PLC
  SG_ Crc : 56|8@1+ (1,0) [0|255] "" SAFETY_PLC
 
+BO_ 2298433668 SafeSensors: 8 SENSOR_NODE
+ SG_ SpeedB : 0|16@1- (0.001,0) [-6|6] "m/s" SAFETY_PLC
+ SG_ Articulation : 16|16@1- (0.0001,0) [-0.8|0.8] "rad" SAFETY_PLC
+ SG_ BoomAngle : 32|16@1- (0.001,0) [-1.5|1.5] "rad" SAFETY_PLC
+ SG_ AliveCounter : 48|4@1+ (1,0) [0|15] "" SAFETY_PLC
+ SG_ BoomRaised : 52|1@1+ (1,0) [0|1] "" SAFETY_PLC
+ SG_ SensorOk : 53|1@1+ (1,0) [0|1] "" SAFETY_PLC
+ SG_ Crc : 56|8@1+ (1,0) [0|255] "" SAFETY_PLC
+
+BO_ 2298433925 ScannerStatus: 8 FIELD_EVAL
+ SG_ FrontProt : 0|1@1+ (1,0) [0|1] "" SAFETY_PLC
+ SG_ FrontWarn : 1|1@1+ (1,0) [0|1] "" SAFETY_PLC
+ SG_ RearProt : 2|1@1+ (1,0) [0|1] "" SAFETY_PLC
+ SG_ RearWarn : 3|1@1+ (1,0) [0|1] "" SAFETY_PLC
+ SG_ SideProt : 4|1@1+ (1,0) [0|1] "" SAFETY_PLC
+ SG_ SideContact : 5|1@1+ (1,0) [0|1] "" SAFETY_PLC
+ SG_ FrontSide : 6|1@1+ (1,0) [0|1] "" SAFETY_PLC
+ SG_ UnderNear : 7|1@1+ (1,0) [0|1] "" SAFETY_PLC
+ SG_ UnderMid : 8|1@1+ (1,0) [0|1] "" SAFETY_PLC
+ SG_ UnderFar : 9|1@1+ (1,0) [0|1] "" SAFETY_PLC
+ SG_ ScannersOk : 10|1@1+ (1,0) [0|1] "" SAFETY_PLC
+ SG_ EvaluatedSet : 16|8@1+ (1,0) [0|255] "" SAFETY_PLC
+ SG_ AliveCounter : 48|4@1+ (1,0) [0|15] "" SAFETY_PLC
+ SG_ Crc : 56|8@1+ (1,0) [0|255] "" SAFETY_PLC
+
+BO_ 2365543046 ZoneStatus: 8 ZONE_SRC
+ SG_ InOperatingArea : 0|1@1+ (1,0) [0|1] "" SAFETY_PLC
+ SG_ InDigZone : 1|1@1+ (1,0) [0|1] "" SAFETY_PLC
+ SG_ InDockZone : 2|1@1+ (1,0) [0|1] "" SAFETY_PLC
+ SG_ PositionValid : 3|1@1+ (1,0) [0|1] "" SAFETY_PLC
+ SG_ TruckDoorOpen : 4|1@1+ (1,0) [0|1] "" SAFETY_PLC
+ SG_ AliveCounter : 48|4@1+ (1,0) [0|15] "" SAFETY_PLC
+ SG_ Crc : 56|8@1+ (1,0) [0|255] "" SAFETY_PLC
 
 CM_ BU_ AUTONOMY "Autonomy computer (non-safety). J1939 source address 0x80.";
 CM_ BU_ SAFETY_PLC "Safety PLC (PL d target). J1939 source address 0x81.";
 CM_ BU_ REMOTE_GW "Remote station radio gateway. J1939 source address 0x82.";
 CM_ BU_ MACHINE_GW "Drive-by-wire gateway to OEM machine bus. J1939 source address 0x83.";
+CM_ BU_ SENSOR_NODE "1:8 testbed: the safety PLC's own speed, articulation and boom sensors. J1939 source address 0x84.";
+CM_ BU_ FIELD_EVAL "1:8 testbed: software field evaluator for a non-rated lidar, standing in for safety scanner outputs. J1939 source address 0x85.";
+CM_ BU_ ZONE_SRC "1:8 testbed: zone and position-validity source for the PLC. J1939 source address 0x86.";
 CM_ BO_ 2365526144 "PGN 0xFF10 prio 3. 20 Hz, receiver timeout 150 ms. E2E: AliveCounter + CRC8 (SAE J1850) over bytes 0-6 and data ID.";
 CM_ BO_ 2365526400 "PGN 0xFF11 prio 3. 20 Hz, receiver timeout 150 ms.";
 CM_ BO_ 2298421377 "PGN 0xFF20 prio 2. 40 Hz (PLC cycle 25 ms). Informational copy of safety state; the stop itself is hardwired.";
@@ -74,5 +110,8 @@ CM_ BO_ 2365534339 "PGN 0xFF30 prio 3. 40 Hz.";
 CM_ BO_ 2365534595 "PGN 0xFF31 prio 3. 20 Hz.";
 CM_ BO_ 2365538434 "PGN 0xFF40 prio 3. 20 Hz. Loss > 500 ms forces a protective stop.";
 CM_ SG_ 2298421377 Cause "Bitfield: see kauha.safety.plc.Cause.";
+CM_ BO_ 2298433668 "PGN 0xFF50 prio 2. 40 Hz, receiver timeout 100 ms. Testbed only (the full machine wires these sensors to the PLC).";
+CM_ BO_ 2298433925 "PGN 0xFF51 prio 2. 40 Hz, receiver timeout 100 ms. Testbed only: the full machine and a rated testbed wire scanner outputs to the PLC.";
+CM_ BO_ 2365543046 "PGN 0xFF52 prio 3. 10 Hz, receiver timeout 500 ms. Testbed only.";
 VAL_ 2365526144 Mode 0 "IDLE" 1 "AUTO" 2 "TELEOP" ;
 VAL_ 2298421377 State 0 "RUN" 1 "WARNING" 2 "PROTECTIVE_STOP" 3 "EMERGENCY_STOP" ;
