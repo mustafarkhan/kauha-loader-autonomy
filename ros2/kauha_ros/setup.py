@@ -17,7 +17,7 @@ setup(
     ],
     install_requires=["setuptools"],
     zip_safe=True,
-    maintainer="Mustafa Khan",
+    maintainer="Mustafa R. Khan",
     description="ROS 2 interface for the KAUHA wheel-loader autonomy retrofit",
     license="Proprietary",
     entry_points={"console_scripts": [
