@@ -1,0 +1,32 @@
+{
+ "interference": {},
+ "ground": [],
+ "actuators": [],
+ "stability": {
+  "mass_kg": 42.34,
+  "cg_mm": [
+   -229.6,
+   117.8,
+   170.7
+  ],
+  "tipping_load_straight_kg": 21.55,
+  "tipping_load_full_turn_kg": 18.21,
+  "rated_operating_load_kg": 9.1
+ },
+ "bucket_struck_volume_l": 5.15,
+ "bucket_shell_flat": {
+  "segments_mm": [
+   125.5457948196839,
+   20.842342296547837,
+   129.00270197270953,
+   55.73836292804657
+  ],
+  "bend_angles_deg": [
+   54.49162950956839,
+   33.69006752597978,
+   67.06789956241022
+  ],
+  "flat_length_mm": 331.12920201698785,
+  "width_mm": 331.5
+ }
+}

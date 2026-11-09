@@ -1,0 +1,59 @@
+item,qty,kind,material,thickness_mm,mass_each_kg,supplier_or_process,note
+FF_side_plate,2,plate,Al5083,5.0,0.556,laser cut from DXF,"front frame side plate, laser cut"
+FF_hinge_lug_top,1,plate,Al5083,5.0,0.127,laser cut from DXF,bolts to the side plates through angle brackets
+FF_hinge_lug_bottom,1,plate,Al5083,5.0,0.127,laser cut from DXF,
+FF_cross,5,bought,Al6063,,0.054,"20x20 B-type slot 6 aluminium profile, cut to 110 mm, M5 tapped ends",
+FF_boom_pivot_shaft,1,turned,S235,,0.076,machine from drawing/BOM,"10 h8 shaft through both side plates and both boom arms, with spacers"
+FF_axle_clamp,2,printed,Al6082,,0.158,3D print PETG (STL),split clamp for the hub-motor axle; machined aluminium (or printed for bench tests)
+FF_steer_bracket,2,printed,PETG,,0.021,3D print PETG (STL),"steering actuator clevis bracket; PETG for bench, aluminium for field tests"
+FF_front_scanner,1,bought,-,,0.67,SICK nanoScan3 Pro I/O NANS3-CAAZ30AN1 (or 2D lidar for the evaluator profile),scan plane about 85 mm above ground
+FF_mast,1,bought,Al6063,,0.11,"20x20 profile, 225 mm",
+FF_mast_sensors,1,bought,-,,0.4,autonomy lidar + GNSS antenna (envelope),
+RF_side_plate,2,plate,Al5083,5.0,0.528,laser cut from DXF,
+RF_deck,1,plate,Al5083,4.0,0.441,laser cut from DXF,
+RF_hinge_block,1,turned,Al6082,,1.795,machine from drawing/BOM,"machined block, flanged bronze bushes top and bottom"
+RF_front_cross,1,plate,Al5083,10.0,0.415,laser cut from DXF,
+RF_trunnion_F,1,plate,Al5083,5.0,0.226,laser cut from DXF,
+RF_trunnion,1,plate,Al5083,5.0,0.226,laser cut from DXF,
+RF_steer_bracket,2,printed,PETG,,0.031,3D print PETG (STL),
+RF_counterweight,1,turned,S235,,11.398,machine from drawing/BOM,steel ballast block; trim length to set the static tipping load
+RF_battery,1,bought,-,,2.4,"36 V 10S Li-ion pack, 10 Ah, with BMS and XT60 (e-bike type)",
+RF_cab_electronics,1,printed,PETG,,1.4,3D print PETG (STL),"cab: PLC (Pi 4 + CAN HAT + 24 V I/O), gateway, sensor node, relays; printed shell"
+RF_cab_roof,1,printed,PETG,,0.119,3D print PETG (STL),
+RF_estop,2,bought,-,,0.08,"E-stop pushbutton 22 mm, 2 NC, with yellow enclosure",
+RF_rear_scanner,1,bought,-,,0.67,SICK nanoScan3 Pro I/O NANS3-CAAZ30AN1 (or 2D lidar for the evaluator profile),
+RA_beam,1,turned,Al6063,,0.235,machine from drawing/BOM,"40x40x3 aluminium square tube, 200 mm; 10 mm cross bore for the oscillation pin"
+RA_axle_clamp,2,printed,Al6082,,0.017,3D print PETG (STL),
+FW_hub_motor,2,bought,-,,3.0,"6.5 in hoverboard hub motor, 36 V 350 W, Hall sensors, solid tyre",
+RW_hub_motor,2,bought,-,,3.0,"6.5 in hoverboard hub motor, 36 V 350 W, Hall sensors, solid tyre",
+BM_arm,2,plate,Al5083,6.0,0.232,laser cut from DXF,"drawn at boom angle 0; holes: pivot, bucket pivot, tilt base, side-link pivot, tube"
+BM_cross_tube,1,turned,Al6063,,0.05,machine from drawing/BOM,
+BM_pin_tilt_base,1,turned,S235,,0.024,machine from drawing/BOM,
+BM_pin_side_link,1,turned,S235,,0.024,machine from drawing/BOM,
+BM_pin_lift,2,turned,S235,,0.007,machine from drawing/BOM,
+BK_side,2,plate,S235,3.0,0.366,laser cut from DXF,
+BK_shell,1,sheet,S235,,1.296,laser cut + bend from DXF,"one 1.5 mm sheet, four bends; flat pattern in the DXF"
+BK_cutting_edge,1,turned,S235,,0.075,machine from drawing/BOM,6 mm round bar welded along the lip (cutting edge)
+BK_pivot_lug,2,plate,S235,4.0,0.037,laser cut from DXF,
+BK_hlink_lug,2,plate,S235,3.0,0.037,laser cut from DXF,
+TL_side_link,2,plate,S235,3.0,0.036,laser cut from DXF,centre distance 71.8 mm
+TL_h_link,2,plate,S235,3.0,0.026,laser cut from DXF,centre distance 47.9 mm
+ACT_lift,2,bought,-,,0.7,"Progressive Automations PA-14P-4-150 (12 V, pot feedback)",pin-to-pin 268.6 mm
+ACT_tilt,1,bought,-,,0.7,"Progressive Automations PA-14P-4-150 (12 V, pot feedback)",pin-to-pin 263.3 mm
+ACT_steer,2,bought,-,,0.7,"Progressive Automations PA-14P-6-150 (12 V, pot feedback)",pin-to-pin 378.0 mm
+"ODrive v3.6 56 V (or compatible), dual-axis motor controller",2,bought,,,,,"motor control, CAN to the gateway"
+Teensy 4.1 + SN65HVD230 CAN transceiver x2,1,bought,,,,,drive-by-wire gateway
+Teensy 4.0 + SN65HVD230 CAN transceiver,1,bought,,,,,"sensor node: PLC's own speed, articulation and boom sensors"
+AS5600 magnetic angle sensor board + diametric magnet,2,bought,,,,,articulation pin and boom pivot (sensor node)
+Raspberry Pi 4 (4 GB) + Waveshare RS485 CAN HAT (MCP2515),1,bought,,,,,"safety PLC stand-in, CODESYS Control SL"
+8-ch 24 V opto-isolated input board + 8-ch relay board (5 V coil),1,bought,,,,,PLC I/O
+Pilz PNOZ s4 24 V DC safety relay (or equivalent cat. 3 relay),1,bought,,,,,"e-stop chain, K-DRIVE and K-IMPL"
+Finder 60.13 3-pole relay 24 V DC + socket,4,bought,,,,,"K-DRIVE: per wheel, phase disconnect + short (dynamic brake)"
+Finder 60.12 2-pole relay 24 V DC + socket,1,bought,,,,,K-IMPL: actuator supply
+Cytron MDD10A dual motor driver,3,bought,,,,,"five PA-14P actuators (lift L/R, tilt, steer L/R)"
+"DC-DC 36 V -> 24 V 10 A, 36 V -> 12 V 10 A, 24 V -> 5 V 5 A",1,bought,,,,,power
+Radio remote e-stop with fail-safe relay output,1,bought,,,,,remote e-stop in the chain
+2D lidar (e.g. LDROBOT LD19) x2,1,bought,,,,,evaluator profile stand-in for the safety scanners
+Raspberry Pi 5 8 GB or Jetson Orin Nano,1,bought,,,,,"autonomy computer, ROS 2 Jazzy"
+u-blox ZED-F9P RTK board + antenna,1,bought,,,,,localisation outdoors
+"Fasteners: M5 x 12 button head (60), M4 (40), 10 h8 pins with e-clips, flanged bronze bushes 10x12",1,bought,,,,,see the assembly STEP for positions
