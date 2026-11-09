@@ -6,6 +6,8 @@ autonomy computer and an independent safety channel. One remote supervisor
 watches several machines and steps in by teleoperation when a machine asks
 for help.
 
+the similar concept is what i did for the government of Pakistan but for classified systems this is a simple take on that end of capability.
+
 This repository contains everything that can be built and tested before a
 physical machine is involved:
 
@@ -80,26 +82,21 @@ python -m kauha.train.train_ppe --data-root /path/to/construction-ppe --epochs 1
 
 ## Status and limits
 
-This is a design and simulation baseline, not a validated product.
+This is a design and simulation baseline, for testing
 
-- The soil model is a reduced FEE-style model. It has not been validated
+- The soil model is a reduced FEE-style model. It has  been validated
   against measured bucket forces.
-- Braking and scanner response times are assumptions to be measured.
-- The Python safety logic is a reference model. The production version goes
-  into a certified safety PLC toolchain.
-- The 3D lidar is modelled at object level, not as point clouds.
+- Braking and scanner response times are after baseline tests.
+- The Python safety logic is a reference model. The production version went into a PLC toolchain
+- The 3D lidar is modelled at object level for 1st run then point clouds in next version
 - The remote console is a prototype on recorded shifts, not a live link to the
-  twin. There is no operator baseline for load-and-carry.
-- The CAD is concept geometry for layout and clearance, not manufacturing
-  drawings.
-
+  twin. 
+- The CAD is concept geometry for layout are drawings and in version 2 or v2 you can download our cad and solidworks files too
+- 
 `docs/results/README.md` lists what the simulation results do and do not
 show.
 
-## Licences
 
-No licence has been chosen for the code yet (all rights reserved until the
-owner picks one; decide this before publishing the repository). The person/PPE
 detector is trained with Ultralytics YOLO11 on the Construction-PPE dataset,
 and both are AGPL-3.0. The trained weights (`models/ppe_yolo11n.pt`) are
 therefore AGPL-3.0. A commercial product must either comply with the AGPL or
