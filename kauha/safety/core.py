@@ -289,7 +289,7 @@ def step(O, P, T: FieldTable, s: Memory, i):
     # SR-04 speed limit and overspeed monitoring.
     limit = O.If(auto, min(P.auto_speed, T.speed_cap), O.If(i.mode == TELEOP, min(P.teleop_speed, T.speed_cap), 0.0))
     limit = O.If(warning, O.Min(limit, P.warning_speed), limit)
-    limit = O.If(O.nz(rec), O.Min(limit, O.If(O.has(rec, FIELD_SIDE), 0.3, P.recovery_speed)), limit)
+    limit = O.If(O.nz(rec), O.Min(limit, O.If(O.has(rec, FIELD_SIDE), P.side_recovery_speed, P.recovery_speed)), limit)
     limit = O.If(fs_id == DIG_SET, O.Min(limit, T.dig_speed),
                  O.If(fs_id == DOCK_SET, O.Min(limit, T.dock_speed), limit))
     # The monitored envelope follows a limit increase at once. After a decrease
@@ -351,7 +351,8 @@ def step(O, P, T: FieldTable, s: Memory, i):
                  prev_limit=limit, env_t0=env_t0, env_v0=env_v0)
     # The recovery creep limit applies from the cycle recovery starts (found by the
     # proof of SR-12e).
-    limit_out = O.If(O.nz(rec), O.Min(limit, O.If(O.has(rec, FIELD_SIDE), 0.3, P.recovery_speed)), limit)
+    creep = O.If(O.has(rec, FIELD_SIDE), P.side_recovery_speed, P.recovery_speed)
+    limit_out = O.If(O.nz(rec), O.Min(limit, creep), limit)
     out = Out(state=st, cause=lat, speed_limit=O.If(stopped, 0.0, limit_out), field_set=fs_id,
               brake_release=O.Not(stopped),
               # SR-12: no boom/bucket motion while recovering from an occupied field.

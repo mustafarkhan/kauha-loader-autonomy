@@ -81,6 +81,7 @@ class SafetyParams:
     warning_speed: float = 1.0
     standstill: float = 0.05
     recovery_speed: float = 0.5          # SR-12
+    side_recovery_speed: float = 0.3     # SR-12, recovering from a side stop
 
 
 @dataclass
