@@ -8,8 +8,7 @@ for help.
 
 the similar concept is what i did for the government of Pakistan but for classified systems this is a simple take on that end of capability.
 
-This repository contains everything that can be built and tested before a
-physical machine is involved:
+This repository contains everything that can be built and tested on this domain
 
 | Layer | What is here | Where |
 |---|---|---|
