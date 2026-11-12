@@ -29,6 +29,12 @@ This repository contains everything that can be built and tested on this domain
 | Remote console | Clickable prototype of the supervisor's station on three recorded shifts: fleet, requests, 360° view, stop, e-stop, reset, task-space teleop, hash-chained log | `kauha/demo/console.py`, `docs/results/kauha_console.html` |
 | Demonstration | 60-minute shift with people, link loss, an obstacle, dust, a GNSS outage, a material change, a computer freeze and a remote e-stop; KPIs, 2D and 3D replay | `kauha/demo`, `docs/results` |
 
+## External validation
+
+Criteria from standards, published measurements and open datasets, fixed before
+the checks ran: [docs/results/validation.md](docs/results/validation.md). It lists
+passes, two failures that are open design issues, and what still needs data.
+
 ## 1:8 testbed build pack
 
 A Froude-scaled 1:8 articulated loader for testing the stack on a real machine:

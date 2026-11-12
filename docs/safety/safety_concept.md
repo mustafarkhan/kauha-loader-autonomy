@@ -114,3 +114,28 @@ the safety channel in the normal conformity route.
 | Object detection systems | ISO 16001 | Field verification, person detection |
 | Outdoor safety sensors | IEC 62998 | Scanner selection |
 | Machinery Regulation | (EU) 2023/1230 | Section 1, residual risk 5, cybersecurity in the gateway |
+
+## Open findings from external validation
+
+Checks against standards and published attack classes (`docs/results/validation.md`)
+found three limits the twin had not shown. None is closed yet.
+
+1. **Scanner range.** The protective fields are measured from the bucket's front
+   edge, but the front scanners sit about 3 m behind it. The far edge of the
+   longest field is up to 8.1 m from the nearest scanner, beyond the 4 m protective
+   range the speed cap (SR-04) assumes. The twin's scanners see 15 m, so no shift
+   or search exposed it. Options: a rated sensor with about 9 m protective range, a
+   mounting further forward, or a speed cap recomputed from the scanner position.
+   The 1:8 testbed is not affected in the same way (its scanner sits at the frame
+   nose with a 3 m range against 0.5 m fields), so it cannot be used to argue this
+   point for the full machine.
+2. **Person lying on the ground.** A horizontal scan plane at 0.5 m passes over
+   the 70 mm lying test piece of ISO 3691-4. Options: a second low scan plane, a
+   rated 3D sensor, or a stated residual risk covered by access control (A1).
+3. **The bus is not authenticated.** CRC and alive counter detect faults, not
+   attackers. A node on the bus that computes the CRC can make the gateway release
+   while the PLC reports a stop (the PLC's relays still cut power), and a forged
+   RemoteHeartbeat could hide a lost link or a pressed remote e-stop. Needed before
+   any use outside a closed test area: message authentication (for example SecOC
+   with a CMAC) or a physically separate safety segment, and the remote e-stop on a
+   hardwired or authenticated channel.
