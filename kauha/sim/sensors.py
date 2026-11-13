@@ -7,7 +7,12 @@ Fidelity is chosen per sensor by what the test needs:
     stops and stop distances are measured, not assumed. Each scanner
     evaluates the field set the PLC selected (as the real devices do) and
     needs a hit on >= 2 adjacent beams in 2 consecutive scans (object-size
-    and multiple-sampling filters).
+    and multiple-sampling filters). A return only counts toward a stopping
+    field inside the sensor's rated coverage (kauha.safety.coverage): 4 m for
+    the scanners. Beyond that the front and rear fields are watched by the
+    safety radars, modelled as line-of-sight detection inside their rated
+    range and field of view, without dust returns. Warning fields use the
+    scanners' full range.
   * 3D lidar: object level (landmarks, pile face, truck pose, people) with
     noise, range limits and dust dropout. Point clouds are not simulated.
   * Camera person detector: detection probability and false-positive rate
@@ -22,6 +27,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from kauha.geometry import points_in_polygon  # noqa: F401  (re-exported)
+from kauha.safety.coverage import LAYOUT, RatedSensor
 from kauha.safety.fields import FieldSet
 
 
@@ -74,6 +80,24 @@ REAR_MOUNTS = (ScannerMount("rear_left", "rear", 1.7, -1.2, math.radians(-45)),
                ScannerMount("rear_right", "rear", 1.7, 1.2, math.radians(45)))
 
 
+RATED = {s.name: s for s in LAYOUT}
+RADARS = tuple(s for s in LAYOUT if s.kind == "radar")
+RADAR_RESOLUTION = math.radians(0.5)      # sampling of the radar's field of view in the ray model
+
+
+def _radar_hits(s: RatedSensor, pose: tuple[float, float, float], segments: np.ndarray, circles: np.ndarray):
+    """Body-frame points a radar detects inside its rated coverage, and the mask of valid ones."""
+    bx, by, bth = pose
+    c, sn = math.cos(bth), math.sin(bth)
+    ox, oy = bx + c * s.x - sn * s.y, by + sn * s.x + c * s.y
+    half = max(h for _, h in s.zones)
+    far = max(r for r, _ in s.zones)
+    rel = np.linspace(-half, half, int(2 * half / RADAR_RESOLUTION) + 1)
+    r = raycast(ox, oy, bth + s.heading + rel, far, segments, circles)
+    ok = (r < far) & s.rated(r, rel)
+    return s.x + r * np.cos(s.heading + rel), s.y + r * np.sin(s.heading + rel), ok
+
+
 @dataclass
 class ScanResult:
     front_prot: bool
@@ -119,18 +143,22 @@ class SafetyScanners:
             # beam endpoints in the body frame (`local` angles are body-frame)
             hx = m.x + r * np.cos(local)
             hy = m.y + r * np.sin(local)
-            hits[m.body].append((hx, hy, valid))
+            # (points, valid for warning fields, valid for stopping fields: inside the rated range)
+            hits[m.body].append((hx, hy, valid, valid & RATED[m.name].rated(r, local - m.heading)))
             self.last_ranges[m.name] = r
+        for s in RADARS:
+            hx, hy, ok = _radar_hits(s, body_poses[s.body], segments, circles)
+            hits[s.body].append((hx, hy, np.zeros_like(ok), ok))
 
-        def eval_fields(body: str, polys: list) -> list[bool]:
+        def eval_fields(body: str, polys: list, warning: tuple = ()) -> list[bool]:
             out = []
-            for poly in polys:
+            for k, poly in enumerate(polys):
                 if not poly:
                     out.append(False)
                     continue
                 v = False
-                for hx, hy, valid in hits[body]:
-                    inside = valid & points_in_polygon(hx, hy, poly)
+                for hx, hy, valid, rated in hits[body]:
+                    inside = (valid if k in warning else rated) & points_in_polygon(hx, hy, poly)
                     if self._adjacent_hits(inside):
                         v = True
                         break
@@ -138,9 +166,9 @@ class SafetyScanners:
             return out
 
         side_polys = [fs.side, [(x, -y) for x, y in fs.side]] if fs.side else []
-        front_p, front_w = (eval_fields("front", [fs.protective, fs.warning])
+        front_p, front_w = (eval_fields("front", [fs.protective, fs.warning], warning=(1,))
                             if fs.direction >= 0 else (False, False))
-        rear_p, rear_w = (eval_fields("rear", [fs.protective_for("rear"), fs.warning_for("rear")])
+        rear_p, rear_w = (eval_fields("rear", [fs.protective_for("rear"), fs.warning_for("rear")], warning=(1,))
                           if fs.direction <= 0 else (False, False))
         side = any(eval_fields("front", side_polys)) if side_polys else False
         if fs.side_rear:

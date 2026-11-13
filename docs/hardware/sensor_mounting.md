@@ -13,6 +13,8 @@ pointing backwards. Height is above ground.
 | Front-right safety scanner | front | (2.0, −1.35, 0.5) | yaw −45°, 275° scan | Mirror of the above |
 | Rear-left safety scanner | rear | (1.7, −1.2, 0.5) | yaw −45°, 275° scan | Behind the counterweight, and forward along the rear frame to the articulation joint |
 | Rear-right safety scanner | rear | (1.7, +1.2, 0.5) | yaw +45°, 275° scan | Mirror of the above |
+| Front safety radars (3) | front | (2.0, 0, about 1.8) and (2.0, ±1.0, about 1.8) | centre straight ahead, outer two yaw ±25° | The far part of the front protective field, 4 to 8.1 m from the sensors, over the lowered bucket. Rated 9 m within 40°, 5 m within 100°, 20° vertical |
+| Rear safety radars (3) | rear | (1.7, 0, about 1.5) and (1.7, ±0.9, about 1.5) | centre straight back, outer two yaw ±25° | The far part of the rear protective field |
 | 3D lidar | front (sensor mast) | (−0.4, 0, 3.4) | level | Over the bucket at carry height; sees the pile face and the truck body. On a mast on the front frame, so it turns with the bucket |
 | 4D radar | front (frame nose) | (1.16, 0, 1.0) | forward | Dust fallback. Moved from (2.2, 0, 1.2) during CAD layout: there the boom's tilt cylinder struck it with the boom fully lowered |
 | Cameras | rear (cab roof edges) | — | front, rear, left, right | Person detection and remote video |
@@ -54,3 +56,14 @@ merged field.
     the front tyres and the truck side (2.0–2.8 m ahead of the front axle).
   - The truck must be parked so that its side is at least 2.8 m from the front
     axle at the dump pose. The planner docks at 3.1 m.
+
+## Why the radars are there
+
+The front protective field starts at the bucket edge, 5.1 m ahead of the front axle,
+and is up to 4 m long. The front scanners sit 3.1 m behind the bucket edge, so the
+field ends up to 8.1 m from them. Their rated protective range is 4 m. Six safety
+radars on one control unit (the product limit) cover the rest. `kauha/safety/coverage.py`
+holds the rated coverage of every sensor and checks each field set against it; the
+heights above are proposals, to be fixed on the machine so the radar looks over the
+lowered bucket. Open points for the radar: confirmation for a moving outdoor machine,
+response time, PFHd, and behaviour with the boom and bucket moving in its view.

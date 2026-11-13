@@ -4,10 +4,11 @@
 
 t_react = scanner response + PLC cycles + brake actuator latency + brake
 pressure build-up. The protective field must be at least d_stop long at the
-top speed of its speed band. With a 4 m protective-field range (typical of
-outdoor safety scanners; confirm for the selected part) the scanner range,
-not the drivetrain, caps the autonomous speed. That cap falls further on a
-low-friction winter surface.
+top speed of its speed band. The longest field is 4 m, measured from the
+machine contour. That length, not the drivetrain, caps the autonomous speed,
+and the cap falls further on a low-friction winter surface. Which sensors are
+rated to watch a field that far from their mounting is checked separately in
+kauha.safety.coverage.
 """
 from __future__ import annotations
 

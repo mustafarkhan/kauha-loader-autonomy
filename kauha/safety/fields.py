@@ -27,7 +27,7 @@ from kauha.safety.stopping import StopBudget, max_speed_for_field, stopping_dist
 
 Polygon = list[tuple[float, float]]
 
-SCANNER_PROTECTIVE_RANGE_M = 4.0   # to confirm against the selected scanner
+SCANNER_PROTECTIVE_RANGE_M = 4.0   # longest protective field, from the machine contour (see coverage.py)
 SCANNER_WARNING_RANGE_M = 10.0
 SIDE_MARGIN_M = 0.5
 
@@ -116,6 +116,7 @@ class Geometry:
 
 
 CONTACT_BAND_M = 0.35
+SCAN_PLANE_M = 0.5           # height of the scanners' horizontal scan plane above the ground
 BOOM_RAISED_M = 1.0          # bucket bottom height above which the scan plane (0.5 m) sees under it
 
 
