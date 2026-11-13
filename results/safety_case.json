@@ -400,10 +400,22 @@
   "H1.S.SR-04.tests": {
    "id": "H1.S.SR-04.tests",
    "kind": "solution",
-   "text": "Requirement-traced tests: 8/8 passed",
+   "text": "Requirement-traced tests: 11/11 passed",
    "parent": "H1.S.SR-04",
    "status": "passed",
    "evidence": [
+    {
+     "test": "tests/safety/test_coverage.py::test_all_stopping_fields_are_inside_rated_coverage_dry_and_winter",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_coverage.py::test_scanners_alone_do_not_cover_the_fields",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_coverage.py::test_twin_ignores_returns_outside_rated_coverage",
+     "outcome": "passed"
+    },
     {
      "test": "tests/safety/test_plc.py::test_sr04_overspeed_trips",
      "outcome": "passed"
@@ -1134,10 +1146,22 @@
   "H2.S.SR-04.tests": {
    "id": "H2.S.SR-04.tests",
    "kind": "solution",
-   "text": "Requirement-traced tests: 8/8 passed",
+   "text": "Requirement-traced tests: 11/11 passed",
    "parent": "H2.S.SR-04",
    "status": "passed",
    "evidence": [
+    {
+     "test": "tests/safety/test_coverage.py::test_all_stopping_fields_are_inside_rated_coverage_dry_and_winter",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_coverage.py::test_scanners_alone_do_not_cover_the_fields",
+     "outcome": "passed"
+    },
+    {
+     "test": "tests/safety/test_coverage.py::test_twin_ignores_returns_outside_rated_coverage",
+     "outcome": "passed"
+    },
     {
      "test": "tests/safety/test_plc.py::test_sr04_overspeed_trips",
      "outcome": "passed"

@@ -48,9 +48,12 @@ the safety channel in the normal conformity route.
 2. **Scanner coverage close to the bucket** has a blind volume at ground level
    (see `docs/hardware/sensor_mounting.md`). It must be measured on the
    machine.
-3. **The 4 m protective range caps speed at about 3 m/s.** Faster autonomous
-   travel would need a longer-range safety-rated sensor, and none is chosen
-   yet.
+3. **A 4 m protective field caps speed at about 3 m/s, and needs safety radars
+   to be watched at all.** The field is 4 m long from the bucket edge, which is
+   8 m from the sensors. The scanners are rated to 4 m, so the far part relies on
+   9 m safety radars whose use on a moving outdoor machine is not yet confirmed
+   with a manufacturer (see the findings section). Without them the forward cap
+   is about 0.3 m/s.
 4. **Automatic restart after a field stop (SR-11)** is a site decision. The
    demo enables it after 3 s of clear fields. A conservative site can disable
    it, at the cost of more supervisor interventions.
@@ -101,6 +104,9 @@ the safety channel in the normal conformity route.
     for that, and it is only as good as its search space: one pedestrian,
     routes of two legs, dust. Two people working together, vehicles other than
     the truck, and sensor faults during the search are not yet covered.
+11. **A person lying on the ground is not detected by any rated sensor.** The
+    scan plane is 0.5 m above the ground. Covered only by access control to the
+    operating area (A1); see the findings section.
 
 ## 4. Standards map
 
@@ -115,27 +121,49 @@ the safety channel in the normal conformity route.
 | Outdoor safety sensors | IEC 62998 | Scanner selection |
 | Machinery Regulation | (EU) 2023/1230 | Section 1, residual risk 5, cybersecurity in the gateway |
 
-## Open findings from external validation
+## Findings from external validation and what was done
 
 Checks against standards and published attack classes (`docs/results/validation.md`)
-found three limits the twin had not shown. None is closed yet.
+found three limits the twin had not shown. Each now has a design decision.
 
-1. **Scanner range.** The protective fields are measured from the bucket's front
-   edge, but the front scanners sit about 3 m behind it. The far edge of the
-   longest field is up to 8.1 m from the nearest scanner, beyond the 4 m protective
-   range the speed cap (SR-04) assumes. The twin's scanners see 15 m, so no shift
-   or search exposed it. Options: a rated sensor with about 9 m protective range, a
-   mounting further forward, or a speed cap recomputed from the scanner position.
-   The 1:8 testbed is not affected in the same way (its scanner sits at the frame
-   nose with a 3 m range against 0.5 m fields), so it cannot be used to argue this
-   point for the full machine.
-2. **Person lying on the ground.** A horizontal scan plane at 0.5 m passes over
-   the 70 mm lying test piece of ISO 3691-4. Options: a second low scan plane, a
-   rated 3D sensor, or a stated residual risk covered by access control (A1).
-3. **The bus is not authenticated.** CRC and alive counter detect faults, not
-   attackers. A node on the bus that computes the CRC can make the gateway release
-   while the PLC reports a stop (the PLC's relays still cut power), and a forged
-   RemoteHeartbeat could hide a lost link or a pressed remote e-stop. Needed before
-   any use outside a closed test area: message authentication (for example SecOC
-   with a CMAC) or a physically separate safety segment, and the remote e-stop on a
-   hardwired or authenticated channel.
+1. **Sensor range (was a failure, now designed for).** The protective fields start at
+   the bucket's front edge, but the sensors sit about 3 m behind it, so the longest
+   field ends 8.1 m from them. An outdoor safety laser scanner is rated to 4 m.
+   - Decision: three safety radars on each end (PL d, category 3 product class, rated
+     to 9 m in a 40° sector and to 5 m in a 100° sector) watch the far part of the
+     front and rear fields. The four scanners keep the near part and the side,
+     contact and under-bucket fields, all within 4 m.
+   - `kauha/safety/coverage.py` states each sensor's rated coverage and checks that
+     every stopping field of every field set lies inside it. The twin now counts a
+     return toward a stopping field only inside rated coverage, so a field outside
+     it would fail the shifts and the search, not pass silently.
+   - Fallback without the radars: about 0.3 m/s forward, because the scanners see
+     less than 1 m beyond the bucket.
+   - Still to confirm before purchase: the radar on a moving outdoor machine, its
+     response time against the 0.10 s in the stop budget, and its PFHd. The radar is
+     rated for detecting people, not the ISO 3691-4 test piece.
+   - The 1:8 testbed is not affected (its scanner sits at the frame nose with a 3 m
+     range against 0.5 m fields), so it cannot be used to argue this point.
+2. **Person lying on the ground (accepted as a residual risk, number 11 above).** A
+   horizontal scan plane at 0.5 m passes over the 70 mm lying test piece of
+   ISO 3691-4. A plane at 70 mm is not usable on a loader: on gravel, ruts and
+   ramps it would see the ground. ISO 3691-4 is written for driverless trucks on
+   flat floors; ISO 17757, for autonomous earth-moving machines, relies on a
+   controlled autonomous operating zone. The measure is therefore access control
+   (A1). The autonomy side's 3D lidar and camera could see a person on the ground,
+   but they are not safety rated and that case is not tested.
+3. **Bus authentication (was a failure, now designed for).** CRC and alive counter
+   detect faults, not attackers.
+   - Decision: the bus is split. The PLC, its sensors and the gateway are on a
+     safety segment inside the cabinet. The autonomy computer, remote gateway and
+     zone source are on an open segment. A guard on the gateway controller forwards
+     only four command frames from the open segment, and only with a valid
+     authentication code (AES-128 CMAC, freshness counter, session key per power
+     cycle). `kauha/can/guard.py`, `kauha/can/auth.py`, firmware port in
+     `firmware/common`, requirement AR-06.
+   - Not covered: a compromised autonomy computer holds its own key and can send any
+     command; the PLC bounds that as before. Someone with a tool inside the cabinet
+     is on the safety segment. Key handling is a commissioning procedure
+     (`firmware/gateway/provision_keys.py`), not yet a managed process.
+   - The stop never depended on the bus: relays cut the power. The remote e-stop
+     stays hardwired through a rated radio receiver.

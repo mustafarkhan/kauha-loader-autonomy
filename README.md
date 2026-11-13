@@ -14,7 +14,7 @@ This repository contains everything that can be built and tested on this domain
 |---|---|---|
 | Hardware design | Candidate BOM, interface spec, wiring/architecture, sensor mounting, HIL bench spec, J1939 DBC | `docs/hardware`, `hardware/` |
 | Safety channel | Deterministic safety PLC logic: speed-banded field sets, protective/warning fields, speed envelope, heartbeat, watchdog, geofence, dig/dock muting, supervised recovery, hash-chained event log | `kauha/safety` |
-| Machine bus | DBC, encoder/decoder, end-to-end protection (counter + CRC-8 J1850), drive-by-wire gateway | `kauha/can` |
+| Machine bus | DBC, encoder/decoder, end-to-end protection (counter + CRC-8 J1850), two segments with an authenticating guard (AES-128 CMAC), drive-by-wire gateway | `kauha/can` |
 | Digital twin | Articulated loader dynamics, bucket–pile interaction, depleting stockpiles, trucks, people, ray-cast safety scanners, lidar/camera/GNSS/IMU models, dust, outages | `kauha/sim` |
 | Autonomy | EKF localisation (GNSS + survey posts), pile/truck/people perception, V-cycle planner, articulated pure pursuit, field-aware speed limiting, supervisor, learned bucket filling | `kauha/autonomy` |
 | Learning | PPO bucket-filling policy with domain randomisation; YOLO11n person/PPE detector fine-tuned on Construction-PPE | `kauha/train`, `models/` |
@@ -33,7 +33,9 @@ This repository contains everything that can be built and tested on this domain
 
 Criteria from standards, published measurements and open datasets, fixed before
 the checks ran: [docs/results/validation.md](docs/results/validation.md). It lists
-passes, two failures that are open design issues, and what still needs data.
+passes, findings, what is still open and what needs data. Two earlier failures
+(sensor range, unauthenticated bus) led to design changes described in
+[docs/safety/safety_concept.md](docs/safety/safety_concept.md).
 
 ## 1:8 testbed build pack
 

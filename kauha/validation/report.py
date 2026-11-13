@@ -16,7 +16,7 @@ from kauha.validation.criteria import CRITERIA
 JSON = REPO_ROOT / "results" / "validation.json"
 MD = REPO_ROOT / "docs" / "results" / "validation.md"
 # Failures that are understood and recorded as open design issues. A new failure breaks CI.
-KNOWN_FAILURES = {"V-STD-04", "V-DAT-01"}
+KNOWN_FAILURES: set[str] = set()
 
 
 def run() -> list[dict]:

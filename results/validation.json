@@ -22,8 +22,8 @@
   "target": "below the table limit; the limit formula must be read from the purchased standard",
   "data_env": "",
   "status": "open",
-  "measured": "twin stops from 19.8 km/h in 7.8 m",
-  "note": "The limit formula is unreadable in the free sample. A commonly quoted form (v2/150 + 0.2(v + 5), v in km/h) would give 7.6 m, which the twin's assumed braking would miss. Confirm the formula in the purchased standard, then measure the real brake."
+  "measured": "twin stops from 19.8 km/h in 7.2 m after brake actuation (7.8 m with the retrofit actuator's delay)",
+  "note": "Confirmed from the 1985 edition's sample: the test speed is 32 km/h or the top speed if lower, and the distance is measured from the point where the brake control is actuated. The limit table is not legible there and later editions are not free. The commonly quoted later form (v2/150 + 0.2(v + 5), v in km/h) gives 7.6 m, which the assumed braking would meet measured the standard's way; it corresponds to a mean deceleration of about 2.3 m/s2, close to the 2.5 m/s2 the stop budget assumes. To close: read the limit in the purchased standard and measure the machine's brake."
  },
  {
   "id": "V-STD-03",
@@ -47,9 +47,9 @@
   "metric": "a standing test piece (200 mm diameter) just inside the far edge of each protective field",
   "target": "detected in every field set, on the axis and at both far corners",
   "data_env": "",
-  "status": "fail",
-  "measured": "127 of 129 test-piece positions detected",
-  "note": "Missed at 1 degree resolution: fwd_3.0_S/front at (8.82, 1.89); fwd_3.0_S/front at (8.82, -1.89). The fields are measured from the bucket's front edge, but the scanners sit about 3 m behind it: the far edge is up to 8.1 m from the nearest scanner, beyond the 4 m protective range the speed cap assumes. The twin's scanners see 15 m, so the shifts never showed it. The full machine needs a rated sensor with that range (or one mounted further forward), or a lower speed cap."
+  "status": "pass",
+  "measured": "129 of 129 test-piece positions detected in 43 field sets; 0 field sample points outside rated coverage",
+  "note": "2D twin; a return counts only inside a sensor's rated coverage. The front and rear fields end up to 8.1 m from the scanners, beyond their 4 m rated range, so three 9 m safety radars per end watch the far part (8.1 m at most); the scanners keep the side, contact and under-bucket fields. With the scanners alone the forward cap would be 0.31 m/s. The radar is rated for people, not for the test piece, and its use on a moving outdoor machine is to be confirmed with the manufacturer; the check on the hardware is test T4."
  },
  {
   "id": "V-STD-05",
@@ -61,8 +61,8 @@
   "target": "scan plane at or below 70 mm, or another means of detecting a person lying down",
   "data_env": "",
   "status": "finding",
-  "measured": "scan plane 0.5 m on the full machine, about 0.085 m on the 1:8 testbed",
-  "note": "A horizontal scan plane at 0.5 m passes over a 70 mm lying test piece, so a person lying on the ground is not detected by the safety scanners. ISO 3691-4 is written for indoor trucks with low scanners. Options: a second, low scan plane; a rated 3D sensor; or stating it as a residual risk covered by site access control. Not yet decided in the safety concept."
+  "measured": "scan plane 0.5 m on the full machine; no rated means of detecting a person lying on the ground",
+  "note": "Decided: accepted as a stated residual risk (safety concept, residual risk 11). A scan plane at 70 mm cannot be used on a loader: on gravel and ruts it would see the ground. ISO 3691-4 is written for driverless trucks on flat floors; for autonomous earth-moving machines ISO 17757 relies on a controlled autonomous operating zone. Measures: access control to the operating area (A1). The autonomy side's 3D lidar and camera are the only sensors that could see a person on the ground; they are not safety rated and that case is not tested. The 1:8 testbed's plane is about 0.085 m, so test T4.2 shows the limit rather than hiding it."
  },
  {
   "id": "V-STD-06",
@@ -87,8 +87,8 @@
   "target": "PL d calculated from the selected components' MTTFd, DC and CCF",
   "data_env": "",
   "status": "open",
-  "measured": "not calculated",
-  "note": "Needs MTTFd, DC and CCF from the data sheets of the selected safety relay, relays and scanners (SISTEMA or hand calculation)."
+  "measured": "selected parts add up to 3.63e-07 1/h of the 1e-06 PL d limit; 6.37e-07 1/h left for the parts not selected",
+  "note": "4 safety laser scanners 3.20e-07; output stage: brake valve and drive cut-off, two monitored channels 4.29e-08. Output stage MTTFd 100 years per channel at 28000 operations a year; common-cause score claimed 95 (65 needed). Not selected, so no figure: safety radar system (6 sensors, 1 control unit); safety controller. PL d holds if those stay inside the remaining budget. Table K.1 values are from a manufacturer's reproduction and need confirming in the standard. kauha/safety/pl.py."
  },
  {
   "id": "V-PUB-01",
@@ -125,9 +125,9 @@
   "metric": "KAUHA cycle time against the measured novice-to-professional spread",
   "target": "reported against the spread; the paper gives it only in plots",
   "data_env": "",
-  "status": "open",
-  "measured": "KAUHA median cycle 69 s (truck loading, twin)",
-  "note": "The operator study reports cycle times only in plots. Needs the figures digitised or the pilot site's own operator timing."
+  "status": "finding",
+  "measured": "KAUHA median cycle 70 s (truck loading, twin); every operator in the study's plots is below about 45 s",
+  "note": "The study gives cycle times only in figures 9 and 10, whose axis ends near 45 s, and reports spread as ratios: productivity differs by a factor of 5 to 8 between operators, 2 to 4 without novices. So the twin's autonomous cycle is at least 1.5 times as long as a human short loading cycle. The causes are the 3 m/s speed cap from the protective field length and a longer travel path in the twin's site. The honest claim is unattended running, not speed. A like-for-like figure needs the pilot site's own operator timing."
  },
  {
   "id": "V-PUB-04",
@@ -151,9 +151,9 @@
   "metric": "attack frames accepted by the gateway or the PLC, and unsafe commands that follow",
   "target": "0 forged frames accepted; replay and suspension end in a stop within the frame timeout",
   "data_env": "",
-  "status": "fail",
-  "measured": "fuzzing: 82 of 200000 random frames accepted (0.041 %); replay: 12.5 % accepted; masquerade with a computed CRC: gateway released in 400 of 400 cycles while the PLC said stop; suspension: brake after 0.105 s",
-  "note": "The CRC and alive counter detect faults, not attackers: they use no secret, so anyone on the bus can forge frames. The stop itself survives (the PLC cuts power through relays, not over CAN), but a forged RemoteHeartbeat could hide a lost link or a pressed remote e-stop. The bus needs message authentication (for example AUTOSAR SecOC with a CMAC) or physical separation of the safety segment before it leaves a closed test area. Suspension is handled."
+  "status": "pass",
+  "measured": "from the open segment, through the segment guard: fuzzing 0 of 200000 forged frames forwarded; replay 0 of 20000 accepted; masquerade: gateway released in 0 of 400 cycles while the PLC said stop, 0 forged heartbeats accepted; suspension: brake after 0.105 s",
+  "note": "The bus is split: the PLC, sensors and gateway are on a safety segment inside the cabinet; the autonomy computer, remote link and zone source are on an open segment. The guard forwards only four command frames from the open segment, each authenticated with an AES-128 CMAC, a freshness counter and a per-power-cycle session key. Under fuzzing 96 % of genuine commands still got through; the rest are lost and end in a stop by timeout. Limits: a compromised autonomy computer holds its own key and can send any command, which the PLC bounds as before. An attacker with a tool inside the cabinet is on the safety segment, where the CRC alone does not stop forged frames (82 of 200000 random frames accepted at a receiver); that is covered by physical access control, not by the bus. Reference implementation and firmware port, tested against each other; not yet run on the hardware."
  },
  {
   "id": "V-DAT-02",
@@ -200,25 +200,25 @@
   "kind": "dataset",
   "source": "Boreas multi-season dataset",
   "url": "https://arxiv.org/pdf/2203.10168",
-  "metric": "false-occupied rate and missed people in snow against dry runs",
-  "target": "not built yet",
+  "metric": "share of frames with a 4 m field ahead occupied, snow against clear runs of one route",
+  "target": "snow adds less than 1 percentage point",
   "data_env": "KAUHA_DATA_BOREAS",
-  "status": "open",
-  "measured": "not built",
-  "note": "Needs the dataset's calibration and label format in hand before a loader is written."
+  "status": "needs data",
+  "measured": "",
+  "note": "Set KAUHA_DATA_BOREAS to a folder with two subfolders, snow/ and clear/, each holding Boreas sequences of the same route (boreas-YYYY-MM-DD-HH-MM/lidar/*.bin). Optional KAUHA_BOREAS_SENSOR_HEIGHT in metres (default 2.0)."
  },
  {
   "id": "V-DAT-06",
   "part": "radar in dust and snow",
   "kind": "dataset",
-  "source": "RADIATE; 4D radar in an open-pit mine",
+  "source": "RADIATE radar dataset (fog, snow, rain)",
   "url": "https://arxiv.org/pdf/2010.09076",
-  "metric": "radar detections of people when lidar is degraded",
-  "target": "not built yet",
+  "metric": "labelled pedestrians a CFAR detector finds on the radar image in fog and snow",
+  "target": "at least 90 % of those within 9 m",
   "data_env": "KAUHA_DATA_RADIATE",
-  "status": "open",
-  "measured": "not built",
-  "note": "Radar replay needs the radar's role fixed first (detection only, or part of a field)."
+  "status": "needs data",
+  "measured": "",
+  "note": "Set KAUHA_DATA_RADIATE to a folder of RADIATE sequences (each with Navtech_Cartesian/*.png and annotations/annotations.json); fog and snow sequences are the ones of interest. Needs Pillow."
  },
  {
   "id": "V-DAT-07",
@@ -231,6 +231,6 @@
   "data_env": "KAUHA_DATA_RTKSLAM",
   "status": "open",
   "measured": "not built",
-  "note": "Needs the benchmark's file format and the EKF run from logged GNSS/IMU instead of the twin."
+  "note": "The benchmark's download page and file format could not be read from the build environment. Needs the format description, then the EKF run on its logged GNSS and IMU instead of the twin's."
  }
 ]

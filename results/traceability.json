@@ -60,6 +60,35 @@
   ],
   "all_passed": true
  },
+ "AR-06": {
+  "tests": [
+   {
+    "test": "tests/can/test_auth.py::test_aes_and_cmac_match_the_published_vectors",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/can/test_auth.py::test_genuine_command_is_forwarded_and_everything_else_is_not",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/can/test_auth.py::test_a_new_challenge_invalidates_recorded_frames",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/can/test_auth.py::test_random_companions_are_never_accepted",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/firmware/test_firmware.py::test_cmac_matches_python",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/firmware/test_firmware.py::test_segment_guard_matches_python",
+    "outcome": "passed"
+   }
+  ],
+  "all_passed": true
+ },
  "SR-01": {
   "tests": [
    {
@@ -253,6 +282,18 @@
  },
  "SR-04": {
   "tests": [
+   {
+    "test": "tests/safety/test_coverage.py::test_all_stopping_fields_are_inside_rated_coverage_dry_and_winter",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/safety/test_coverage.py::test_scanners_alone_do_not_cover_the_fields",
+    "outcome": "passed"
+   },
+   {
+    "test": "tests/safety/test_coverage.py::test_twin_ignores_returns_outside_rated_coverage",
+    "outcome": "passed"
+   },
    {
     "test": "tests/safety/test_plc.py::test_sr04_overspeed_trips",
     "outcome": "passed"
