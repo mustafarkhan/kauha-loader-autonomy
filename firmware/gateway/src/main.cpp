@@ -1,6 +1,11 @@
 // KAUHA 1:8 testbed: drive-by-wire gateway (Teensy 4.1).
 //
-// CAN1 (500 kbit/s, 29-bit J1939 ids): the machine bus (DBC hardware/can/kauha_machine.dbc).
+// CAN1 (500 kbit/s, 29-bit J1939 ids): the safety segment of the machine bus (PLC, sensor node,
+//   field evaluator). DBC hardware/can/kauha_machine.dbc.
+// CAN3 (500 kbit/s, 29-bit): the open segment (autonomy computer, remote gateway, zone source).
+//   The segment guard (firmware/common/guard_core.c) forwards only authenticated command frames
+//   from CAN3 to CAN1 and copies CAN1 to CAN3. Sender keys are read from EEPROM (written once at
+//   commissioning with firmware/gateway/provision_keys.py); with no keys nothing is forwarded.
 // CAN2 (500 kbit/s, 11-bit ids): two ODrive v3.6 controllers, CANSimple protocol,
 //   node 0 = front axle (axis0 left, axis1 right as nodes 0/1), nodes 2/3 = rear axle.
 // PWM + DIR to three Cytron MDD10A boards for the five PA-14P actuators,
@@ -11,17 +16,21 @@
 // this code does: K-DRIVE removes the hub motors from the ODrives and shorts their
 // phases; K-IMPL removes actuator power.
 #include <Arduino.h>
+#include <EEPROM.h>
+#include <Entropy.h>
 #include <FlexCAN_T4.h>
 
 extern "C" {
 #include "drive_ctrl.h"
 #include "gateway_core.h"
+#include "guard_core.h"
 #include "generated/kauha_machine.h"
 #include "generated/kinematics.h"
 #include "kauha_e2e.h"
 }
 
-FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> bus;     // machine bus
+FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> bus;     // safety segment
+FlexCAN_T4<CAN3, RX_SIZE_256, TX_SIZE_16> open_bus; // open segment
 FlexCAN_T4<CAN2, RX_SIZE_64, TX_SIZE_16> motors;   // ODrives
 
 // ------------------------------------------------------------------ pins
@@ -41,6 +50,8 @@ static float pot_retracted[5] = {80, 80, 80, 80, 80};
 static float pot_extended[5] = {3990, 3990, 3990, 3990, 3990};
 
 static gw_t gw;
+static guard_t guard;
+static bool guard_ready = false;
 static const drive_geom_t GEOM = {KIN_LF, KIN_LR, KIN_TRACK, KIN_MAX_ACCEL, KIN_MAX_SPEED};
 static const act_loop_t ACT_LOOP = {60.0, 0.0008, 1.0};      // duty per m, 0.8 mm deadband
 
@@ -99,17 +110,49 @@ static void on_motor_frame(const CAN_message_t &m) {
     }
 }
 
-static void on_bus_frame(const CAN_message_t &m) {
-    if (m.flags.extended && m.len == 8) gw_receive(&gw, now_s(), m.id, m.buf);
-}
-
-static void send_bus(uint32_t id, const uint8_t *payload) {
+static void send_on(bool open_side, uint32_t id, const uint8_t *payload) {
     CAN_message_t m;
     m.id = id;
     m.flags.extended = 1;
     m.len = 8;
     memcpy(m.buf, payload, 8);
-    bus.write(m);
+    if (open_side) open_bus.write(m); else bus.write(m);
+}
+
+// Safety segment: the gateway takes the PLC's status from here only, and copies every frame
+// to the open segment for the autonomy computer and the console.
+static void on_bus_frame(const CAN_message_t &m) {
+    if (!m.flags.extended || m.len != 8) return;
+    if (m.id == KAUHA_MACHINE_SAFETY_STATUS_FRAME_ID) gw_receive(&gw, now_s(), m.id, m.buf);
+    send_on(true, m.id, m.buf);
+}
+
+// Open segment: nothing reaches the gateway logic or the safety segment except through the guard.
+static void on_open_frame(const CAN_message_t &m) {
+    if (!m.flags.extended || !guard_ready) return;
+    uint32_t id; uint8_t d[8];
+    if (guard_from_open(&guard, now_s(), m.id, m.buf, m.len, &id, d)) {
+        gw_receive(&gw, now_s(), id, d);
+        send_on(false, id, d);
+    }
+}
+
+static void send_bus(uint32_t id, const uint8_t *payload) {
+    send_on(false, id, payload);
+    send_on(true, id, payload);
+}
+
+// Keys: 3 x 16 bytes at EEPROM address 0, followed by a marker byte 0xA5. Erased EEPROM reads 0xFF.
+static void start_guard() {
+    uint8_t keys[GUARD_SENDERS][16], challenge[8];
+    if (EEPROM.read(GUARD_SENDERS * 16) != 0xA5) return;      // not provisioned: fail closed
+    for (int k = 0; k < GUARD_SENDERS; k++)
+        for (int i = 0; i < 16; i++) keys[k][i] = EEPROM.read(k * 16 + i);
+    Entropy.Initialize();                                      // hardware random number generator
+    for (int i = 0; i < 8; i++) challenge[i] = Entropy.randomByte();
+    guard_init(&guard, keys, challenge);
+    memset(keys, 0, sizeof keys);
+    guard_ready = true;
 }
 
 static void publish(double speed) {
@@ -135,6 +178,7 @@ static void publish(double speed) {
 
 void setup() {
     gw_init(&gw);
+    start_guard();
     for (auto &a : ACT) {
         pinMode(a.dir, OUTPUT);
         pinMode(a.pwm, OUTPUT);
@@ -149,6 +193,11 @@ void setup() {
     bus.enableFIFO();
     bus.enableFIFOInterrupt();
     bus.onReceive(on_bus_frame);
+    open_bus.begin();
+    open_bus.setBaudRate(500000);
+    open_bus.enableFIFO();
+    open_bus.enableFIFOInterrupt();
+    open_bus.onReceive(on_open_frame);
     motors.begin();
     motors.setBaudRate(500000);
     motors.enableFIFO();
@@ -159,7 +208,9 @@ void setup() {
 void loop() {
     static uint32_t last = micros(), last_pub = 0;
     bus.events();
+    open_bus.events();
     motors.events();
+    if (guard_ready && guard_challenge_due(&guard, now_s())) send_on(true, GUARD_CHALLENGE_ID, guard.challenge);
     uint32_t nowu = micros();
     if (nowu - last < 5000) return;              // 200 Hz control loop
     double dt = (nowu - last) * 1e-6;
@@ -209,5 +260,5 @@ void loop() {
         last_pub = nowu;
         publish(drive_speed_estimate(&GEOM, wheel_speed, gamma_now));
     }
-    digitalWrite(PIN_LED, closed_loop);
+    digitalWrite(PIN_LED, guard_ready ? closed_loop : (nowu >> 17) & 1);   // fast blink: no keys loaded
 }

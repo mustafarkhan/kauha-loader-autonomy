@@ -110,33 +110,42 @@ def page_can(pdf):
     ax.set_ylim(0, 1)
     ax.axis("off")
     ax.text(0.02, 0.975, "KAUHA 1:8 testbed - sheet 2: CAN bus and signals", fontsize=14, weight="bold", va="top")
-    ax.text(0.02, 0.95, "Machine bus: 500 kbit/s, 29-bit J1939 identifiers, hardware/can/kauha_machine.dbc. Twisted "
-            "pair, 120 ohm at both ends only. Motor bus (CAN2) is separate.", fontsize=8.5, va="top")
+    ax.text(0.02, 0.95, "Machine bus: 500 kbit/s, 29-bit J1939 identifiers, hardware/can/kauha_machine.dbc. Two "
+            "separate twisted pairs, each with 120 ohm at both ends. The gateway's segment guard is the only "
+            "connection between them. Motor bus (CAN2) is separate.", fontsize=8.5, va="top")
     y = 0.62
-    wire(ax, [(0.04, y), (0.96, y)], BLUE, None, lw=3)
-    wire(ax, [(0.04, y - 0.012), (0.96, y - 0.012)], BLUE, None, lw=3)
-    ax.text(0.04, y + 0.012, "CAN_H / CAN_L  (machine bus)", fontsize=8, color=BLUE)
-    for x in (0.04, 0.96):
-        ax.add_patch(FancyBboxPatch((x - 0.012, y - 0.03), 0.024, 0.045, boxstyle="square", fc="white", ec=BLUE))
-        ax.text(x, y - 0.045, "120R", fontsize=7, ha="center", color=BLUE)
+    open_col = "#b45309"
+    for x0, x1, col, label in ((0.03, 0.585, BLUE, "CAN_H / CAN_L  safety segment (inside the electronics tray)"),
+                               (0.615, 0.97, open_col, "CAN_H / CAN_L  open segment")):
+        wire(ax, [(x0, y), (x1, y)], col, None, lw=3)
+        wire(ax, [(x0, y - 0.012), (x1, y - 0.012)], col, None, lw=3)
+        ax.text(x0, y + 0.012, label, fontsize=8, color=col)
+        for x in (x0, x1):
+            ax.add_patch(plt.Rectangle((x - 0.006, y - 0.026), 0.012, 0.04, fc="white", ec=col, zorder=3))
+            ax.text(x, y - 0.042, "120R", fontsize=7, ha="center", color=col)
     nodes = [
-        (0.06, "Safety PLC 0x81", ["Pi 4 + CAN HAT (can0)", "CODESYS PRG_Main 25 ms", "tx SafetyStatus 40 Hz",
-                                   "rx all frames below", "GPIO: IN1..IN8, OUT1..OUT9"], RED),
-        (0.23, "Gateway 0x83", ["Teensy 4.1 CAN1", "rx DriveCmd, ImplementCmd,", "   SafetyStatus",
-                                "tx MachineState1/2", "CAN2 -> ODrives (11-bit)", "PWM -> 3 x MDD10A"], BLACK),
-        (0.40, "Sensor node 0x84", ["Teensy 4.0", "AS5600 hinge (Wire)", "AS5600 boom (Wire1)",
-                                    "FL Halls via 74HC14", "tx SafeSensors 40 Hz"], RED),
-        (0.57, "Field evaluator 0x85", ["evaluator profile only:", "Pi + 2 x LD19 lidar",
+        (0.05, "Safety PLC 0x81", ["Pi 4 + CAN HAT (can0)", "CODESYS PRG_Main 25 ms", "tx SafetyStatus 40 Hz",
+                                   "rx all frames below", "GPIO: IN1..IN8, OUT1..OUT9"], RED, BLUE, 0.05),
+        (0.21, "Sensor node 0x84", ["Teensy 4.0", "AS5600 hinge (Wire)", "AS5600 boom (Wire1)",
+                                    "FL Halls via 74HC14", "tx SafeSensors 40 Hz"], RED, BLUE, 0.05),
+        (0.37, "Field evaluator 0x85", ["evaluator profile only:", "Pi + 2 x LD19 lidar",
                                         "kauha/scale/field_eval.py", "tx ScannerStatus 40 Hz",
-                                        "(rated scanners: wired to", " PLC IN3..IN8 instead)"], GREY),
-        (0.74, "Autonomy 0x80", ["Pi 5 / Jetson, ROS 2", "kauha_ros can_bridge", "tx DriveCmd, ImplementCmd",
-                                 "rx SafetyStatus, MachineState", "USB-CAN or CAN HAT"], BLUE),
-        (0.88, "Remote 0x82 / zones 0x86", ["supervisor laptop:", "tx RemoteHeartbeat 20 Hz", "tx ZoneStatus 10 Hz",
-                                            "(console + test bench", " zone switches)"], BLUE),
+                                        "(rated scanners: wired to", " PLC IN3..IN8 instead)"], GREY, BLUE, 0.05),
+        (0.53, "Gateway 0x83 + segment guard", ["Teensy 4.1: CAN1 safety, CAN3 open", "copies safety -> open",
+                                                "open -> safety: 4 command frames,", "  only with a valid FrameAuth",
+                                                "tx MachineState1/2, AuthChallenge", "CAN2 -> ODrives, PWM -> MDD10A"],
+         BLACK, BLUE, 0.02),
+        (0.69, "Autonomy 0x80", ["Pi 5 / Jetson, ROS 2", "kauha_ros can_bridge (key_file)",
+                                 "tx DriveCmd, ImplementCmd", "  each followed by FrameAuth",
+                                 "rx SafetyStatus, MachineState"], BLUE, open_col, 0.05),
+        (0.845, "Remote 0x82 / zones 0x86", ["supervisor laptop:", "tx RemoteHeartbeat 20 Hz", "tx ZoneStatus 10 Hz",
+                                            "  each followed by FrameAuth", "(console + zone switches)"],
+         BLUE, open_col, 0.05),
     ]
-    for x, title, lines, col in nodes:
+    for x, title, lines, col, bus_col, tap in nodes:
         block(ax, x - 0.02, 0.30, 0.15, 0.24, title, lines, col)
-        wire(ax, [(x + 0.05, 0.54), (x + 0.05, y - 0.012)], BLUE, None)
+        wire(ax, [(x + tap, 0.54), (x + tap, y - 0.012)], bus_col, None)
+    wire(ax, [(0.635, 0.54), (0.635, y - 0.012)], open_col, None)       # the gateway's second port
     block(ax, 0.02, 0.70, 0.30, 0.18, "Frame timing and timeouts (PLC side)", [
         "RemoteHeartbeat 20 Hz   timeout 0.5 s  -> REMOTE_LINK",
         "DriveCmd        20 Hz   timeout 0.2 s  -> WATCHDOG",
@@ -151,6 +160,8 @@ def page_can(pdf):
         "data ID = PGN low byte (unique per message)",
         "checked in FB_E2ERx (PLC) and kauha_e2e.c (firmware)",
         "both tested bit for bit against kauha/can/e2e.py",
+        "open segment: + FrameAuth (AES-128 CMAC, 32 bit,",
+        "  24-bit freshness), checked by the segment guard",
     ], BLACK)
     block(ax, 0.70, 0.70, 0.28, 0.18, "Connectors", [
         "CAN: 4-pin M8 or JST-XH: CAN_H, CAN_L, GND, shield",

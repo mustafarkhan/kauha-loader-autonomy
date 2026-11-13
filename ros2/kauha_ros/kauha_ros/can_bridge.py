@@ -28,6 +28,7 @@ from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Header
 
+from kauha.can.auth import AuthSender, load_keys
 from kauha.can.codec import Codec
 
 STATE = ["RUN", "WARNING", "PROTECTIVE_STOP", "EMERGENCY_STOP"]
@@ -40,9 +41,14 @@ class CanBridge(Node):
         self.declare_parameter("channel", "239.74.0.1")
         self.declare_parameter("mode", 1)                 # 1 AUTO, 2 TELEOP
         self.declare_parameter("cmd_timeout", 0.1)
+        self.declare_parameter("key_file", "")            # commissioning key file; empty = single-segment bench bus
         p = self.get_parameter
         self.bus = can.Bus(interface=p("interface").value, channel=p("channel").value, receive_own_messages=False)
         self.codec = Codec()
+        # With a key, every command is followed by its FrameAuth companion so the segment guard
+        # forwards it to the safety segment (kauha/can/guard.py).
+        key_file = str(p("key_file").value)
+        self.auth = AuthSender(0x80, load_keys(key_file)[0x80]) if key_file else None
         self.rx_status = self.codec.receiver("SafetyStatus", 0.1)
         self.mode = int(p("mode").value)
         self.cmd_timeout = float(p("cmd_timeout").value)
@@ -68,6 +74,8 @@ class CanBridge(Node):
     def _send(self, name: str, sig: dict) -> None:
         fid, data = self.codec.encode(name, sig)
         self.bus.send(can.Message(arbitration_id=fid, data=data, is_extended_id=True))
+        if self.auth is not None and (signed := self.auth.sign(fid, data)) is not None:
+            self.bus.send(can.Message(arbitration_id=signed[0], data=signed[1], is_extended_id=True))
 
     def send_commands(self) -> None:
         fresh = self.drive is not None and time.monotonic() - self.drive_t <= self.cmd_timeout
@@ -89,7 +97,10 @@ class CanBridge(Node):
             except KeyError:
                 continue
             now = self.get_clock().now().to_msg()
-            if name == "MachineState1":
+            if name == "AuthChallenge":
+                if self.auth is not None:
+                    self.auth.on_challenge(bytes(m.data))
+            elif name == "MachineState1":
                 self.pub_js.publish(JointState(header=Header(stamp=now), name=["articulation", "boom"],
                                                position=[float(sig["Articulation"]), float(sig["Boom"])]))
                 o = Odometry(header=Header(stamp=now, frame_id="odom"), child_frame_id="base_link")

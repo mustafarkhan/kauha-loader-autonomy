@@ -53,6 +53,10 @@ extern "C" {
 #define KAUHA_MACHINE_SAFE_SENSORS_FRAME_ID (0x8ff5084u)
 #define KAUHA_MACHINE_SCANNER_STATUS_FRAME_ID (0x8ff5185u)
 #define KAUHA_MACHINE_ZONE_STATUS_FRAME_ID (0xcff5286u)
+#define KAUHA_MACHINE_FRAME_AUTH_AUTONOMY_FRAME_ID (0x18ff6080u)
+#define KAUHA_MACHINE_FRAME_AUTH_REMOTE_FRAME_ID (0x18ff6082u)
+#define KAUHA_MACHINE_FRAME_AUTH_ZONE_FRAME_ID (0x18ff6086u)
+#define KAUHA_MACHINE_AUTH_CHALLENGE_FRAME_ID (0x18ff6183u)
 
 /* Frame lengths in bytes. */
 #define KAUHA_MACHINE_DRIVE_CMD_LENGTH (8u)
@@ -64,6 +68,10 @@ extern "C" {
 #define KAUHA_MACHINE_SAFE_SENSORS_LENGTH (8u)
 #define KAUHA_MACHINE_SCANNER_STATUS_LENGTH (8u)
 #define KAUHA_MACHINE_ZONE_STATUS_LENGTH (8u)
+#define KAUHA_MACHINE_FRAME_AUTH_AUTONOMY_LENGTH (8u)
+#define KAUHA_MACHINE_FRAME_AUTH_REMOTE_LENGTH (8u)
+#define KAUHA_MACHINE_FRAME_AUTH_ZONE_LENGTH (8u)
+#define KAUHA_MACHINE_AUTH_CHALLENGE_LENGTH (8u)
 
 /* Extended or standard frame types. */
 #define KAUHA_MACHINE_DRIVE_CMD_IS_EXTENDED (1)
@@ -75,6 +83,10 @@ extern "C" {
 #define KAUHA_MACHINE_SAFE_SENSORS_IS_EXTENDED (1)
 #define KAUHA_MACHINE_SCANNER_STATUS_IS_EXTENDED (1)
 #define KAUHA_MACHINE_ZONE_STATUS_IS_EXTENDED (1)
+#define KAUHA_MACHINE_FRAME_AUTH_AUTONOMY_IS_EXTENDED (1)
+#define KAUHA_MACHINE_FRAME_AUTH_REMOTE_IS_EXTENDED (1)
+#define KAUHA_MACHINE_FRAME_AUTH_ZONE_IS_EXTENDED (1)
+#define KAUHA_MACHINE_AUTH_CHALLENGE_IS_EXTENDED (1)
 
 /* Frame cycle times in milliseconds. */
 
@@ -99,6 +111,10 @@ extern "C" {
 #define KAUHA_MACHINE_SAFE_SENSORS_NAME "SafeSensors"
 #define KAUHA_MACHINE_SCANNER_STATUS_NAME "ScannerStatus"
 #define KAUHA_MACHINE_ZONE_STATUS_NAME "ZoneStatus"
+#define KAUHA_MACHINE_FRAME_AUTH_AUTONOMY_NAME "FrameAuthAutonomy"
+#define KAUHA_MACHINE_FRAME_AUTH_REMOTE_NAME "FrameAuthRemote"
+#define KAUHA_MACHINE_FRAME_AUTH_ZONE_NAME "FrameAuthZone"
+#define KAUHA_MACHINE_AUTH_CHALLENGE_NAME "AuthChallenge"
 
 /* Signal Names. */
 #define KAUHA_MACHINE_DRIVE_CMD_SPEED_REQ_NAME "SpeedReq"
@@ -166,6 +182,16 @@ extern "C" {
 #define KAUHA_MACHINE_ZONE_STATUS_TRUCK_DOOR_OPEN_NAME "TruckDoorOpen"
 #define KAUHA_MACHINE_ZONE_STATUS_ALIVE_COUNTER_NAME "AliveCounter"
 #define KAUHA_MACHINE_ZONE_STATUS_CRC_NAME "Crc"
+#define KAUHA_MACHINE_FRAME_AUTH_AUTONOMY_DATA_ID_NAME "DataId"
+#define KAUHA_MACHINE_FRAME_AUTH_AUTONOMY_FRESHNESS_NAME "Freshness"
+#define KAUHA_MACHINE_FRAME_AUTH_AUTONOMY_MAC_NAME "Mac"
+#define KAUHA_MACHINE_FRAME_AUTH_REMOTE_DATA_ID_NAME "DataId"
+#define KAUHA_MACHINE_FRAME_AUTH_REMOTE_FRESHNESS_NAME "Freshness"
+#define KAUHA_MACHINE_FRAME_AUTH_REMOTE_MAC_NAME "Mac"
+#define KAUHA_MACHINE_FRAME_AUTH_ZONE_DATA_ID_NAME "DataId"
+#define KAUHA_MACHINE_FRAME_AUTH_ZONE_FRESHNESS_NAME "Freshness"
+#define KAUHA_MACHINE_FRAME_AUTH_ZONE_MAC_NAME "Mac"
+#define KAUHA_MACHINE_AUTH_CHALLENGE_CHALLENGE_NAME "Challenge"
 
 /**
  * Signals in message DriveCmd.
@@ -703,6 +729,112 @@ struct kauha_machine_zone_status_t {
      * Offset: 0
      */
     uint8_t crc;
+};
+
+/**
+ * Signals in message FrameAuthAutonomy.
+ *
+ * PGN 0xFF60 prio 6. Companion frame sent right after each DriveCmd and ImplementCmd on the open segment: data ID, freshness counter, 32-bit truncated AES-128 CMAC. The segment guard forwards a command to the safety segment only with a valid companion. See kauha/can/auth.py.
+ *
+ * All signal values are as on the CAN bus.
+ */
+struct kauha_machine_frame_auth_autonomy_t {
+    /**
+     * Range: 0..255 (0..255 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t data_id;
+
+    /**
+     * Range: 0..16777215 (0..16777215 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint32_t freshness;
+
+    /**
+     * Range: 0..4294967295 (0..4294967295 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint32_t mac;
+};
+
+/**
+ * Signals in message FrameAuthRemote.
+ *
+ * PGN 0xFF60 prio 6. Companion frame for RemoteHeartbeat.
+ *
+ * All signal values are as on the CAN bus.
+ */
+struct kauha_machine_frame_auth_remote_t {
+    /**
+     * Range: 0..255 (0..255 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t data_id;
+
+    /**
+     * Range: 0..16777215 (0..16777215 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint32_t freshness;
+
+    /**
+     * Range: 0..4294967295 (0..4294967295 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint32_t mac;
+};
+
+/**
+ * Signals in message FrameAuthZone.
+ *
+ * PGN 0xFF60 prio 6. Companion frame for ZoneStatus.
+ *
+ * All signal values are as on the CAN bus.
+ */
+struct kauha_machine_frame_auth_zone_t {
+    /**
+     * Range: 0..255 (0..255 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint8_t data_id;
+
+    /**
+     * Range: 0..16777215 (0..16777215 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint32_t freshness;
+
+    /**
+     * Range: 0..4294967295 (0..4294967295 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint32_t mac;
+};
+
+/**
+ * Signals in message AuthChallenge.
+ *
+ * PGN 0xFF61 prio 6. 1 Hz on the open segment. Random value drawn by the segment guard at power-up; senders derive the session key from it.
+ *
+ * All signal values are as on the CAN bus.
+ */
+struct kauha_machine_auth_challenge_t {
+    /**
+     * Range: 0..18446744073709551615 (0..18446744073709551615 -)
+     * Scale: 1
+     * Offset: 0
+     */
+    uint64_t challenge;
 };
 
 /**
@@ -3637,6 +3769,554 @@ bool kauha_machine_zone_status_crc_is_in_range(uint8_t value);
  * @return true if in range, false otherwise.
  */
 bool kauha_machine_zone_status_crc_is_in_phys_range(double value);
+
+/**
+ * Pack message FrameAuthAutonomy.
+ *
+ * @param[out] dst_p Buffer to pack the message into.
+ * @param[in] src_p Data to pack.
+ * @param[in] size Size of dst_p.
+ *
+ * @return Size of packed data, or negative error code.
+ */
+int kauha_machine_frame_auth_autonomy_pack(
+    uint8_t *dst_p,
+    const struct kauha_machine_frame_auth_autonomy_t *src_p,
+    size_t size);
+
+/**
+ * Unpack message FrameAuthAutonomy.
+ *
+ * @param[out] dst_p Object to unpack the message into.
+ * @param[in] src_p Message to unpack.
+ * @param[in] size Size of src_p.
+ *
+ * @return zero(0) or negative error code.
+ */
+int kauha_machine_frame_auth_autonomy_unpack(
+    struct kauha_machine_frame_auth_autonomy_t *dst_p,
+    const uint8_t *src_p,
+    size_t size);
+
+/**
+ * Init message fields to default values from FrameAuthAutonomy.
+ *
+ * @param[in] msg_p Message to init.
+ *
+ * @return zero(0) on success or (-1) in case of nullptr argument.
+ */
+int kauha_machine_frame_auth_autonomy_init(struct kauha_machine_frame_auth_autonomy_t *msg_p);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t kauha_machine_frame_auth_autonomy_data_id_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double kauha_machine_frame_auth_autonomy_data_id_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool kauha_machine_frame_auth_autonomy_data_id_is_in_range(uint8_t value);
+
+/**
+ * Check that given physical value is in allowed range before encoding.
+ *
+ * Use this BEFORE calling _encode() to avoid silent integer overflow:
+ *   encode(-1.0) on a [0,100] signal wraps to 255 and passes is_in_range().
+ *   is_in_phys_range(-1.0) correctly returns false.
+ *
+ * @param[in] value Physical signal value to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool kauha_machine_frame_auth_autonomy_data_id_is_in_phys_range(double value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint32_t kauha_machine_frame_auth_autonomy_freshness_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double kauha_machine_frame_auth_autonomy_freshness_decode(uint32_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool kauha_machine_frame_auth_autonomy_freshness_is_in_range(uint32_t value);
+
+/**
+ * Check that given physical value is in allowed range before encoding.
+ *
+ * Use this BEFORE calling _encode() to avoid silent integer overflow:
+ *   encode(-1.0) on a [0,100] signal wraps to 255 and passes is_in_range().
+ *   is_in_phys_range(-1.0) correctly returns false.
+ *
+ * @param[in] value Physical signal value to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool kauha_machine_frame_auth_autonomy_freshness_is_in_phys_range(double value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint32_t kauha_machine_frame_auth_autonomy_mac_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double kauha_machine_frame_auth_autonomy_mac_decode(uint32_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool kauha_machine_frame_auth_autonomy_mac_is_in_range(uint32_t value);
+
+/**
+ * Check that given physical value is in allowed range before encoding.
+ *
+ * Use this BEFORE calling _encode() to avoid silent integer overflow:
+ *   encode(-1.0) on a [0,100] signal wraps to 255 and passes is_in_range().
+ *   is_in_phys_range(-1.0) correctly returns false.
+ *
+ * @param[in] value Physical signal value to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool kauha_machine_frame_auth_autonomy_mac_is_in_phys_range(double value);
+
+/**
+ * Pack message FrameAuthRemote.
+ *
+ * @param[out] dst_p Buffer to pack the message into.
+ * @param[in] src_p Data to pack.
+ * @param[in] size Size of dst_p.
+ *
+ * @return Size of packed data, or negative error code.
+ */
+int kauha_machine_frame_auth_remote_pack(
+    uint8_t *dst_p,
+    const struct kauha_machine_frame_auth_remote_t *src_p,
+    size_t size);
+
+/**
+ * Unpack message FrameAuthRemote.
+ *
+ * @param[out] dst_p Object to unpack the message into.
+ * @param[in] src_p Message to unpack.
+ * @param[in] size Size of src_p.
+ *
+ * @return zero(0) or negative error code.
+ */
+int kauha_machine_frame_auth_remote_unpack(
+    struct kauha_machine_frame_auth_remote_t *dst_p,
+    const uint8_t *src_p,
+    size_t size);
+
+/**
+ * Init message fields to default values from FrameAuthRemote.
+ *
+ * @param[in] msg_p Message to init.
+ *
+ * @return zero(0) on success or (-1) in case of nullptr argument.
+ */
+int kauha_machine_frame_auth_remote_init(struct kauha_machine_frame_auth_remote_t *msg_p);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t kauha_machine_frame_auth_remote_data_id_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double kauha_machine_frame_auth_remote_data_id_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool kauha_machine_frame_auth_remote_data_id_is_in_range(uint8_t value);
+
+/**
+ * Check that given physical value is in allowed range before encoding.
+ *
+ * Use this BEFORE calling _encode() to avoid silent integer overflow:
+ *   encode(-1.0) on a [0,100] signal wraps to 255 and passes is_in_range().
+ *   is_in_phys_range(-1.0) correctly returns false.
+ *
+ * @param[in] value Physical signal value to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool kauha_machine_frame_auth_remote_data_id_is_in_phys_range(double value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint32_t kauha_machine_frame_auth_remote_freshness_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double kauha_machine_frame_auth_remote_freshness_decode(uint32_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool kauha_machine_frame_auth_remote_freshness_is_in_range(uint32_t value);
+
+/**
+ * Check that given physical value is in allowed range before encoding.
+ *
+ * Use this BEFORE calling _encode() to avoid silent integer overflow:
+ *   encode(-1.0) on a [0,100] signal wraps to 255 and passes is_in_range().
+ *   is_in_phys_range(-1.0) correctly returns false.
+ *
+ * @param[in] value Physical signal value to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool kauha_machine_frame_auth_remote_freshness_is_in_phys_range(double value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint32_t kauha_machine_frame_auth_remote_mac_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double kauha_machine_frame_auth_remote_mac_decode(uint32_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool kauha_machine_frame_auth_remote_mac_is_in_range(uint32_t value);
+
+/**
+ * Check that given physical value is in allowed range before encoding.
+ *
+ * Use this BEFORE calling _encode() to avoid silent integer overflow:
+ *   encode(-1.0) on a [0,100] signal wraps to 255 and passes is_in_range().
+ *   is_in_phys_range(-1.0) correctly returns false.
+ *
+ * @param[in] value Physical signal value to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool kauha_machine_frame_auth_remote_mac_is_in_phys_range(double value);
+
+/**
+ * Pack message FrameAuthZone.
+ *
+ * @param[out] dst_p Buffer to pack the message into.
+ * @param[in] src_p Data to pack.
+ * @param[in] size Size of dst_p.
+ *
+ * @return Size of packed data, or negative error code.
+ */
+int kauha_machine_frame_auth_zone_pack(
+    uint8_t *dst_p,
+    const struct kauha_machine_frame_auth_zone_t *src_p,
+    size_t size);
+
+/**
+ * Unpack message FrameAuthZone.
+ *
+ * @param[out] dst_p Object to unpack the message into.
+ * @param[in] src_p Message to unpack.
+ * @param[in] size Size of src_p.
+ *
+ * @return zero(0) or negative error code.
+ */
+int kauha_machine_frame_auth_zone_unpack(
+    struct kauha_machine_frame_auth_zone_t *dst_p,
+    const uint8_t *src_p,
+    size_t size);
+
+/**
+ * Init message fields to default values from FrameAuthZone.
+ *
+ * @param[in] msg_p Message to init.
+ *
+ * @return zero(0) on success or (-1) in case of nullptr argument.
+ */
+int kauha_machine_frame_auth_zone_init(struct kauha_machine_frame_auth_zone_t *msg_p);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint8_t kauha_machine_frame_auth_zone_data_id_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double kauha_machine_frame_auth_zone_data_id_decode(uint8_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool kauha_machine_frame_auth_zone_data_id_is_in_range(uint8_t value);
+
+/**
+ * Check that given physical value is in allowed range before encoding.
+ *
+ * Use this BEFORE calling _encode() to avoid silent integer overflow:
+ *   encode(-1.0) on a [0,100] signal wraps to 255 and passes is_in_range().
+ *   is_in_phys_range(-1.0) correctly returns false.
+ *
+ * @param[in] value Physical signal value to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool kauha_machine_frame_auth_zone_data_id_is_in_phys_range(double value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint32_t kauha_machine_frame_auth_zone_freshness_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double kauha_machine_frame_auth_zone_freshness_decode(uint32_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool kauha_machine_frame_auth_zone_freshness_is_in_range(uint32_t value);
+
+/**
+ * Check that given physical value is in allowed range before encoding.
+ *
+ * Use this BEFORE calling _encode() to avoid silent integer overflow:
+ *   encode(-1.0) on a [0,100] signal wraps to 255 and passes is_in_range().
+ *   is_in_phys_range(-1.0) correctly returns false.
+ *
+ * @param[in] value Physical signal value to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool kauha_machine_frame_auth_zone_freshness_is_in_phys_range(double value);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint32_t kauha_machine_frame_auth_zone_mac_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double kauha_machine_frame_auth_zone_mac_decode(uint32_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool kauha_machine_frame_auth_zone_mac_is_in_range(uint32_t value);
+
+/**
+ * Check that given physical value is in allowed range before encoding.
+ *
+ * Use this BEFORE calling _encode() to avoid silent integer overflow:
+ *   encode(-1.0) on a [0,100] signal wraps to 255 and passes is_in_range().
+ *   is_in_phys_range(-1.0) correctly returns false.
+ *
+ * @param[in] value Physical signal value to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool kauha_machine_frame_auth_zone_mac_is_in_phys_range(double value);
+
+/**
+ * Pack message AuthChallenge.
+ *
+ * @param[out] dst_p Buffer to pack the message into.
+ * @param[in] src_p Data to pack.
+ * @param[in] size Size of dst_p.
+ *
+ * @return Size of packed data, or negative error code.
+ */
+int kauha_machine_auth_challenge_pack(
+    uint8_t *dst_p,
+    const struct kauha_machine_auth_challenge_t *src_p,
+    size_t size);
+
+/**
+ * Unpack message AuthChallenge.
+ *
+ * @param[out] dst_p Object to unpack the message into.
+ * @param[in] src_p Message to unpack.
+ * @param[in] size Size of src_p.
+ *
+ * @return zero(0) or negative error code.
+ */
+int kauha_machine_auth_challenge_unpack(
+    struct kauha_machine_auth_challenge_t *dst_p,
+    const uint8_t *src_p,
+    size_t size);
+
+/**
+ * Init message fields to default values from AuthChallenge.
+ *
+ * @param[in] msg_p Message to init.
+ *
+ * @return zero(0) on success or (-1) in case of nullptr argument.
+ */
+int kauha_machine_auth_challenge_init(struct kauha_machine_auth_challenge_t *msg_p);
+
+/**
+ * Encode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to encode.
+ *
+ * @return Encoded signal.
+ */
+uint64_t kauha_machine_auth_challenge_challenge_encode(double value);
+
+/**
+ * Decode given signal by applying scaling and offset.
+ *
+ * @param[in] value Signal to decode.
+ *
+ * @return Decoded signal.
+ */
+double kauha_machine_auth_challenge_challenge_decode(uint64_t value);
+
+/**
+ * Check that given signal is in allowed range.
+ *
+ * @param[in] value Signal to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool kauha_machine_auth_challenge_challenge_is_in_range(uint64_t value);
+
+/**
+ * Check that given physical value is in allowed range before encoding.
+ *
+ * Use this BEFORE calling _encode() to avoid silent integer overflow:
+ *   encode(-1.0) on a [0,100] signal wraps to 255 and passes is_in_range().
+ *   is_in_phys_range(-1.0) correctly returns false.
+ *
+ * @param[in] value Physical signal value to check.
+ *
+ * @return true if in range, false otherwise.
+ */
+bool kauha_machine_auth_challenge_challenge_is_in_phys_range(double value);
 
 
 #ifdef __cplusplus

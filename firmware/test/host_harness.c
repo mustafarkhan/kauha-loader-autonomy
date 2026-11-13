@@ -1,11 +1,12 @@
 /* Host harness for the shared firmware code (tests/firmware/test_firmware.py).
- * Modes: crc | e2e | gw | wheels; text protocol, doubles as C99 hex floats. */
+ * Modes: crc | e2e | gw | wheels | cmac | guard; text protocol, doubles as C99 hex floats. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "drive_ctrl.h"
 #include "gateway_core.h"
+#include "guard_core.h"
 #include "kauha_e2e.h"
 
 static double rd(void) { double x; if (scanf("%la", &x) != 1) exit(0); return x; }
@@ -39,6 +40,30 @@ int main(int argc, char **argv) {
             double v = rd(), gam = rd(), gd = rd(), w[4];
             drive_wheel_speeds(&g, v, gam, gd, w);
             printf("%a %a %a %a %a\n", w[0], w[1], w[2], w[3], drive_speed_estimate(&g, w, gam));
+        }
+    } else if (!strcmp(argv[1], "cmac")) {
+        /* per line: key(16) len msg(len)  ->  tag as 16 numbers */
+        for (;;) {
+            uint8_t key[16], msg[80], tag[16]; cmac_key_t k;
+            for (int i = 0; i < 16; i++) key[i] = (uint8_t)ri();
+            long n = ri();
+            for (long i = 0; i < n; i++) msg[i] = (uint8_t)ri();
+            kauha_cmac_init(&k, key); kauha_cmac(&k, msg, (size_t)n, tag);
+            for (int i = 0; i < 16; i++) printf("%u%c", tag[i], i == 15 ? '\n' : ' ');
+        }
+    } else if (!strcmp(argv[1], "guard")) {
+        /* first line: 3 keys (16 each) and the challenge (8); then per line: t id dlc b0..b7
+         *  ->  forwarded id (or -1) and the six counters */
+        uint8_t keys[GUARD_SENDERS][16], ch[8]; guard_t g;
+        for (int k = 0; k < GUARD_SENDERS; k++) for (int i = 0; i < 16; i++) keys[k][i] = (uint8_t)ri();
+        bytes8(ch);
+        guard_init(&g, (const uint8_t (*)[16])keys, ch);
+        for (;;) {
+            double t = rd(); uint32_t id = (uint32_t)ri(); uint8_t dlc = (uint8_t)ri(), d[8], od[8]; uint32_t oid = 0;
+            bytes8(d);
+            bool f = guard_from_open(&g, t, id, d, dlc, &oid, od);
+            printf("%ld %u %u %u %u %u %u\n", f ? (long)oid : -1L, g.stats.forwarded, g.stats.dropped_not_allowed,
+                   g.stats.dropped_no_auth, g.stats.dropped_bad_mac, g.stats.dropped_stale, g.stats.intrusions);
         }
     }
     return 0;

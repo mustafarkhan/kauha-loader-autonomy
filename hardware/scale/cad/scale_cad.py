@@ -762,7 +762,7 @@ def bom_rows(parts: list[Part], masses: dict) -> list[dict]:
 
 EXTRA_BOM = [  # parts with no geometry in the model
     ("ODrive v3.6 56 V (or compatible), dual-axis motor controller", 2, "motor control, CAN to the gateway"),
-    ("Teensy 4.1 + SN65HVD230 CAN transceiver x2", 1, "drive-by-wire gateway"),
+    ("Teensy 4.1 + SN65HVD230 CAN transceiver x3", 1, "drive-by-wire gateway"),
     ("Teensy 4.0 + SN65HVD230 CAN transceiver", 1, "sensor node: PLC's own speed, articulation and boom sensors"),
     ("AS5600 magnetic angle sensor board + diametric magnet", 2, "articulation pin and boom pivot (sensor node)"),
     ("Raspberry Pi 4 (4 GB) + Waveshare RS485 CAN HAT (MCP2515)", 1, "safety PLC stand-in, CODESYS Control SL"),

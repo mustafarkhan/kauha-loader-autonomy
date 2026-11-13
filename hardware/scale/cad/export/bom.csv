@@ -42,7 +42,7 @@ ACT_lift,2,bought,-,,0.7,"Progressive Automations PA-14P-4-150 (12 V, pot feedba
 ACT_tilt,1,bought,-,,0.7,"Progressive Automations PA-14P-4-150 (12 V, pot feedback)",pin-to-pin 263.3 mm
 ACT_steer,2,bought,-,,0.7,"Progressive Automations PA-14P-6-150 (12 V, pot feedback)",pin-to-pin 378.0 mm
 "ODrive v3.6 56 V (or compatible), dual-axis motor controller",2,bought,,,,,"motor control, CAN to the gateway"
-Teensy 4.1 + SN65HVD230 CAN transceiver x2,1,bought,,,,,drive-by-wire gateway
+Teensy 4.1 + SN65HVD230 CAN transceiver x3,1,bought,,,,,drive-by-wire gateway
 Teensy 4.0 + SN65HVD230 CAN transceiver,1,bought,,,,,"sensor node: PLC's own speed, articulation and boom sensors"
 AS5600 magnetic angle sensor board + diametric magnet,2,bought,,,,,articulation pin and boom pivot (sensor node)
 Raspberry Pi 4 (4 GB) + Waveshare RS485 CAN HAT (MCP2515),1,bought,,,,,"safety PLC stand-in, CODESYS Control SL"

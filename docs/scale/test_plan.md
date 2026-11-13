@@ -23,7 +23,7 @@ pass/fail, who). A failed step stops the sequence until it is understood.
 | T0.1 | Continuity of both e-stop channels with all e-stops released; open with each pressed | every e-stop opens both channels |
 | T0.2 | K2..K5 NC contacts: motor phases short-circuited through the resistors with coils off | three phases joined, about 0.94 ohm phase-to-phase |
 | T0.3 | No connection between 36 V traction and 24 V safety circuits | > 1 Mohm |
-| T0.4 | CAN: 60 ohm between CAN_H and CAN_L with both terminators | 55-65 ohm |
+| T0.4 | CAN: 60 ohm between CAN_H and CAN_L with both terminators, on each of the two segments; no continuity between the segments | 55-65 ohm each; > 1 Mohm between them |
 
 ## T1: bench, wheels off the ground, power on
 
@@ -52,6 +52,8 @@ logic analyser or `candump -t a` plus a scope on the relay coils.
 | T2.7 | Hold K2 mechanically closed (test fixture) and command a stop | relay fault latched; restart refused until power cycle |
 | T2.8 | Stop the Pi (pull power) | KP1/KP2 drop; wheels stop |
 | T2.9 | Reset with a cause still present | refused (reset_pending false) |
+| T2.10 | Segment guard: from the open segment send (a) a SafetyStatus frame with a correct CRC, (b) a DriveCmd with no companion frame, (c) a recorded DriveCmd and companion pair again, (d) the same pair after power-cycling the gateway | none appears on the safety segment (`candump can0` on the PLC); the machine stops by WATCHDOG while only forged commands arrive |
+| T2.11 | Gateway without keys (erased EEPROM) | no command is forwarded, LED blinks fast, PLC reports WATCHDOG |
 
 ## T3: stopping distance on the floor (no people, test pieces only)
 

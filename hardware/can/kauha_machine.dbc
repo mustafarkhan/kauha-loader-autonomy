@@ -1,4 +1,4 @@
-VERSION "KAUHA machine bus 0.4"
+VERSION "KAUHA machine bus 0.5"
 
 
 NS_ :
@@ -96,6 +96,24 @@ BO_ 2365543046 ZoneStatus: 8 ZONE_SRC
  SG_ AliveCounter : 48|4@1+ (1,0) [0|15] "" SAFETY_PLC
  SG_ Crc : 56|8@1+ (1,0) [0|255] "" SAFETY_PLC
 
+BO_ 2566873216 FrameAuthAutonomy: 8 AUTONOMY
+ SG_ DataId : 0|8@1+ (1,0) [0|255] "" MACHINE_GW
+ SG_ Freshness : 8|24@1+ (1,0) [0|16777215] "" MACHINE_GW
+ SG_ Mac : 32|32@1+ (1,0) [0|4294967295] "" MACHINE_GW
+
+BO_ 2566873218 FrameAuthRemote: 8 REMOTE_GW
+ SG_ DataId : 0|8@1+ (1,0) [0|255] "" MACHINE_GW
+ SG_ Freshness : 8|24@1+ (1,0) [0|16777215] "" MACHINE_GW
+ SG_ Mac : 32|32@1+ (1,0) [0|4294967295] "" MACHINE_GW
+
+BO_ 2566873222 FrameAuthZone: 8 ZONE_SRC
+ SG_ DataId : 0|8@1+ (1,0) [0|255] "" MACHINE_GW
+ SG_ Freshness : 8|24@1+ (1,0) [0|16777215] "" MACHINE_GW
+ SG_ Mac : 32|32@1+ (1,0) [0|4294967295] "" MACHINE_GW
+
+BO_ 2566873475 AuthChallenge: 8 MACHINE_GW
+ SG_ Challenge : 0|64@1+ (1,0) [0|18446744073709551615] "" AUTONOMY,REMOTE_GW,ZONE_SRC
+
 CM_ BU_ AUTONOMY "Autonomy computer (non-safety). J1939 source address 0x80.";
 CM_ BU_ SAFETY_PLC "Safety PLC (PL d target). J1939 source address 0x81.";
 CM_ BU_ REMOTE_GW "Remote station radio gateway. J1939 source address 0x82.";
@@ -113,5 +131,9 @@ CM_ SG_ 2298421377 Cause "Bitfield: see kauha.safety.plc.Cause.";
 CM_ BO_ 2298433668 "PGN 0xFF50 prio 2. 40 Hz, receiver timeout 100 ms. Testbed only (the full machine wires these sensors to the PLC).";
 CM_ BO_ 2298433925 "PGN 0xFF51 prio 2. 40 Hz, receiver timeout 100 ms. Testbed only: the full machine and a rated testbed wire scanner outputs to the PLC.";
 CM_ BO_ 2365543046 "PGN 0xFF52 prio 3. 10 Hz, receiver timeout 500 ms. Testbed only.";
+CM_ BO_ 2566873216 "PGN 0xFF60 prio 6. Companion frame sent right after each DriveCmd and ImplementCmd on the open segment: data ID, freshness counter, 32-bit truncated AES-128 CMAC. The segment guard forwards a command to the safety segment only with a valid companion. See kauha/can/auth.py.";
+CM_ BO_ 2566873218 "PGN 0xFF60 prio 6. Companion frame for RemoteHeartbeat.";
+CM_ BO_ 2566873222 "PGN 0xFF60 prio 6. Companion frame for ZoneStatus.";
+CM_ BO_ 2566873475 "PGN 0xFF61 prio 6. 1 Hz on the open segment. Random value drawn by the segment guard at power-up; senders derive the session key from it.";
 VAL_ 2365526144 Mode 0 "IDLE" 1 "AUTO" 2 "TELEOP" ;
 VAL_ 2298421377 State 0 "RUN" 1 "WARNING" 2 "PROTECTIVE_STOP" 3 "EMERGENCY_STOP" ;

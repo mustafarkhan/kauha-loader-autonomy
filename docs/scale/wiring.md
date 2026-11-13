@@ -76,8 +76,9 @@ disable the console (`raspi-config` > Interface > Serial) before using them.
 
 | Signal | Pin |
 |---|---|
-| CAN1 TX/RX (machine bus) | 22 / 23 -> SN65HVD230 #1 |
+| CAN1 TX/RX (machine bus, safety segment: PLC, sensor node, evaluator) | 22 / 23 -> SN65HVD230 #1 |
 | CAN2 TX/RX (ODrives) | 1 / 0 -> SN65HVD230 #2 |
+| CAN3 TX/RX (machine bus, open segment: autonomy computer, remote, zones) | 31 / 30 -> SN65HVD230 #3 |
 | Lift L PWM/DIR, pot | 2 / 3, A0 |
 | Lift R PWM/DIR, pot | 4 / 5, A1 |
 | Tilt PWM/DIR, pot | 6 / 7, A2 |
@@ -102,3 +103,22 @@ retracted/extended counts in T1 and set `pot_retracted` / `pot_extended`.
 500 kbit/s, 29-bit identifiers, one twisted pair with 120 ohm at the two physical
 ends (PLC and remote/zone node). Stubs under 0.3 m. Message list and timing:
 `hardware/can/kauha_machine.dbc` and sheet 2 of the drawing.
+
+## Two bus segments
+
+The machine bus is two separate twisted pairs, each with its own two 120 ohm
+terminators:
+
+- **Safety segment** (gateway CAN1): safety PLC, sensor node, field evaluator. Keep it
+  inside the electronics tray; do not bring it to an external connector.
+- **Open segment** (gateway CAN3): autonomy computer, and the laptop that plays the
+  remote and the zone source.
+
+The gateway's segment guard copies the safety segment to the open one and forwards
+only authenticated command frames the other way (`kauha/can/guard.py`). Before first
+use, create keys and store them in the gateway:
+`python firmware/gateway/provision_keys.py <folder outside the repository>`, flash the
+generated `provision.ino` once, then the gateway firmware, and give the key file to
+the ROS bridge (`key_file` parameter). With no keys the gateway forwards nothing and
+its LED blinks fast. For first bench tests without keys, the autonomy computer can be
+plugged into the safety segment directly; that is a bench shortcut, not the design.

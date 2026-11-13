@@ -22,6 +22,7 @@ autonomy.
 | A1 | Safety controller | TTControl HY-TTC 500 family (safety variant) or ifm ecomatController safety | 1 | PL d, 2 CAN, ≥ 8 safe digital in, ≥ 4 safe outputs, 25 ms task | Runs `kauha/safety/plc.py` logic, ported to the vendor's certified toolchain (C / CODESYS Safety). |
 | A2 | Safety laser scanner, front | SICK outdoorScan3 | 2 | Outdoor certified (IEC TS 62998), 275° scan angle, 4 m protective range, field-set switching by inputs, up to 128 fields with 8 monitored at once | The 4 m protective range caps the protected speed at 3.17 m/s dry and 2.61 m/s winter; the PLC grants 0.2 m/s less (2.97 / 2.41 m/s) so the overspeed tolerance stays protected (`stopping.py`, proof SR-04b). Heated window option for winter. |
 | A3 | Safety laser scanner, rear | SICK outdoorScan3 | 2 | as A2 | Mount at the rear corners turned 45° outward, so each one also covers its side of the rear frame. Keep clear of the rear grille. |
+| A3b | Safety radar system | PL d / category 3 radar with 9 m range, for example Pilz PSEN rd1.2 F-FOV LR or Inxpect S201A-MLR, with its control unit | 6 sensors + 1 control unit | 9 m within 40°, 5 m within 100°, 20° vertical | Three per end. Watches the far part of the front and rear protective fields, which the 4 m scanners cannot reach (`kauha/safety/coverage.py`). To confirm with the manufacturer: use on a moving outdoor machine, response time, PFHd. |
 | A4 | Driveline speed sensor | Inductive, two-channel, on the transmission output | 1 | Independent speed for SR-04/SR-08 | Must not share a signal path with the OEM speed on CAN. |
 | A5 | Articulation angle sensor | Contactless angle sensor, safety rated | 1 | Field-set sector selection (SR-02) | Mount on the articulation joint pin. |
 | A6 | Safety GNSS receiver | Standard GNSS + SBAS, separate antenna | 1 | Geofence (SR-07), with dead reckoning from A4/A5 | Not RTK on purpose: independent of the autonomy GNSS. |
@@ -48,7 +49,7 @@ autonomy.
 | # | Function | Candidate | Qty | Requirement it meets | Notes / to confirm |
 |---|---|---|---|---|---|
 | C1 | Autonomy computer | NVIDIA Jetson AGX Orin, industrial carrier, −25…+70 °C | 1 | Runs `kauha/autonomy`, detector inference | Shock and vibration rating for the cab mounting. |
-| C2 | CAN interface | 2–4 channel CAN-FD USB/PCIe interface (socketcan) | 1 | Machine bus J1939 to the gateway | |
+| C2 | CAN interface | 2–4 channel CAN-FD USB/PCIe interface (socketcan) | 1 | Open segment of the machine bus, to the gateway's segment guard | Commands are authenticated (`kauha/can/auth.py`); the safety segment has no connector outside the cabinet. |
 | C3 | Data radio | Private LTE/5G router with two modems | 1 | Teleoperation video and commands; target p95 < 150 ms | Latency model in `kauha/sim/remote.py`. |
 | C4 | Ethernet switch | Managed industrial switch, M12 | 1 | Lidar, radar, cameras, compute | |
 | C5 | Event recorder storage | Industrial SSD, 1 TB | 1 | Hash-chained safety log + data logging | |

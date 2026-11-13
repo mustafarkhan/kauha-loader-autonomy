@@ -30,7 +30,7 @@ jobs:
           python - <<'PY'
           import json, sys
           m = json.load(open("results/traceability.json"))
-          need = [f"SR-{i:02d}" for i in range(1, 17)] + ["AR-01", "AR-02", "AR-03", "AR-04", "AR-05"]
+          need = [f"SR-{i:02d}" for i in range(1, 17)] + ["AR-01", "AR-02", "AR-03", "AR-04", "AR-05", "AR-06"]
           missing = [r for r in need if r not in m or not m[r]["all_passed"]]
           print("requirements covered:", len(m))
           sys.exit(f"uncovered or failing: {missing}" if missing else 0)

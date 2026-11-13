@@ -4,6 +4,8 @@
 - Gateway decisions: identical to kauha/can/gateway.py on random frame streams with
   corrupted, repeated, late and missing frames.
 - Wheel speeds: consistent with the twin's articulated kinematics.
+- AES-128 CMAC and the segment guard: bit-identical to kauha/can/auth.py and guard.py,
+  on genuine traffic mixed with forged, replayed and malformed frames.
 - Generated files are current; the Teensy sketches compile against stub headers.
 """
 from __future__ import annotations
@@ -30,7 +32,8 @@ pytestmark = pytest.mark.skipif(shutil.which("gcc") is None, reason="gcc not ins
 def exe(tmp_path_factory):
     out = tmp_path_factory.mktemp("fw") / "host"
     srcs = [FW / "test" / "host_harness.c", COMMON / "kauha_e2e.c", COMMON / "gateway_core.c",
-            COMMON / "drive_ctrl.c", COMMON / "generated" / "kauha_machine.c"]
+            COMMON / "drive_ctrl.c", COMMON / "generated" / "kauha_machine.c", COMMON / "kauha_cmac.c",
+            COMMON / "guard_core.c"]
     subprocess.run(["gcc", "-std=c99", "-O1", "-Wall", "-Werror", "-ffp-contract=off", f"-I{COMMON}",
                     *map(str, srcs), "-o", str(out), "-lm"], check=True, capture_output=True, text=True)
     return out
@@ -136,6 +139,70 @@ def test_wheel_speeds_follow_the_articulated_kinematics(exe):
         assert (rr - rl) / track == pytest.approx(yaw_f - gd, abs=1e-12)
         if gd == 0:
             assert est == pytest.approx(v, abs=1e-12)
+
+
+@pytest.mark.req("AR-06")
+def test_cmac_matches_python(exe):
+    from kauha.can.auth import cmac
+    rnd = random.Random(5)
+    cases = [(bytes(rnd.randrange(256) for _ in range(16)), bytes(rnd.randrange(256) for _ in range(n)))
+             for n in list(range(0, 50)) * 4]
+    out = run(exe, "cmac", [" ".join(map(str, k)) + f" {len(m)} " + " ".join(map(str, m)) for k, m in cases])
+    assert [bytes(map(int, ln.split())) for ln in out] == [cmac(k, m) for k, m in cases]
+
+
+@pytest.mark.req("AR-06")
+def test_segment_guard_matches_python(exe):
+    from kauha.can.auth import TEST_KEYS, AuthSender, auth_frame_id
+    from kauha.can.guard import SegmentGuard
+    rnd = random.Random(6)
+    codec = Codec()
+    challenge = bytes(range(8))
+    py = SegmentGuard(dict(TEST_KEYS), challenge)
+    senders = {sa: AuthSender(sa, k) for sa, k in TEST_KEYS.items()}
+    for sd in senders.values():
+        sd.on_challenge(challenge)
+    owner = {"DriveCmd": 0x80, "ImplementCmd": 0x80, "RemoteHeartbeat": 0x82, "ZoneStatus": 0x86}
+    recorded, stream, t = [], [], 0.0
+    for _ in range(4000):
+        t += rnd.choice((0.001, 0.005, 0.025))
+        kind = rnd.random()
+        name = rnd.choice(list(owner))
+        fid, d = codec.encode(name, {})
+        d = bytes(rnd.randrange(256) for _ in range(6)) + d[6:]
+        if kind < 0.45:                                   # genuine pair, sometimes late or with a flipped bit
+            auth = senders[owner[name]].sign(fid, d)
+            stream.append((t, fid, 8, d))
+            a = bytearray(auth[1])
+            if rnd.random() < 0.1:
+                a[rnd.randrange(8)] ^= 1 << rnd.randrange(8)
+            stream.append((t + rnd.choice((0.0005, 0.0005, 0.03)), auth[0], 8, bytes(a)))
+            recorded.append(((fid, d), auth))
+        elif kind < 0.6 and recorded:                     # replay of an earlier pair
+            (rf, rd_), ra = rnd.choice(recorded)
+            stream += [(t, rf, 8, rd_), (t + 0.0005, ra[0], 8, ra[1])]
+        elif kind < 0.75:                                 # data frame without a companion, or short
+            stream.append((t, fid, rnd.choice((8, 8, 4)), d))
+        elif kind < 0.9:                                  # safety-segment identifier or unknown sender
+            other = rnd.choice([codec.db.get_message_by_name("SafetyStatus").frame_id, auth_frame_id(0x90),
+                                rnd.getrandbits(29)])
+            stream.append((t, other, 8, bytes(rnd.randrange(256) for _ in range(8))))
+        else:                                             # random companion frame
+            stream.append((t, auth_frame_id(rnd.choice((0x80, 0x82, 0x86))), 8,
+                           bytes(rnd.randrange(256) for _ in range(8))))
+    stream.sort(key=lambda x: x[0])
+    first = " ".join(str(b) for sa in (0x80, 0x82, 0x86) for b in TEST_KEYS[sa]) + " " + " ".join(map(str, challenge))
+    lines, want = [first], []
+    for t, fid, dlc, d in stream:
+        out = py.from_open(t, fid, d[:dlc] if dlc < 8 else d)
+        st = py.stats
+        want.append(f"{out[0] if out else -1} {st.forwarded} {st.dropped_not_allowed} {st.dropped_no_auth} "
+                    f"{st.dropped_bad_mac} {st.dropped_stale} {st.intrusions}")
+        lines.append(f"{t.hex()} {fid} {dlc} " + " ".join(map(str, d)))
+    assert run(exe, "guard", lines) == want
+    st = py.stats
+    assert min(st.forwarded, st.dropped_no_auth, st.dropped_bad_mac, st.dropped_stale, st.intrusions,
+               st.dropped_not_allowed) > 20        # every branch exercised
 
 
 def test_generated_files_are_current(tmp_path):

@@ -40,6 +40,7 @@ each function, using its Annex H for wheel loaders.
 | AR-03 | Complete truck-loading V-cycles with fill factor 0.8–1.15 in the integrated twin. | `tests/scenario/test_shift_short.py` |
 | AR-04 | The autonomy limits speed so that mapped static objects (stockpiles, truck, walls, posts) stay outside the protective field the PLC will select along the path ahead, avoiding nuisance stops. | `tests/autonomy/test_autonomy.py::test_field_guard_*` |
 | AR-05 | Complete load-and-carry cycles from a stockpile to a fixed hopper about 40 m away (phase 2 task) with fill factor 0.8–1.15, without remote help in a nominal run. | `tests/scenario/test_carry_short.py`, campaign configuration `carry` |
+| AR-06 | Bus security: the safety segment accepts from the open segment (autonomy computer, remote gateway, zone source) only the four command frames, and only when authenticated (AES-128 CMAC, freshness counter, session key per power cycle). Forged, replayed and safety-segment identifiers are dropped. This is a security measure, not a safety function: the stop does not depend on it. | `tests/can/test_auth.py`, `tests/firmware/test_firmware.py` (C against Python), validation V-DAT-01 |
 
 ## What these tests do not prove
 

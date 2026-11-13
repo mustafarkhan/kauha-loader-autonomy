@@ -48,8 +48,40 @@ static inline uint8_t pack_left_shift_u16(
     return (uint8_t)((uint8_t)(value << shift) & mask);
 }
 
+static inline uint8_t pack_left_shift_u32(
+    uint32_t value,
+    uint8_t shift,
+    uint8_t mask)
+{
+    return (uint8_t)((uint8_t)(value << shift) & mask);
+}
+
+static inline uint8_t pack_left_shift_u64(
+    uint64_t value,
+    uint8_t shift,
+    uint8_t mask)
+{
+    return (uint8_t)((uint8_t)(value << shift) & mask);
+}
+
 static inline uint8_t pack_right_shift_u16(
     uint16_t value,
+    uint8_t shift,
+    uint8_t mask)
+{
+    return (uint8_t)((uint8_t)(value >> shift) & mask);
+}
+
+static inline uint8_t pack_right_shift_u32(
+    uint32_t value,
+    uint8_t shift,
+    uint8_t mask)
+{
+    return (uint8_t)((uint8_t)(value >> shift) & mask);
+}
+
+static inline uint8_t pack_right_shift_u64(
+    uint64_t value,
     uint8_t shift,
     uint8_t mask)
 {
@@ -62,6 +94,22 @@ static inline uint16_t unpack_left_shift_u16(
     uint8_t mask)
 {
     return (uint16_t)((uint16_t)(value & mask) << shift);
+}
+
+static inline uint32_t unpack_left_shift_u32(
+    uint8_t value,
+    uint8_t shift,
+    uint8_t mask)
+{
+    return (uint32_t)((uint32_t)(value & mask) << shift);
+}
+
+static inline uint64_t unpack_left_shift_u64(
+    uint8_t value,
+    uint8_t shift,
+    uint8_t mask)
+{
+    return (uint64_t)((uint64_t)(value & mask) << shift);
 }
 
 static inline uint8_t unpack_right_shift_u8(
@@ -78,6 +126,22 @@ static inline uint16_t unpack_right_shift_u16(
     uint8_t mask)
 {
     return (uint16_t)((uint16_t)(value & mask) >> shift);
+}
+
+static inline uint32_t unpack_right_shift_u32(
+    uint8_t value,
+    uint8_t shift,
+    uint8_t mask)
+{
+    return (uint32_t)((uint32_t)(value & mask) >> shift);
+}
+
+static inline uint64_t unpack_right_shift_u64(
+    uint8_t value,
+    uint8_t shift,
+    uint8_t mask)
+{
+    return (uint64_t)((uint64_t)(value & mask) >> shift);
 }
 
 static uint64_t cantools_unsigned_from_double(double value)
@@ -1952,4 +2016,430 @@ bool kauha_machine_zone_status_crc_is_in_range(uint8_t value)
 bool kauha_machine_zone_status_crc_is_in_phys_range(double value)
 {
     return ((value >= 0.0) && (value <= 255.0));
+}
+
+int kauha_machine_frame_auth_autonomy_pack(
+    uint8_t *dst_p,
+    const struct kauha_machine_frame_auth_autonomy_t *src_p,
+    size_t size)
+{
+    if (size < 8u) {
+        return (-EINVAL);
+    }
+
+    memset(&dst_p[0], 0, 8);
+
+    dst_p[0] |= pack_left_shift_u8(src_p->data_id, 0u, 0xffu);
+    dst_p[1] |= pack_left_shift_u32(src_p->freshness, 0u, 0xffu);
+    dst_p[2] |= pack_right_shift_u32(src_p->freshness, 8u, 0xffu);
+    dst_p[3] |= pack_right_shift_u32(src_p->freshness, 16u, 0xffu);
+    dst_p[4] |= pack_left_shift_u32(src_p->mac, 0u, 0xffu);
+    dst_p[5] |= pack_right_shift_u32(src_p->mac, 8u, 0xffu);
+    dst_p[6] |= pack_right_shift_u32(src_p->mac, 16u, 0xffu);
+    dst_p[7] |= pack_right_shift_u32(src_p->mac, 24u, 0xffu);
+
+    return (8);
+}
+
+int kauha_machine_frame_auth_autonomy_unpack(
+    struct kauha_machine_frame_auth_autonomy_t *dst_p,
+    const uint8_t *src_p,
+    size_t size)
+{
+    if (size < 8u) {
+        return (-EINVAL);
+    }
+
+    dst_p->data_id = unpack_right_shift_u8(src_p[0], 0u, 0xffu);
+    dst_p->freshness = unpack_right_shift_u32(src_p[1], 0u, 0xffu);
+    dst_p->freshness |= unpack_left_shift_u32(src_p[2], 8u, 0xffu);
+    dst_p->freshness |= unpack_left_shift_u32(src_p[3], 16u, 0xffu);
+    dst_p->mac = unpack_right_shift_u32(src_p[4], 0u, 0xffu);
+    dst_p->mac |= unpack_left_shift_u32(src_p[5], 8u, 0xffu);
+    dst_p->mac |= unpack_left_shift_u32(src_p[6], 16u, 0xffu);
+    dst_p->mac |= unpack_left_shift_u32(src_p[7], 24u, 0xffu);
+
+    return (0);
+}
+
+int kauha_machine_frame_auth_autonomy_init(struct kauha_machine_frame_auth_autonomy_t *msg_p)
+{
+    if (msg_p == NULL) return -1;
+
+    memset(msg_p, 0, sizeof(struct kauha_machine_frame_auth_autonomy_t));
+
+    return 0;
+}
+
+uint8_t kauha_machine_frame_auth_autonomy_data_id_encode(double value)
+{
+    return (uint8_t)(cantools_unsigned_from_double(value));
+}
+
+double kauha_machine_frame_auth_autonomy_data_id_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool kauha_machine_frame_auth_autonomy_data_id_is_in_range(uint8_t value)
+{
+    (void)value;
+
+    return (true);
+}
+
+bool kauha_machine_frame_auth_autonomy_data_id_is_in_phys_range(double value)
+{
+    return ((value >= 0.0) && (value <= 255.0));
+}
+
+uint32_t kauha_machine_frame_auth_autonomy_freshness_encode(double value)
+{
+    return (uint32_t)(cantools_unsigned_from_double(value));
+}
+
+double kauha_machine_frame_auth_autonomy_freshness_decode(uint32_t value)
+{
+    return ((double)value);
+}
+
+bool kauha_machine_frame_auth_autonomy_freshness_is_in_range(uint32_t value)
+{
+    return (value <= 16777215u);
+}
+
+bool kauha_machine_frame_auth_autonomy_freshness_is_in_phys_range(double value)
+{
+    return ((value >= 0.0) && (value <= 16777215.0));
+}
+
+uint32_t kauha_machine_frame_auth_autonomy_mac_encode(double value)
+{
+    return (uint32_t)(cantools_unsigned_from_double(value));
+}
+
+double kauha_machine_frame_auth_autonomy_mac_decode(uint32_t value)
+{
+    return ((double)value);
+}
+
+bool kauha_machine_frame_auth_autonomy_mac_is_in_range(uint32_t value)
+{
+    (void)value;
+
+    return (true);
+}
+
+bool kauha_machine_frame_auth_autonomy_mac_is_in_phys_range(double value)
+{
+    return ((value >= 0.0) && (value <= 4294967295.0));
+}
+
+int kauha_machine_frame_auth_remote_pack(
+    uint8_t *dst_p,
+    const struct kauha_machine_frame_auth_remote_t *src_p,
+    size_t size)
+{
+    if (size < 8u) {
+        return (-EINVAL);
+    }
+
+    memset(&dst_p[0], 0, 8);
+
+    dst_p[0] |= pack_left_shift_u8(src_p->data_id, 0u, 0xffu);
+    dst_p[1] |= pack_left_shift_u32(src_p->freshness, 0u, 0xffu);
+    dst_p[2] |= pack_right_shift_u32(src_p->freshness, 8u, 0xffu);
+    dst_p[3] |= pack_right_shift_u32(src_p->freshness, 16u, 0xffu);
+    dst_p[4] |= pack_left_shift_u32(src_p->mac, 0u, 0xffu);
+    dst_p[5] |= pack_right_shift_u32(src_p->mac, 8u, 0xffu);
+    dst_p[6] |= pack_right_shift_u32(src_p->mac, 16u, 0xffu);
+    dst_p[7] |= pack_right_shift_u32(src_p->mac, 24u, 0xffu);
+
+    return (8);
+}
+
+int kauha_machine_frame_auth_remote_unpack(
+    struct kauha_machine_frame_auth_remote_t *dst_p,
+    const uint8_t *src_p,
+    size_t size)
+{
+    if (size < 8u) {
+        return (-EINVAL);
+    }
+
+    dst_p->data_id = unpack_right_shift_u8(src_p[0], 0u, 0xffu);
+    dst_p->freshness = unpack_right_shift_u32(src_p[1], 0u, 0xffu);
+    dst_p->freshness |= unpack_left_shift_u32(src_p[2], 8u, 0xffu);
+    dst_p->freshness |= unpack_left_shift_u32(src_p[3], 16u, 0xffu);
+    dst_p->mac = unpack_right_shift_u32(src_p[4], 0u, 0xffu);
+    dst_p->mac |= unpack_left_shift_u32(src_p[5], 8u, 0xffu);
+    dst_p->mac |= unpack_left_shift_u32(src_p[6], 16u, 0xffu);
+    dst_p->mac |= unpack_left_shift_u32(src_p[7], 24u, 0xffu);
+
+    return (0);
+}
+
+int kauha_machine_frame_auth_remote_init(struct kauha_machine_frame_auth_remote_t *msg_p)
+{
+    if (msg_p == NULL) return -1;
+
+    memset(msg_p, 0, sizeof(struct kauha_machine_frame_auth_remote_t));
+
+    return 0;
+}
+
+uint8_t kauha_machine_frame_auth_remote_data_id_encode(double value)
+{
+    return (uint8_t)(cantools_unsigned_from_double(value));
+}
+
+double kauha_machine_frame_auth_remote_data_id_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool kauha_machine_frame_auth_remote_data_id_is_in_range(uint8_t value)
+{
+    (void)value;
+
+    return (true);
+}
+
+bool kauha_machine_frame_auth_remote_data_id_is_in_phys_range(double value)
+{
+    return ((value >= 0.0) && (value <= 255.0));
+}
+
+uint32_t kauha_machine_frame_auth_remote_freshness_encode(double value)
+{
+    return (uint32_t)(cantools_unsigned_from_double(value));
+}
+
+double kauha_machine_frame_auth_remote_freshness_decode(uint32_t value)
+{
+    return ((double)value);
+}
+
+bool kauha_machine_frame_auth_remote_freshness_is_in_range(uint32_t value)
+{
+    return (value <= 16777215u);
+}
+
+bool kauha_machine_frame_auth_remote_freshness_is_in_phys_range(double value)
+{
+    return ((value >= 0.0) && (value <= 16777215.0));
+}
+
+uint32_t kauha_machine_frame_auth_remote_mac_encode(double value)
+{
+    return (uint32_t)(cantools_unsigned_from_double(value));
+}
+
+double kauha_machine_frame_auth_remote_mac_decode(uint32_t value)
+{
+    return ((double)value);
+}
+
+bool kauha_machine_frame_auth_remote_mac_is_in_range(uint32_t value)
+{
+    (void)value;
+
+    return (true);
+}
+
+bool kauha_machine_frame_auth_remote_mac_is_in_phys_range(double value)
+{
+    return ((value >= 0.0) && (value <= 4294967295.0));
+}
+
+int kauha_machine_frame_auth_zone_pack(
+    uint8_t *dst_p,
+    const struct kauha_machine_frame_auth_zone_t *src_p,
+    size_t size)
+{
+    if (size < 8u) {
+        return (-EINVAL);
+    }
+
+    memset(&dst_p[0], 0, 8);
+
+    dst_p[0] |= pack_left_shift_u8(src_p->data_id, 0u, 0xffu);
+    dst_p[1] |= pack_left_shift_u32(src_p->freshness, 0u, 0xffu);
+    dst_p[2] |= pack_right_shift_u32(src_p->freshness, 8u, 0xffu);
+    dst_p[3] |= pack_right_shift_u32(src_p->freshness, 16u, 0xffu);
+    dst_p[4] |= pack_left_shift_u32(src_p->mac, 0u, 0xffu);
+    dst_p[5] |= pack_right_shift_u32(src_p->mac, 8u, 0xffu);
+    dst_p[6] |= pack_right_shift_u32(src_p->mac, 16u, 0xffu);
+    dst_p[7] |= pack_right_shift_u32(src_p->mac, 24u, 0xffu);
+
+    return (8);
+}
+
+int kauha_machine_frame_auth_zone_unpack(
+    struct kauha_machine_frame_auth_zone_t *dst_p,
+    const uint8_t *src_p,
+    size_t size)
+{
+    if (size < 8u) {
+        return (-EINVAL);
+    }
+
+    dst_p->data_id = unpack_right_shift_u8(src_p[0], 0u, 0xffu);
+    dst_p->freshness = unpack_right_shift_u32(src_p[1], 0u, 0xffu);
+    dst_p->freshness |= unpack_left_shift_u32(src_p[2], 8u, 0xffu);
+    dst_p->freshness |= unpack_left_shift_u32(src_p[3], 16u, 0xffu);
+    dst_p->mac = unpack_right_shift_u32(src_p[4], 0u, 0xffu);
+    dst_p->mac |= unpack_left_shift_u32(src_p[5], 8u, 0xffu);
+    dst_p->mac |= unpack_left_shift_u32(src_p[6], 16u, 0xffu);
+    dst_p->mac |= unpack_left_shift_u32(src_p[7], 24u, 0xffu);
+
+    return (0);
+}
+
+int kauha_machine_frame_auth_zone_init(struct kauha_machine_frame_auth_zone_t *msg_p)
+{
+    if (msg_p == NULL) return -1;
+
+    memset(msg_p, 0, sizeof(struct kauha_machine_frame_auth_zone_t));
+
+    return 0;
+}
+
+uint8_t kauha_machine_frame_auth_zone_data_id_encode(double value)
+{
+    return (uint8_t)(cantools_unsigned_from_double(value));
+}
+
+double kauha_machine_frame_auth_zone_data_id_decode(uint8_t value)
+{
+    return ((double)value);
+}
+
+bool kauha_machine_frame_auth_zone_data_id_is_in_range(uint8_t value)
+{
+    (void)value;
+
+    return (true);
+}
+
+bool kauha_machine_frame_auth_zone_data_id_is_in_phys_range(double value)
+{
+    return ((value >= 0.0) && (value <= 255.0));
+}
+
+uint32_t kauha_machine_frame_auth_zone_freshness_encode(double value)
+{
+    return (uint32_t)(cantools_unsigned_from_double(value));
+}
+
+double kauha_machine_frame_auth_zone_freshness_decode(uint32_t value)
+{
+    return ((double)value);
+}
+
+bool kauha_machine_frame_auth_zone_freshness_is_in_range(uint32_t value)
+{
+    return (value <= 16777215u);
+}
+
+bool kauha_machine_frame_auth_zone_freshness_is_in_phys_range(double value)
+{
+    return ((value >= 0.0) && (value <= 16777215.0));
+}
+
+uint32_t kauha_machine_frame_auth_zone_mac_encode(double value)
+{
+    return (uint32_t)(cantools_unsigned_from_double(value));
+}
+
+double kauha_machine_frame_auth_zone_mac_decode(uint32_t value)
+{
+    return ((double)value);
+}
+
+bool kauha_machine_frame_auth_zone_mac_is_in_range(uint32_t value)
+{
+    (void)value;
+
+    return (true);
+}
+
+bool kauha_machine_frame_auth_zone_mac_is_in_phys_range(double value)
+{
+    return ((value >= 0.0) && (value <= 4294967295.0));
+}
+
+int kauha_machine_auth_challenge_pack(
+    uint8_t *dst_p,
+    const struct kauha_machine_auth_challenge_t *src_p,
+    size_t size)
+{
+    if (size < 8u) {
+        return (-EINVAL);
+    }
+
+    memset(&dst_p[0], 0, 8);
+
+    dst_p[0] |= pack_left_shift_u64(src_p->challenge, 0u, 0xffu);
+    dst_p[1] |= pack_right_shift_u64(src_p->challenge, 8u, 0xffu);
+    dst_p[2] |= pack_right_shift_u64(src_p->challenge, 16u, 0xffu);
+    dst_p[3] |= pack_right_shift_u64(src_p->challenge, 24u, 0xffu);
+    dst_p[4] |= pack_right_shift_u64(src_p->challenge, 32u, 0xffu);
+    dst_p[5] |= pack_right_shift_u64(src_p->challenge, 40u, 0xffu);
+    dst_p[6] |= pack_right_shift_u64(src_p->challenge, 48u, 0xffu);
+    dst_p[7] |= pack_right_shift_u64(src_p->challenge, 56u, 0xffu);
+
+    return (8);
+}
+
+int kauha_machine_auth_challenge_unpack(
+    struct kauha_machine_auth_challenge_t *dst_p,
+    const uint8_t *src_p,
+    size_t size)
+{
+    if (size < 8u) {
+        return (-EINVAL);
+    }
+
+    dst_p->challenge = unpack_right_shift_u64(src_p[0], 0u, 0xffu);
+    dst_p->challenge |= unpack_left_shift_u64(src_p[1], 8u, 0xffu);
+    dst_p->challenge |= unpack_left_shift_u64(src_p[2], 16u, 0xffu);
+    dst_p->challenge |= unpack_left_shift_u64(src_p[3], 24u, 0xffu);
+    dst_p->challenge |= unpack_left_shift_u64(src_p[4], 32u, 0xffu);
+    dst_p->challenge |= unpack_left_shift_u64(src_p[5], 40u, 0xffu);
+    dst_p->challenge |= unpack_left_shift_u64(src_p[6], 48u, 0xffu);
+    dst_p->challenge |= unpack_left_shift_u64(src_p[7], 56u, 0xffu);
+
+    return (0);
+}
+
+int kauha_machine_auth_challenge_init(struct kauha_machine_auth_challenge_t *msg_p)
+{
+    if (msg_p == NULL) return -1;
+
+    memset(msg_p, 0, sizeof(struct kauha_machine_auth_challenge_t));
+
+    return 0;
+}
+
+uint64_t kauha_machine_auth_challenge_challenge_encode(double value)
+{
+    return (uint64_t)(cantools_unsigned_from_double(value));
+}
+
+double kauha_machine_auth_challenge_challenge_decode(uint64_t value)
+{
+    return ((double)value);
+}
+
+bool kauha_machine_auth_challenge_challenge_is_in_range(uint64_t value)
+{
+    (void)value;
+
+    return (true);
+}
+
+bool kauha_machine_auth_challenge_challenge_is_in_phys_range(double value)
+{
+    return ((value >= 0.0) && (value <= 1.8446744073709552e+19));
 }

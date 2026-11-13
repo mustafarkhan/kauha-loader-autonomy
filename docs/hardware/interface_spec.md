@@ -4,7 +4,8 @@
 
 | Network | Physical | Participants | Purpose |
 |---|---|---|---|
-| KAUHA machine bus | CAN 2.0B, 500 kbit/s, J1939 29-bit IDs | Autonomy computer (SA 0x80), safety PLC (0x81), remote radio gateway (0x82), drive-by-wire gateway (0x83) | Commands, safety status, machine state |
+| KAUHA machine bus, safety segment | CAN 2.0B, 500 kbit/s, J1939 29-bit IDs, inside the control cabinet and machine harness only | Safety PLC (SA 0x81), drive-by-wire gateway (0x83), sensor node (0x84), field evaluation (0x85) | Safety status, machine state, the PLC's sensor frames |
+| KAUHA machine bus, open segment | CAN 2.0B, 500 kbit/s, J1939 29-bit IDs | Autonomy computer (0x80), remote radio gateway (0x82), zone source (0x86), the gateway's second port | Commands with authentication frames (PGN 0xFF60), challenge (0xFF61), a copy of the safety segment's traffic. The gateway's segment guard forwards only authenticated commands to the safety segment (`kauha/can/guard.py`) |
 | OEM machine bus | CAN (J1939), machine specific | Drive-by-wire gateway, OEM ECUs | Transmission, steering, hydraulics; reached only through the gateway |
 | Sensor Ethernet | 1000BASE-T1 / M12 | Lidar, radar, cameras, autonomy computer | Perception data; non-safety |
 | Hardwired safety I/O | 24 V two-channel | Safety PLC, scanners, e-stops, relays, pilot cut-off valve | Stop functions; independent of both CAN buses |
